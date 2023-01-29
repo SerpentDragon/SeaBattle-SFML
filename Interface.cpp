@@ -97,10 +97,48 @@ void Interface::mainMenu()
         exitButton.drawButton();
 
         if (playButton.isPressed());
-        else if (referenceButton.isPressed());
+        else if (referenceButton.isPressed())
+        {
+            showReference();
+        }
         else if (recordsButton.isPressed());
         else if (exitButton.isPressed()) window->close();
 
         window->display();
+    }
+}
+
+void Interface::showReference()
+{
+    RenderWindow refWindow(VideoMode(0.5 * Width, 0.6 * Height), L"Справка", Style::Default);
+    refWindow.setPosition(Vector2i((screenWidth - 0.5 * Width) / 2, (screenHeight - 0.6 * Height) / 2));
+    Event event;
+
+    Font font;
+    font.loadFromFile("fonts/arial.ttf");
+
+    Text text(L"В начале игры вам необходимо расставить свои \nкорабли на левом поле:\n1 - четырёхпалубный\n2 - трёхпалубных\n3 - двухпалубных\n4 - однопалубных\n\
+Расстановка кораблей производится путём пере-\nтаскивания их на игровое поле. Корабли не могут \nкасаться сторонами или углами. Пермым ходит \nигрок.\nВ случае\
+попадания игроком по кораблю против-\nника, этот игрок продолжает свой ход. В ином \nслучае, ход переходит другому игроку. Игра закан-\nчивается, когда убиты все корабли одного \
+из иг-\nроков (корабль считается убитым тогда, когда у \nнего подбиты все палубы).", font, 25);
+    text.setFillColor(Color::Black);
+
+    while(refWindow.isOpen())
+    {
+        while(refWindow.pollEvent(event))
+        {
+            switch (event.type)
+            {
+                case Event::Closed:
+                    refWindow.close();
+                    break;
+            }
+        }
+
+        refWindow.clear(Color(240, 240, 240));
+
+        refWindow.draw(text);
+
+        refWindow.display();
     }
 }

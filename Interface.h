@@ -24,4 +24,6 @@ public:
     ~Interface();
 
     void mainMenu();
+
+    void showReference();
 };
