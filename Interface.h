@@ -11,7 +11,7 @@ class Interface
     RenderWindow* window;
 
 public:
-    Interface(RenderWindow*);
+    Interface(const RenderWindow*);
 
     Interface(const Interface&);
 
@@ -23,9 +23,9 @@ public:
 
     ~Interface();
 
-    void mainMenu();
+    void mainMenu() const;
 
-    void gameWindow();
+    void gameWindow() const;
 
-    void showReference();
+    void showReference() const;
 };

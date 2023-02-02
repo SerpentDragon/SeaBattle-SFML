@@ -1,8 +1,8 @@
 #include "Interface.h"
-#include <iostream>
-Interface::Interface(RenderWindow* window)
+
+Interface::Interface(const RenderWindow* window)
 {
-    this->window = window;
+    this->window = const_cast<RenderWindow*>(window);
 }
 
 Interface::Interface(const Interface& obj)
@@ -40,7 +40,7 @@ Interface::~Interface()
     window = nullptr;
 }
 
-void Interface::mainMenu()
+void Interface::mainMenu() const
 {
     Texture texture;
     texture.loadFromFile("images/landscape.jpg");
@@ -111,7 +111,7 @@ void Interface::mainMenu()
     }
 }
 
-void Interface::gameWindow()
+void Interface::gameWindow() const
 {
     Font font;
     font.loadFromFile("fonts/arial.ttf");
@@ -166,7 +166,7 @@ void Interface::gameWindow()
     window->setPosition(Vector2i((screenWidth - Width) / 2, (screenHeight - Height) / 2)); 
 }
 
-void Interface::showReference()
+void Interface::showReference() const
 {
     RenderWindow refWindow(VideoMode(0.5 * Width, 0.6 * Height), L"Справка", Style::Default);
     refWindow.setPosition(Vector2i((screenWidth - 0.5 * Width) / 2, (screenHeight - 0.6 * Height) / 2));
