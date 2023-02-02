@@ -25,5 +25,7 @@ public:
 
     void mainMenu();
 
+    void gameWindow();
+
     void showReference();
 };

@@ -1,5 +1,5 @@
 #include "Interface.h"
-
+#include <iostream>
 Interface::Interface(RenderWindow* window)
 {
     this->window = window;
@@ -71,7 +71,7 @@ void Interface::mainMenu()
     Button exitButton(window, Text(L"Выход", font, 0.0497 * Height), 0.7512 * Width, 0.6634 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
     exitButton.setTextColor(Color::Black);
 
-    Event event;
+    Event event;   
 
     while(window->isOpen())
     {
@@ -96,7 +96,10 @@ void Interface::mainMenu()
         recordsButton.drawButton();
         exitButton.drawButton();
 
-        if (playButton.isPressed());
+        if (playButton.isPressed())
+        {
+            gameWindow();
+        }
         else if (referenceButton.isPressed())
         {
             showReference();
@@ -106,6 +109,61 @@ void Interface::mainMenu()
 
         window->display();
     }
+}
+
+void Interface::gameWindow()
+{
+    Font font;
+    font.loadFromFile("fonts/arial.ttf");
+
+    int button_width = 0.1178 * screenWidth;
+    int button_height = 0.078 * screenHeight; //15706
+    int val = 180;
+
+    // Button referenceButton(window, Text(L"Справка", font, 0.0161 * screenWidth), 0.0314 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    // referenceButton.setTextColor(Color::Black);
+    Button startButton(window, Text(L"Старт", font, 0.0161 * screenWidth), 0.0418 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    startButton.setTextColor(Color::Black);
+    Button exitButton(window, Text(L"Выход", font, 0.0161 * screenWidth), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    exitButton.setTextColor(Color::Black);
+
+    Texture backgroundTexture;
+    backgroundTexture.loadFromFile("images/sea.jpg");
+
+    RectangleShape backgroundRect(Vector2f(screenWidth, screenHeight));
+    backgroundRect.setTexture(&backgroundTexture);
+
+    window->create(VideoMode(screenWidth, screenHeight), "Морской бой", Style::Fullscreen);
+
+    Event event;
+
+    while(window->isOpen())
+    {
+        while(window->pollEvent(event))
+        {
+            switch(event.type)
+            {
+                
+            }
+        }
+
+        window->clear();
+
+        window->draw(backgroundRect);
+        
+        // referenceButton.drawButton();
+        startButton.drawButton();
+        exitButton.drawButton();
+
+        // if (referenceButton.isPressed()) showReference();
+        if (startButton.isPressed());
+        else if (exitButton.isPressed()) break;
+
+        window->display();
+    }
+
+    window->create(VideoMode(Width, Height), "Морской бой", Style::Close);
+    window->setPosition(Vector2i((screenWidth - Width) / 2, (screenHeight - Height) / 2)); 
 }
 
 void Interface::showReference()
@@ -118,9 +176,9 @@ void Interface::showReference()
     font.loadFromFile("fonts/arial.ttf");
 
     Text text(L"В начале игры вам необходимо расставить свои \nкорабли на левом поле:\n1 - четырёхпалубный\n2 - трёхпалубных\n3 - двухпалубных\n4 - однопалубных\n\
-Расстановка кораблей производится путём пере-\nтаскивания их на игровое поле. Корабли не могут \nкасаться сторонами или углами. Пермым ходит \nигрок.\nВ случае\
+Расстановка кораблей производится путём пере-\nтаскивания их на игровое поле. Корабли не могут \nкасаться сторонами или углами. Пермым ходит \nигрок.\nВ случае \
 попадания игроком по кораблю против-\nника, этот игрок продолжает свой ход. В ином \nслучае, ход переходит другому игроку. Игра закан-\nчивается, когда убиты все корабли одного \
-из иг-\nроков (корабль считается убитым тогда, когда у \nнего подбиты все палубы).", font, 25);
+из иг-\nроков (корабль считается убитым тогда, когда у \nнего подбиты все палубы).", font, 0.020868 * Width);
     text.setFillColor(Color::Black);
 
     while(refWindow.isOpen())
