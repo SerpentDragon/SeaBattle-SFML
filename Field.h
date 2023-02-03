@@ -4,6 +4,8 @@
 
 using namespace sf;
 
+extern int screenWidth;
+
 class Field
 {
     RenderWindow* window;

@@ -8,6 +8,8 @@
 
 using namespace sf;
 
+extern int screenWidth;
+
 class Interface
 {
     RenderWindow* window;

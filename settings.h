@@ -2,9 +2,10 @@
 
 #include <SFML/Graphics.hpp>
 
-using namespace sf;
+extern int screenWidth;
+extern int screenHeight;
+extern int Width;
+extern int Height;
 
-static int screenWidth = VideoMode::getDesktopMode().width;
-static int screenHeight = VideoMode::getDesktopMode().height;
-static int Width = 0.624 * screenWidth;
-static int Height = 0.745 * screenHeight;
+extern sf::Font arialFont;
+extern sf::Font trebuchetFont;

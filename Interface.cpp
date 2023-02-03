@@ -48,13 +48,7 @@ void Interface::mainMenu() const
     RectangleShape screensaver(Vector2f(Height, Height));
     screensaver.setTexture(&texture);
 
-    Font font;
-    font.loadFromFile("fonts/arial.ttf");
-
-    Font titleFont;
-    titleFont.loadFromFile("fonts/trebuchetms.ttf");
-
-    Text titleText(L"Морской бой", titleFont, 0.074 * Height);
+    Text titleText(L"Морской бой", trebuchetFont, 0.074 * Height);
     titleText.setFillColor(Color::Black);
     titleText.setPosition(Height + (Width - Height - titleText.getGlobalBounds().width) / 2, 0);
 
@@ -62,13 +56,13 @@ void Interface::mainMenu() const
     int button_height = 0.077 * Height;
     int val = 150;
 
-    Button playButton(window, Text(L"Играть", font, 0.0497 * Height), 0.7512 * Width, 0.3358 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    Button playButton(window, Text(L"Играть", arialFont, 0.0497 * Height), 0.7512 * Width, 0.3358 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
     playButton.setTextColor(Color::Black);
-    Button referenceButton(window, Text(L"Справка", font, 0.0497 * Height), 0.7512 * Width, 0.445 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    Button referenceButton(window, Text(L"Справка", arialFont, 0.0497 * Height), 0.7512 * Width, 0.445 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
     referenceButton.setTextColor(Color::Black);
-    Button recordsButton(window, Text(L"Рекорды", font, 0.0497 * Height), 0.7512 * Width, 0.5542 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    Button recordsButton(window, Text(L"Рекорды", arialFont, 0.0497 * Height), 0.7512 * Width, 0.5542 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
     recordsButton.setTextColor(Color::Black);
-    Button exitButton(window, Text(L"Выход", font, 0.0497 * Height), 0.7512 * Width, 0.6634 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    Button exitButton(window, Text(L"Выход", arialFont, 0.0497 * Height), 0.7512 * Width, 0.6634 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
     exitButton.setTextColor(Color::Black);
 
     Event event;   
@@ -113,22 +107,33 @@ void Interface::mainMenu() const
 
 void Interface::timer() const
 {
-    
+    static int H, M, S;
+    Text time(std::to_string(H) + ":" + std::to_string(M) + ":" + std::to_string(S), arialFont, 0.0161 * screenWidth);
+
+    S++;
+    if (S % 60 == 0 && S)
+    {
+        M++;
+        S = 0;
+    }
+    if (M % 60 == 0 && M)
+    {
+        H++;
+        S = M = 0;
+    }
+    sleep(milliseconds(1000));
 }
 
 void Interface::gameWindow() const
 {
-    Font font;
-    font.loadFromFile("fonts/arial.ttf");
-
     int button_width = 0.1178 * screenWidth;
     int button_height = 0.078 * screenHeight;
     int font_size = 0.0161 * screenWidth;
     int val = 180;
 
-    Button startButton(window, Text(L"Старт", font, font_size), 0.0418 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    Button startButton(window, Text(L"Старт", arialFont, font_size), 0.0418 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
     startButton.setTextColor(Color::Black);
-    Button exitButton(window, Text(L"Выход", font, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    Button exitButton(window, Text(L"Выход", arialFont, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
     exitButton.setTextColor(Color::Black);
 
     int fieldSize = 0.034 * screenWidth;
@@ -190,13 +195,10 @@ void Interface::showReference() const
     refWindow.setPosition(Vector2i((screenWidth - 0.5 * Width) / 2, (screenHeight - 0.6 * Height) / 2));
     Event event;
 
-    Font font;
-    font.loadFromFile("fonts/arial.ttf");
-
     Text text(L"В начале игры вам необходимо расставить свои \nкорабли на левом поле:\n1 - четырёхпалубный\n2 - трёхпалубных\n3 - двухпалубных\n4 - однопалубных\n\
 Расстановка кораблей производится путём пере-\nтаскивания их на игровое поле. Корабли не могут \nкасаться сторонами или углами. Пермым ходит \nигрок.\nВ случае \
 попадания игроком по кораблю против-\nника, этот игрок продолжает свой ход. В ином \nслучае, ход переходит другому игроку. Игра закан-\nчивается, когда убиты все корабли одного \
-из иг-\nроков (корабль считается убитым тогда, когда у \nнего подбиты все палубы).", font, 0.020868 * Width);
+из иг-\nроков (корабль считается убитым тогда, когда у \nнего подбиты все палубы).", arialFont, 0.020868 * Width);
     text.setFillColor(Color::Black);
 
     while(refWindow.isOpen())
