@@ -97,7 +97,7 @@ Button::~Button()
     if (texture) delete texture;
 }
 
-void Button::drawButton()
+void Button::drawButton() const
 {
     window->draw(button);
     window->draw(text);

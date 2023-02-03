@@ -117,15 +117,26 @@ void Interface::gameWindow() const
     font.loadFromFile("fonts/arial.ttf");
 
     int button_width = 0.1178 * screenWidth;
-    int button_height = 0.078 * screenHeight; //15706
+    int button_height = 0.078 * screenHeight;
+    int font_size = 0.0161 * screenWidth;
     int val = 180;
 
-    // Button referenceButton(window, Text(L"Справка", font, 0.0161 * screenWidth), 0.0314 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
-    // referenceButton.setTextColor(Color::Black);
-    Button startButton(window, Text(L"Старт", font, 0.0161 * screenWidth), 0.0418 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    Button startButton(window, Text(L"Старт", font, font_size), 0.0418 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
     startButton.setTextColor(Color::Black);
-    Button exitButton(window, Text(L"Выход", font, 0.0161 * screenWidth), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    Button exitButton(window, Text(L"Выход", font, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
     exitButton.setTextColor(Color::Black);
+
+    // a=int(0.65625*play.winfo_screenwidth()//21)
+    // x1=(play.winfo_screenwidth()-21*a)//2-1.5*a
+    // y1=(play.winfo_screenheight()-10*a)//2-0.3*a
+    // d=a+6
+    // ButtonsList1[i]+=[Buttons(x1+i*d,y1+b1*d)]
+    // ButtonsList2[i]+=[Buttons2(x1+(i+11)*d,y1+b1*d)]
+
+    int fieldSize = 0.0313 * screenWidth;
+    int distBetweenFields = 0.0345 * screenWidth;
+    int xCoord = 0.125 * screenWidth;
+    int yCoord = 0.206 * screenHeight;
 
     Texture backgroundTexture;
     backgroundTexture.loadFromFile("images/sea.jpg");
@@ -150,14 +161,12 @@ void Interface::gameWindow() const
         window->clear();
 
         window->draw(backgroundRect);
-        
-        // referenceButton.drawButton();
+
         startButton.drawButton();
         exitButton.drawButton();
 
-        // if (referenceButton.isPressed()) showReference();
         if (startButton.isPressed());
-        else if (exitButton.isPressed()) break;
+        else if (exitButton.isPressed()) break;       
 
         window->display();
     }

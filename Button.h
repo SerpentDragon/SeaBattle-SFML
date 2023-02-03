@@ -40,7 +40,7 @@ public:
 
     ~Button();
 
-    void drawButton();
+    void drawButton() const;
     
     bool isPressed();
 

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <vector>
 #include "Button.h"
+#include "Field.h"
 #include "settings.h"
 
 using namespace sf;
