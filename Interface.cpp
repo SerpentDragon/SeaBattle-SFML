@@ -111,6 +111,11 @@ void Interface::mainMenu() const
     }
 }
 
+void Interface::timer() const
+{
+    
+}
+
 void Interface::gameWindow() const
 {
     Font font;
@@ -126,17 +131,19 @@ void Interface::gameWindow() const
     Button exitButton(window, Text(L"Выход", font, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
     exitButton.setTextColor(Color::Black);
 
-    // a=int(0.65625*play.winfo_screenwidth()//21)
-    // x1=(play.winfo_screenwidth()-21*a)//2-1.5*a
-    // y1=(play.winfo_screenheight()-10*a)//2-0.3*a
-    // d=a+6
-    // ButtonsList1[i]+=[Buttons(x1+i*d,y1+b1*d)]
-    // ButtonsList2[i]+=[Buttons2(x1+(i+11)*d,y1+b1*d)]
-
-    int fieldSize = 0.0313 * screenWidth;
-    int distBetweenFields = 0.0345 * screenWidth;
+    int fieldSize = 0.034 * screenWidth;
     int xCoord = 0.125 * screenWidth;
     int yCoord = 0.206 * screenHeight;
+
+    std::vector<Field> leftField;
+
+    for(size_t i = 0; i < 10; i++)
+    {
+        for(size_t j = 0; j < 10; j++)
+        {
+            leftField.emplace_back(Field(window, xCoord + i * fieldSize, yCoord + j * fieldSize, fieldSize));
+        }
+    }
 
     Texture backgroundTexture;
     backgroundTexture.loadFromFile("images/sea.jpg");
@@ -162,11 +169,13 @@ void Interface::gameWindow() const
 
         window->draw(backgroundRect);
 
+        for(int i = 0; i < 100; i++) leftField[i].drawField();
+
         startButton.drawButton();
         exitButton.drawButton();
 
         if (startButton.isPressed());
-        else if (exitButton.isPressed()) break;       
+        else if (exitButton.isPressed()) break;
 
         window->display();
     }

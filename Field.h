@@ -1,5 +1,8 @@
+#pragma once
+
 #include "settings.h"
-#include <iostream>
+
+using namespace sf;
 
 class Field
 {
@@ -10,7 +13,21 @@ class Field
     int y;
     int size;
 
-public:
-    
+    template<typename T>
+    void Swap(T&&);
 
+public:
+    Field(const RenderWindow*, const int&, const int&, const int&);
+
+    Field(const Field&);
+
+    Field(Field&&);
+
+    Field& operator=(const Field&);
+
+    Field& operator=(Field&&);
+
+    ~Field();
+
+    void drawField() const;
 };

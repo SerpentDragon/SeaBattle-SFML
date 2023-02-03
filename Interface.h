@@ -30,4 +30,6 @@ public:
     void gameWindow() const;
 
     void showReference() const;
+
+    void timer() const;
 };
