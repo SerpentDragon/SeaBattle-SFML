@@ -185,10 +185,6 @@ void Interface::gameWindow() const
     RectangleShape backgroundRect(Vector2f(screenWidth, screenHeight));
     backgroundRect.setTexture(&backgroundTexture);
 
-    window->create(VideoMode(screenWidth, screenHeight), "Морской бой", Style::Fullscreen);
-
-    Event event;
-
     int hours = 0, minutes = 0, seconds = 0;
     globalTime = Text("0:0:0", arialFont, 0.0365 * screenWidth);
     globalTime.setFillColor(Color::Red);
@@ -197,6 +193,10 @@ void Interface::gameWindow() const
     Thread th(std::bind(&timer, hours, minutes, seconds));
     
     int counter = 0;
+
+    window->create(VideoMode(screenWidth, screenHeight), "Морской бой", Style::Fullscreen);
+
+    Event event;
 
     while(window->isOpen())
     {
