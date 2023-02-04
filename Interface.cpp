@@ -1,5 +1,58 @@
 #include "Interface.h"
 
+#include <iostream>
+#include <functional>
+
+static Text globalTime;
+
+inline void Interface::drawCoordinates(const int& x, const int& y, const int& size) const
+{
+    Text coordText("", arialFont, static_cast<double>(size) / 1.5);
+    int symbol, offset = size - coordText.getGlobalBounds().width;
+
+    for(int i = 0, symbol = 1072; i < 10; i++, symbol++)
+    {
+        coordText.setString(std::to_string(i + 1));
+
+        coordText.setPosition(x + i * size + offset / 3, y - size);
+        window->draw(coordText);
+
+        coordText.setPosition(x + (i + 12) * size + offset / 3, y - size);
+        window->draw(coordText);
+
+        if (symbol == 1081)symbol++;
+
+        coordText.setString((wchar_t)symbol);
+
+        coordText.setPosition(x - size + offset / 2, y + i * size);
+        window->draw(coordText);
+
+        coordText.setPosition(x + 11 * size + offset / 2, y + i * size);
+        window->draw(coordText);
+    }
+}
+
+void timer(int& hours, int& minutes, int& seconds)
+{
+    while(true)
+    {
+        globalTime.setString(std::to_string(hours) + ":" + std::to_string(minutes) + ":" + std::to_string(seconds));
+
+        seconds++;
+        if (seconds % 60 == 0 && seconds)
+        {
+            minutes++;
+            seconds = 0;
+        }
+        if (minutes % 60 == 0 && minutes)
+        {
+            hours++;
+            seconds = minutes = 0;
+        }
+        sleep(milliseconds(1000));
+    }
+}
+
 Interface::Interface(const RenderWindow* window)
 {
     this->window = const_cast<RenderWindow*>(window);
@@ -90,38 +143,13 @@ void Interface::mainMenu() const
         recordsButton.drawButton();
         exitButton.drawButton();
 
-        if (playButton.isPressed())
-        {
-            gameWindow();
-        }
-        else if (referenceButton.isPressed())
-        {
-            showReference();
-        }
+        if (playButton.isPressed()) gameWindow();
+        else if (referenceButton.isPressed()) showReference();
         else if (recordsButton.isPressed());
         else if (exitButton.isPressed()) window->close();
 
         window->display();
     }
-}
-
-void Interface::timer() const
-{
-    static int H, M, S;
-    Text time(std::to_string(H) + ":" + std::to_string(M) + ":" + std::to_string(S), arialFont, 0.0161 * screenWidth);
-
-    S++;
-    if (S % 60 == 0 && S)
-    {
-        M++;
-        S = 0;
-    }
-    if (M % 60 == 0 && M)
-    {
-        H++;
-        S = M = 0;
-    }
-    sleep(milliseconds(1000));
 }
 
 void Interface::gameWindow() const
@@ -137,16 +165,17 @@ void Interface::gameWindow() const
     exitButton.setTextColor(Color::Black);
 
     int fieldSize = 0.034 * screenWidth;
-    int xCoord = 0.125 * screenWidth;
+    int xCoord = 0.126 * screenWidth;
     int yCoord = 0.206 * screenHeight;
 
-    std::vector<Field> leftField;
+    std::vector<Field> leftField, rightField;
 
     for(size_t i = 0; i < 10; i++)
     {
         for(size_t j = 0; j < 10; j++)
         {
             leftField.emplace_back(Field(window, xCoord + i * fieldSize, yCoord + j * fieldSize, fieldSize));
+            rightField.emplace_back(Field(window, xCoord + (i + 12) * fieldSize, yCoord + j * fieldSize, fieldSize));
         }
     }
 
@@ -159,6 +188,15 @@ void Interface::gameWindow() const
     window->create(VideoMode(screenWidth, screenHeight), "Морской бой", Style::Fullscreen);
 
     Event event;
+
+    int hours = 0, minutes = 0, seconds = 0;
+    globalTime = Text("0:0:0", arialFont, 0.0365 * screenWidth);
+    globalTime.setFillColor(Color::Red);
+    globalTime.setPosition(0.2605 * screenWidth, 0.88 * screenHeight);
+
+    Thread th(std::bind(&timer, hours, minutes, seconds));
+    
+    int counter = 0;
 
     while(window->isOpen())
     {
@@ -174,17 +212,31 @@ void Interface::gameWindow() const
 
         window->draw(backgroundRect);
 
-        for(int i = 0; i < 100; i++) leftField[i].drawField();
+        for(int i = 0; i < 100; i++) 
+        {
+            leftField[i].drawField();
+            rightField[i].drawField();
+        }
+
+        drawCoordinates(xCoord, yCoord, fieldSize);
 
         startButton.drawButton();
         exitButton.drawButton();
 
-        if (startButton.isPressed());
+        if (startButton.isPressed())
+        {
+            if (counter % 2 == 0) th.launch();
+            else th.terminate();
+            counter++;
+        }
         else if (exitButton.isPressed()) break;
+
+        window->draw(globalTime);
 
         window->display();
     }
 
+    th.terminate();
     window->create(VideoMode(Width, Height), "Морской бой", Style::Close);
     window->setPosition(Vector2i((screenWidth - Width) / 2, (screenHeight - Height) / 2)); 
 }

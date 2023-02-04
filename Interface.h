@@ -14,6 +14,8 @@ class Interface
 {
     RenderWindow* window;
 
+    inline void drawCoordinates(const int&, const int&, const int&) const;
+
 public:
     Interface(const RenderWindow*);
 
@@ -32,6 +34,4 @@ public:
     void gameWindow() const;
 
     void showReference() const;
-
-    void timer() const;
 };
