@@ -1,24 +1,24 @@
 #include "Interface.h"
 
 #include <iostream>
-#include <functional>
-#include <sstream>
 
-static Text globalTime;
+Text globalTime;
 
 inline void Interface::drawCoordinates(const int& x, const int& y, const int& size) const
 {
     Text coordText("", arialFont, static_cast<double>(size) / 1.5);
-    int symbol, offset = size - coordText.getGlobalBounds().width;
+    int symbol, offset = (size - coordText.getGlobalBounds().width) / 4;
 
     for(int i = 0, symbol = 1072; i < 10; i++, symbol++)
     {
         coordText.setString(std::to_string(i + 1));
 
-        coordText.setPosition(x + i * size + offset / 3, y - size);
+        if (i == 9) offset /= 2;
+
+        coordText.setPosition(x + i * size + offset, y - size);
         window->draw(coordText);
 
-        coordText.setPosition(x + (i + 12) * size + offset / 3, y - size);
+        coordText.setPosition(x + (i + 12) * size + offset, y - size);
         window->draw(coordText);
 
         if (symbol == 1081) symbol++;
@@ -62,11 +62,11 @@ Interface::Interface(const RenderWindow* window)
     this->window = const_cast<RenderWindow*>(window);
 
     img["landscape"] = std::pair(Texture(), RectangleShape(Vector2f(Height, Height)));
-    img["landscape"].first.loadFromFile("images/landscape.jpg");
+    img["landscape"].first.loadFromFile("images/interface/landscape.jpg");
     img["landscape"].second.setTexture(&img["landscape"].first);
 
     img["sea"] = std::pair(Texture(), RectangleShape(Vector2f(screenWidth, screenHeight)));
-    img["sea"].first.loadFromFile("images/sea.jpg");
+    img["sea"].first.loadFromFile("images/interface/sea.jpg");
     img["sea"].second.setTexture(&img["sea"].first);
 }
 
@@ -168,7 +168,7 @@ void Interface::gameWindow() const
     Button exitButton(window, Text(L"Выход", arialFont, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, buttonColor, buttonColorOn);
     exitButton.setTextColor(Color::Black);
 
-    int xCoord = 0.126 * screenWidth, yCoord = 0.206 * screenHeight;
+    int xCoord = 0.23 * screenWidth, yCoord = 0.206 * screenHeight;
     int fieldSize = 0.034 * screenWidth;
 
     std::vector<Field> leftField, rightField;
@@ -193,6 +193,9 @@ void Interface::gameWindow() const
 
     Event event;
 
+    std::vector<Ship> ships;
+    for(int i = 0; i < 4; i++) ships.emplace_back(Ship(window, i + 1, 0.0261 * screenWidth, 0.3255 * screenHeight + i * fieldSize * 1.1));    
+
     while(window->isOpen())
     {
         while(window->pollEvent(event))
@@ -214,6 +217,8 @@ void Interface::gameWindow() const
         }
 
         drawCoordinates(xCoord, yCoord, fieldSize);
+
+        for(int i = 0; i < 4; i++) ships[i].drawShip();
 
         if (startButton.isPressed())
         {

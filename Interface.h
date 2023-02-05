@@ -1,10 +1,13 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <functional>
+#include <sstream>
 #include <vector>
 #include <map>
 #include "Button.h"
 #include "Field.h"
+#include "Ship.h"
 #include "settings.h"
 
 using namespace sf;
