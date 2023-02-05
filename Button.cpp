@@ -9,6 +9,7 @@ void Button::Swap(T&& obj) noexcept
     height = obj.height;
     xPos = obj.xPos;
     yPos = obj.yPos;
+    pressedCounter = obj.pressedCounter;
     color = obj.color;
     colorOn = obj.colorOn;
     text = obj.text;
@@ -27,6 +28,7 @@ Button::Button(RenderWindow *window, const Text& txt, const int& x, const int& y
     yPos = y;
     width = b_width;
     height = b_height;
+    pressedCounter = 0;
     this->color = color;
     this->colorOn = colorOn;
     text = txt;
@@ -46,6 +48,7 @@ Button::Button(RenderWindow *window, const int& x, const int& y, const int& b_wi
     yPos = y;
     width = b_width;
     height = b_height;
+    pressedCounter = 0;
     color = colorOn = Color(0, 0, 0, 255);
     text = Text();
     this->texture = texture ? new Texture(*texture) : new Texture();
@@ -65,7 +68,7 @@ Button::Button(Button&& obj) noexcept
     Swap(obj);
 
     obj.window = nullptr;
-    obj.width = obj.height = obj.xPos = obj.yPos = 0;
+    obj.width = obj.height = obj.xPos = obj.yPos = obj.pressedCounter = 0;
     obj.texture = nullptr;
 }
 
@@ -85,7 +88,7 @@ Button& Button::operator=(Button&& obj) noexcept
         Swap(obj);
 
         obj.window = nullptr;
-        obj.width = obj.height = obj.xPos = obj.yPos = 0;
+        obj.width = obj.height = obj.xPos = obj.yPos = obj.pressedCounter = 0;
         obj.texture = nullptr;
     }
     return *this;
@@ -97,16 +100,13 @@ Button::~Button()
     if (texture) delete texture;
 }
 
-void Button::drawButton() const
-{
-    window->draw(button);
-    window->draw(text);
-}
-
 bool Button::isPressed()
 {
     int x = Mouse::getPosition(*window).x;
     int y = Mouse::getPosition(*window).y;
+
+    window->draw(button);
+    window->draw(text);
 
     if (OnButton(x, y))
     {
@@ -117,7 +117,7 @@ bool Button::isPressed()
             {
                 if (!Mouse::isButtonPressed(Mouse::Left)) break;
             }
-            if (OnButton(Mouse::getPosition(*window).x, Mouse::getPosition(*window).y)) return true;
+            if (OnButton(Mouse::getPosition(*window).x, Mouse::getPosition(*window).y)) return ++pressedCounter;
         }
     }
     else if (!texture) button.setFillColor(color);
@@ -135,3 +135,5 @@ void Button::setButtonColor(const Color& color)
     this->color = color;
     button.setFillColor(color);
 }
+
+int Button::getPressedCounter() const { return pressedCounter; }

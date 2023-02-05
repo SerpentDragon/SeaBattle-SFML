@@ -12,6 +12,9 @@ int Height = 0.745 * screenHeight;
 Font arialFont;
 Font trebuchetFont;
 
+Color buttonColor(180, 180, 180);
+Color buttonColorOn(0, 191, 255);
+
 void initFonts()
 {
     arialFont.loadFromFile("fonts/arial.ttf");

@@ -14,6 +14,8 @@ class Button
     int height;  
     int xPos;
     int yPos;
+
+    int pressedCounter;
     
     Color color; // button color
     Color colorOn; // button color when the cursore is over it
@@ -39,12 +41,12 @@ public:
     Button& operator=(Button&& obj) noexcept;
 
     ~Button();
-
-    void drawButton() const;
     
     bool isPressed();
 
     void setTextColor(const Color& color);
 
     void setButtonColor(const Color& color);
+
+    int getPressedCounter() const;
 };

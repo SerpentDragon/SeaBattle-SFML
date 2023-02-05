@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <functional>
+#include <sstream>
 
 static Text globalTime;
 
@@ -20,9 +21,9 @@ inline void Interface::drawCoordinates(const int& x, const int& y, const int& si
         coordText.setPosition(x + (i + 12) * size + offset / 3, y - size);
         window->draw(coordText);
 
-        if (symbol == 1081)symbol++;
+        if (symbol == 1081) symbol++;
 
-        coordText.setString((wchar_t)symbol);
+        coordText.setString(static_cast<wchar_t>(symbol));
 
         coordText.setPosition(x - size + offset / 2, y + i * size);
         window->draw(coordText);
@@ -34,9 +35,12 @@ inline void Interface::drawCoordinates(const int& x, const int& y, const int& si
 
 void timer(int& hours, int& minutes, int& seconds)
 {
+    std::stringstream time;
     while(true)
     {
-        globalTime.setString(std::to_string(hours) + ":" + std::to_string(minutes) + ":" + std::to_string(seconds));
+        time << hours << ":" << minutes << ":" << seconds;
+        globalTime.setString(time.str());
+        time.str(""); 
 
         seconds++;
         if (seconds % 60 == 0 && seconds)
@@ -56,14 +60,23 @@ void timer(int& hours, int& minutes, int& seconds)
 Interface::Interface(const RenderWindow* window)
 {
     this->window = const_cast<RenderWindow*>(window);
+
+    img["landscape"] = std::pair(Texture(), RectangleShape(Vector2f(Height, Height)));
+    img["landscape"].first.loadFromFile("images/landscape.jpg");
+    img["landscape"].second.setTexture(&img["landscape"].first);
+
+    img["sea"] = std::pair(Texture(), RectangleShape(Vector2f(screenWidth, screenHeight)));
+    img["sea"].first.loadFromFile("images/sea.jpg");
+    img["sea"].second.setTexture(&img["sea"].first);
 }
 
 Interface::Interface(const Interface& obj)
 {
     window = obj.window;
+    img = obj.img;
 }
 
-Interface::Interface(Interface&& obj) : window(obj.window)
+Interface::Interface(Interface&& obj) noexcept : window(obj.window), img(obj.img)
 {
     obj.window = nullptr;
 }
@@ -73,15 +86,17 @@ Interface& Interface::operator=(const Interface& obj)
     if (this != &obj)
     {
         window = obj.window;
+        img = obj.img;
     }
     return *this;
 }
 
-Interface& Interface::operator=(Interface&& obj)
+Interface& Interface::operator=(Interface&& obj) noexcept
 {
     if (this != &obj)
     {
         window = obj.window;
+        img = obj.img;
 
         obj.window = nullptr;
     }
@@ -95,28 +110,24 @@ Interface::~Interface()
 
 void Interface::mainMenu() const
 {
-    Texture texture;
-    texture.loadFromFile("images/landscape.jpg");
-
-    RectangleShape screensaver(Vector2f(Height, Height));
-    screensaver.setTexture(&texture);
-
     Text titleText(L"Морской бой", trebuchetFont, 0.074 * Height);
     titleText.setFillColor(Color::Black);
-    titleText.setPosition(Height + (Width - Height - titleText.getGlobalBounds().width) / 2, 0);
+    titleText.setPosition(0.5 * Height + (Width - titleText.getGlobalBounds().width) / 2, 0);
 
     int button_width = 0.168 * Width;
     int button_height = 0.077 * Height;
-    int val = 150;
+    int font_size = 0.0497 * Height;
+    int button_xPos = 0.7512 * Width;
 
-    Button playButton(window, Text(L"Играть", arialFont, 0.0497 * Height), 0.7512 * Width, 0.3358 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
-    playButton.setTextColor(Color::Black);
-    Button referenceButton(window, Text(L"Справка", arialFont, 0.0497 * Height), 0.7512 * Width, 0.445 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
-    referenceButton.setTextColor(Color::Black);
-    Button recordsButton(window, Text(L"Рекорды", arialFont, 0.0497 * Height), 0.7512 * Width, 0.5542 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
-    recordsButton.setTextColor(Color::Black);
-    Button exitButton(window, Text(L"Выход", arialFont, 0.0497 * Height), 0.7512 * Width, 0.6634 * Height, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
-    exitButton.setTextColor(Color::Black);
+    Text button_text(L"", arialFont, font_size);
+    const std::wstring writing[] = {L"Играть", L"Справка", L"Рекорды", L"Выход"};
+    std::vector<Button> buttons;
+    for(size_t i = 0; i < 4; i++) 
+    {
+        button_text.setString(writing[i]);
+        buttons.emplace_back(Button(window, button_text, button_xPos, (0.3358 + i * 0.1092) * Height, button_width, button_height, buttonColor, buttonColorOn));
+        buttons[i].setTextColor(Color::Black);
+    }
 
     Event event;   
 
@@ -134,19 +145,14 @@ void Interface::mainMenu() const
 
         window->clear(Color(240, 240, 240));
 
-        window->draw(screensaver);
+        window->draw(img["landscape"].second);
 
         window->draw(titleText);
 
-        playButton.drawButton();
-        referenceButton.drawButton();
-        recordsButton.drawButton();
-        exitButton.drawButton();
-
-        if (playButton.isPressed()) gameWindow();
-        else if (referenceButton.isPressed()) showReference();
-        else if (recordsButton.isPressed());
-        else if (exitButton.isPressed()) window->close();
+        if (buttons[0].isPressed()) gameWindow();           // Play button
+        else if (buttons[1].isPressed()) showReference();   // Reference button
+        else if (buttons[2].isPressed());                   // Records button
+        else if (buttons[3].isPressed()) window->close();   // Exit button
 
         window->display();
     }
@@ -154,19 +160,16 @@ void Interface::mainMenu() const
 
 void Interface::gameWindow() const
 {
-    int button_width = 0.1178 * screenWidth;
-    int button_height = 0.078 * screenHeight;
+    int button_width = 0.1178 * screenWidth, button_height = 0.078 * screenHeight;
     int font_size = 0.0161 * screenWidth;
-    int val = 180;
 
-    Button startButton(window, Text(L"Старт", arialFont, font_size), 0.0418 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    Button startButton(window, Text(L"Старт", arialFont, font_size), 0.0418 * screenWidth, 0.88 * screenHeight, button_width, button_height, buttonColor, buttonColorOn);
     startButton.setTextColor(Color::Black);
-    Button exitButton(window, Text(L"Выход", arialFont, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, Color(val, val, val), Color(0, 191, 255));
+    Button exitButton(window, Text(L"Выход", arialFont, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, buttonColor, buttonColorOn);
     exitButton.setTextColor(Color::Black);
 
+    int xCoord = 0.126 * screenWidth, yCoord = 0.206 * screenHeight;
     int fieldSize = 0.034 * screenWidth;
-    int xCoord = 0.126 * screenWidth;
-    int yCoord = 0.206 * screenHeight;
 
     std::vector<Field> leftField, rightField;
 
@@ -179,20 +182,12 @@ void Interface::gameWindow() const
         }
     }
 
-    Texture backgroundTexture;
-    backgroundTexture.loadFromFile("images/sea.jpg");
-
-    RectangleShape backgroundRect(Vector2f(screenWidth, screenHeight));
-    backgroundRect.setTexture(&backgroundTexture);
-
     int hours = 0, minutes = 0, seconds = 0;
     globalTime = Text("0:0:0", arialFont, 0.0365 * screenWidth);
     globalTime.setFillColor(Color::Red);
     globalTime.setPosition(0.2605 * screenWidth, 0.88 * screenHeight);
 
     Thread th(std::bind(&timer, hours, minutes, seconds));
-    
-    int counter = 0;
 
     window->create(VideoMode(screenWidth, screenHeight), "Морской бой", Style::Fullscreen);
 
@@ -210,7 +205,7 @@ void Interface::gameWindow() const
 
         window->clear();
 
-        window->draw(backgroundRect);
+        window->draw(img["sea"].second);
 
         for(int i = 0; i < 100; i++) 
         {
@@ -220,14 +215,10 @@ void Interface::gameWindow() const
 
         drawCoordinates(xCoord, yCoord, fieldSize);
 
-        startButton.drawButton();
-        exitButton.drawButton();
-
         if (startButton.isPressed())
         {
-            if (counter % 2 == 0) th.launch();
+            if (startButton.getPressedCounter() % 2) th.launch();
             else th.terminate();
-            counter++;
         }
         else if (exitButton.isPressed()) break;
 

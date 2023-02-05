@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <map>
 #include "Button.h"
 #include "Field.h"
 #include "settings.h"
@@ -14,6 +15,8 @@ class Interface
 {
     RenderWindow* window;
 
+    mutable std::map<std::string, std::pair<Texture, RectangleShape>> img;
+
     inline void drawCoordinates(const int&, const int&, const int&) const;
 
 public:
@@ -21,11 +24,11 @@ public:
 
     Interface(const Interface&);
 
-    Interface(Interface&&);
+    Interface(Interface&&) noexcept;
 
     Interface& operator=(const Interface&);
 
-    Interface& operator=(Interface&&);
+    Interface& operator=(Interface&&) noexcept;
 
     ~Interface();
 

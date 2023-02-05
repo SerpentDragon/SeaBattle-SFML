@@ -9,3 +9,6 @@ extern int Height;
 
 extern sf::Font arialFont;
 extern sf::Font trebuchetFont;
+
+extern sf::Color buttonColor;
+extern sf::Color buttonColorOn;
