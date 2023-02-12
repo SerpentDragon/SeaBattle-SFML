@@ -8,9 +8,13 @@ void Ship::Swap(T&& obj) noexcept
     deckNumber = obj.deckNumber;
     x = obj.x;
     y = obj.y;
+    width = obj.width;
+    height = obj.height;
     shipTexture = obj.shipTexture;
     shipRect = obj.shipRect;
-    shipRect.setTexture(&shipTexture);
+    shipRect.setTexture(shipTexture);
+    XPos = obj.XPos;
+    YPos = obj.YPos;
 }
 
 Ship::Ship(const RenderWindow* window, const int& deck, const int& xPos, const int& yPos)
@@ -18,13 +22,17 @@ Ship::Ship(const RenderWindow* window, const int& deck, const int& xPos, const i
     this->window = const_cast<RenderWindow*>(window);
 
     deckNumber = deck;
-    x = xPos;
-    y = yPos;
+    x = XPos = xPos;
+    y = YPos = yPos;
+    width = deck * 0.034 * screenWidth;
+    height = 0.034 * screenWidth;
 
     shipTexture.loadFromFile("images/ships/" + std::to_string(deck) + "deck.png");
-    shipRect.setSize(Vector2f(static_cast<int>(deck * 0.034 * screenWidth), static_cast<int>(0.034 * screenWidth)));
-    shipRect.setTexture(&shipTexture);
-    shipRect.setPosition(x, y);
+
+    shipRect.setTexture(shipTexture);
+    shipRect.setScale(static_cast<double>(width) / shipTexture.getSize().x, static_cast<double>(height) / shipTexture.getSize().y);
+    shipRect.setOrigin(shipRect.getLocalBounds().width / 2, shipRect.getLocalBounds().height / 2);
+    shipRect.setPosition(x + width / 2, y + height / 2);
 }
 
 Ship::Ship(const Ship& obj)
@@ -32,12 +40,12 @@ Ship::Ship(const Ship& obj)
     Swap(obj);
 }
 
-Ship::Ship(Ship&& obj) noexcept
+Ship::Ship(Ship&& obj) noexcept 
 {
     Swap(obj);    
 
     obj.window = nullptr;
-    obj.deckNumber = obj.x = obj.y = 0;
+    obj.deckNumber = obj.x = obj.y = obj.width = obj.height = obj.XPos = obj.YPos = 0;
 }
 
 Ship& Ship::operator=(const Ship& obj)
@@ -56,7 +64,7 @@ Ship& Ship::operator=(Ship&& obj) noexcept
         Swap(obj);
 
         obj.window = nullptr;
-        obj.deckNumber = obj.x = obj.y = 0;
+        obj.deckNumber = obj.x = obj.y = obj.width = obj.height = obj.XPos = obj.YPos = 0;
     }
     return *this;
 }
@@ -66,40 +74,33 @@ Ship::~Ship()
     window = nullptr;
 }
 
-bool Ship::dragAndDrop()
+bool Ship::onShip(const int& xPos, const int& yPos) const
+{
+    return shipRect.getGlobalBounds().contains(xPos, yPos);
+}
+
+void Ship::drawShip() const
 {
     window->draw(shipRect);
+}
 
-    static int prevX = 0; //Mouse::getPosition(*window).x;
-    static int prevY = 0; //Mouse::getPosition(*window).y;
+void Ship::setPos(const int& x, const int& y) 
+{
+    XPos = x; YPos = y;
+    shipRect.setPosition(x + width / 2, y + height / 2);
+}
 
-    int currX = Mouse::getPosition(*window).x;
-    int currY = Mouse::getPosition(*window).y;
+const Vector2f Ship::getPos() const { return Vector2f(XPos, YPos); }
 
-    // std::cout << prevX << " " << prevY << std::endl;
-    // std::cout << shipRect.getPosition().x << " " << shipRect.getPosition().x + shipRect.getGlobalBounds().width << std::endl;
-    // std::cout << shipRect.getPosition().y << " " << shipRect.getPosition().y + shipRect.getGlobalBounds().height << std::endl;
-    // std::cout << (shipRect.getPosition().x <= prevX <= shipRect.getPosition().x + shipRect.getGlobalBounds().width) << " " << (shipRect.getPosition().y <= prevY <= shipRect.getPosition().y + shipRect.getGlobalBounds().height)<<std::endl;
-    // std::cout << (shipRect.getPosition().y <= prevY <= (shipRect.getPosition().y + shipRect.getGlobalBounds().height)) << std::endl;
-    // std::cout << prevX << " " << prevY << std::endl;
+void Ship::rotateShip(const int& x, const int& y)
+{
+    int dx = x - XPos;
+    int dy = y - YPos;
 
+    std::swap(width, height);
 
-    if (shipRect.getPosition().x <= currX  && currX <= shipRect.getPosition().x + shipRect.getGlobalBounds().width && 
-        shipRect.getPosition().y <= currY  && currY <= shipRect.getPosition().y + shipRect.getGlobalBounds().height)
-    {
-        // std::cout << "Yes\n";
-        // prevX = currX; prevY = currY;
-        // return true;
-        if (Mouse::isButtonPressed(Mouse::Left))
-        {
-            
-            if (prevX != currX || prevY != currY)
-            {
-                // shipRect.setPosition(prevX - shipRect.getPosition().x + currX, prevY - shipRect.getPosition().y + currY);
-                shipRect.setPosition(currX, currY);
-                prevX = currX; prevY = currY;
-            }
-        }
-    }
-    return false;
+    XPos = x - width + dy; YPos = y - dx;
+
+    shipRect.rotate(90);
+    shipRect.setPosition(x - width / 2 + dy, y + height / 2 - dx);
 }

@@ -12,9 +12,13 @@ class Ship
     int deckNumber;
     int x;
     int y;
+    int width;
+    int height;
 
     Texture shipTexture;
-    RectangleShape shipRect;
+    Sprite shipRect;
+    int XPos;
+    int YPos;
 
     template <typename T>
     void Swap(T&&) noexcept;
@@ -32,5 +36,13 @@ public:
 
     ~Ship();
 
-    bool dragAndDrop();
+    bool onShip(const int& x, const int& y) const;
+
+    void drawShip() const;
+
+    void setPos(const int&, const int&);
+
+    const Vector2f getPos() const;
+
+    void rotateShip(const int&, const int&);
 };

@@ -1,6 +1,7 @@
 #include "Interface.h"
 
 #include <iostream>
+#include <thread>
 
 Text globalTime;
 
@@ -182,19 +183,21 @@ void Interface::gameWindow() const
         }
     }
 
-    int hours = 0, minutes = 0, seconds = 0;
     globalTime = Text("0:0:0", arialFont, 0.0365 * screenWidth);
     globalTime.setFillColor(Color::Red);
     globalTime.setPosition(0.2605 * screenWidth, 0.88 * screenHeight);
 
-    Thread th(std::bind(&timer, hours, minutes, seconds));
+    Thread th(std::bind(&timer, 0, 0, 0));
 
     window->create(VideoMode(screenWidth, screenHeight), "Морской бой", Style::Fullscreen);
 
     Event event;
 
     std::vector<Ship> ships;
-    for(int i = 0; i < 4; i++) ships.emplace_back(Ship(window, i + 1, 0.0261 * screenWidth, 0.3255 * screenHeight + i * fieldSize * 1.1));    
+    for(size_t i = 0; i < 4; i++) ships.emplace_back(Ship(window, i + 1, 0.0261 * screenWidth, 0.3255 * screenHeight + i * fieldSize * 1.1));
+
+    int flag = -1;
+    int dx, dy;
 
     while(window->isOpen())
     {
@@ -202,7 +205,56 @@ void Interface::gameWindow() const
         {
             switch(event.type)
             {
-                
+                case Event::MouseButtonPressed:
+                    if (event.mouseButton.button == Mouse::Left)
+                    {
+                        int x = Mouse::getPosition(*window).x;
+                        int y = Mouse::getPosition(*window).y;
+                        for(size_t i = 0; i < 4; i++)
+                        {
+                            if (ships[i].onShip(x, y))
+                            {
+                                flag = i;
+                                Vector2f coord = ships[i].getPos();
+                                dx = x - coord.x;
+                                dy = y - coord.y;
+                                break;
+                            }
+                        }
+                    }
+                    else if (event.mouseButton.button == Mouse::Right)
+                    {
+                        int x = Mouse::getPosition(*window).x;
+                        int y = Mouse::getPosition(*window).y;
+                        for(size_t i = 0; i < 4; i++)
+                        {
+                            if (ships[i].onShip(x, y))
+                            {
+                                ships[i].rotateShip(x, y);
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                case Event::MouseMoved:
+                    if (Mouse::isButtonPressed(Mouse::Left) && flag != -1)
+                    {
+                        int x = Mouse::getPosition(*window).x;
+                        int y = Mouse::getPosition(*window).y;
+                        ships[flag].setPos(x - dx, y - dy);
+                    }
+                    break;
+                case Event::MouseButtonReleased:
+                    if (event.mouseButton.button == Mouse::Left) 
+                    {
+                        flag = -1;
+                        dx = dy = 0;
+                    }
+                    break;
+                case Event::KeyPressed:
+                    if (event.key.code == Keyboard::Escape)
+                        window->close();
+                    break;
             }
         }
 
@@ -218,10 +270,9 @@ void Interface::gameWindow() const
 
         drawCoordinates(xCoord, yCoord, fieldSize);
 
-        for(int i = 0; i < 4; i++) 
+        for(size_t i = 0; i < 4; i++) 
         {
-            
-            if (ships[i].dragAndDrop()); // std::cout << i << " ";
+            ships[i].drawShip();
         }
 
         if (startButton.isPressed())
