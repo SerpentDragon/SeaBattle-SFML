@@ -218,7 +218,11 @@ void Interface::gameWindow() const
 
         drawCoordinates(xCoord, yCoord, fieldSize);
 
-        for(int i = 0; i < 4; i++) ships[i].drawShip();
+        for(int i = 0; i < 4; i++) 
+        {
+            
+            if (ships[i].dragAndDrop()); // std::cout << i << " ";
+        }
 
         if (startButton.isPressed())
         {

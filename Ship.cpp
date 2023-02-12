@@ -1,13 +1,5 @@
 #include "Ship.h"
-
-// RenderWindow* window;
-
-// int deckNumber;
-// int x;
-// int y;
-
-// Texture shipTexture;
-// RectangleShape shipRect;
+#include <iostream>
 
 template <typename T>
 void Ship::Swap(T&& obj) noexcept
@@ -29,8 +21,8 @@ Ship::Ship(const RenderWindow* window, const int& deck, const int& xPos, const i
     x = xPos;
     y = yPos;
 
-    shipTexture.loadFromFile("images/ships/" + std::to_string(deck) + "deck.jpg");
-    shipRect.setSize(Vector2f(deck * 0.034 * screenWidth, 0.034 * screenWidth));
+    shipTexture.loadFromFile("images/ships/" + std::to_string(deck) + "deck.png");
+    shipRect.setSize(Vector2f(static_cast<int>(deck * 0.034 * screenWidth), static_cast<int>(0.034 * screenWidth)));
     shipRect.setTexture(&shipTexture);
     shipRect.setPosition(x, y);
 }
@@ -74,7 +66,40 @@ Ship::~Ship()
     window = nullptr;
 }
 
-void Ship::drawShip() const
+bool Ship::dragAndDrop()
 {
     window->draw(shipRect);
+
+    static int prevX = 0; //Mouse::getPosition(*window).x;
+    static int prevY = 0; //Mouse::getPosition(*window).y;
+
+    int currX = Mouse::getPosition(*window).x;
+    int currY = Mouse::getPosition(*window).y;
+
+    // std::cout << prevX << " " << prevY << std::endl;
+    // std::cout << shipRect.getPosition().x << " " << shipRect.getPosition().x + shipRect.getGlobalBounds().width << std::endl;
+    // std::cout << shipRect.getPosition().y << " " << shipRect.getPosition().y + shipRect.getGlobalBounds().height << std::endl;
+    // std::cout << (shipRect.getPosition().x <= prevX <= shipRect.getPosition().x + shipRect.getGlobalBounds().width) << " " << (shipRect.getPosition().y <= prevY <= shipRect.getPosition().y + shipRect.getGlobalBounds().height)<<std::endl;
+    // std::cout << (shipRect.getPosition().y <= prevY <= (shipRect.getPosition().y + shipRect.getGlobalBounds().height)) << std::endl;
+    // std::cout << prevX << " " << prevY << std::endl;
+
+
+    if (shipRect.getPosition().x <= currX  && currX <= shipRect.getPosition().x + shipRect.getGlobalBounds().width && 
+        shipRect.getPosition().y <= currY  && currY <= shipRect.getPosition().y + shipRect.getGlobalBounds().height)
+    {
+        // std::cout << "Yes\n";
+        // prevX = currX; prevY = currY;
+        // return true;
+        if (Mouse::isButtonPressed(Mouse::Left))
+        {
+            
+            if (prevX != currX || prevY != currY)
+            {
+                // shipRect.setPosition(prevX - shipRect.getPosition().x + currX, prevY - shipRect.getPosition().y + currY);
+                shipRect.setPosition(currX, currY);
+                prevX = currX; prevY = currY;
+            }
+        }
+    }
+    return false;
 }

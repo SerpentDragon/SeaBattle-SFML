@@ -32,5 +32,5 @@ public:
 
     ~Ship();
 
-    void drawShip() const;
+    bool dragAndDrop();
 };

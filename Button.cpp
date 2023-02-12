@@ -18,7 +18,7 @@ void Button::Swap(T&& obj) noexcept
 
 bool Button::OnButton(const int& x, const int& y)
 {
-    return xPos <= x && x <= xPos + width && yPos <= y && y <= yPos + height;
+    return xPos <= x <= xPos + width && yPos <= y <= yPos + height;
 }
 
 Button::Button(RenderWindow *window, const Text& txt, const int& x, const int& y, const int& b_width, const int& b_height, const Color& color, const Color& colorOn)
