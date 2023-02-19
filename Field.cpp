@@ -9,15 +9,16 @@ void Field::Swap(T&& obj)
     x = obj.x;
     y = obj.y;
     size = obj.size;
+    data = obj.data;
 }
 
-Field::Field(const RenderWindow* window, const int& xPos, const int& yPos, const int& size)
+Field::Field(const RenderWindow* window, const int& xPos, const int& yPos)
 {
     this->window = const_cast<RenderWindow*>(window);
 
     x = xPos;
     y = yPos;
-    this->size = size;
+    this->size = fieldSize;
 
     field = RectangleShape(Vector2f(size, size));
     field.setOutlineThickness(2);
@@ -36,7 +37,7 @@ Field::Field(Field&& obj)
     Swap(obj);
 
     obj.window = nullptr;
-    obj.x = obj.y = obj.size = 0;
+    obj.x = obj.y = obj.size = obj.data = 0;
 }
 
 Field& Field::operator=(const Field& obj)
@@ -55,7 +56,7 @@ Field& Field::operator=(Field&& obj)
         Swap(obj);
 
         obj.window = nullptr;
-        obj.x = obj.y = obj.size = 0;
+        obj.x = obj.y = obj.size = obj.data = 0;
     }
     return *this;
 }
@@ -68,4 +69,19 @@ Field::~Field()
 void Field::drawField() const
 {
     window->draw(field);
+}
+
+void Field::setCorrectColor() 
+{ 
+    field.setFillColor(Color::Green); 
+}
+
+void Field::setWrongColor() 
+{ 
+    field.setFillColor(Color::Red); 
+}
+
+void Field::setNeutralColor() 
+{ 
+    field.setFillColor(Color::White); 
 }

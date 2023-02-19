@@ -8,6 +8,9 @@ int screenWidth = VideoMode::getDesktopMode().width;
 int screenHeight = VideoMode::getDesktopMode().height;
 int Width = 0.624 * screenWidth;
 int Height = 0.745 * screenHeight;
+int fieldSize = 0.034 * screenWidth;
+int xCoord = 0.23 * screenWidth;
+int yCoord = 0.206 * screenHeight;
 
 Font arialFont;
 Font trebuchetFont;

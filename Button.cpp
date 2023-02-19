@@ -18,7 +18,7 @@ void Button::Swap(T&& obj) noexcept
 
 bool Button::OnButton(const int& x, const int& y)
 {
-    return xPos <= x <= xPos + width && yPos <= y <= yPos + height;
+    return xPos <= x && x <= xPos + width && yPos <= y && y <= yPos + height;
 }
 
 Button::Button(RenderWindow *window, const Text& txt, const int& x, const int& y, const int& b_width, const int& b_height, const Color& color, const Color& colorOn)
@@ -100,14 +100,14 @@ Button::~Button()
     if (texture) delete texture;
 }
 
-bool Button::isPressed()
+int Button::isPressed()
 {
     int x = Mouse::getPosition(*window).x;
     int y = Mouse::getPosition(*window).y;
 
     window->draw(button);
     window->draw(text);
-
+    
     if (OnButton(x, y))
     {
         if (!texture) button.setFillColor(colorOn);
@@ -122,7 +122,7 @@ bool Button::isPressed()
     }
     else if (!texture) button.setFillColor(color);
 
-    return false;
+    return 0;
 }
 
 void Button::setTextColor(const Color& color)

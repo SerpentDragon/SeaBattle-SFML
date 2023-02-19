@@ -1,6 +1,8 @@
 #include "Ship.h"
 #include <iostream>
 
+static int rotateCounter = 0;
+
 template <typename T>
 void Ship::Swap(T&& obj) noexcept
 {
@@ -57,7 +59,7 @@ Ship& Ship::operator=(const Ship& obj)
     return *this;
 }
 
-Ship& Ship::operator=(Ship&& obj) noexcept
+Ship& Ship::operator=(Ship&& obj) noexcept 
 {
     if (this != &obj)
     {
@@ -74,26 +76,20 @@ Ship::~Ship()
     window = nullptr;
 }
 
-bool Ship::onShip(const int& xPos, const int& yPos) const
-{
-    return shipRect.getGlobalBounds().contains(xPos, yPos);
-}
-
 void Ship::drawShip() const
 {
     window->draw(shipRect);
 }
 
-void Ship::setPos(const int& x, const int& y) 
+bool Ship::onShip(const int& xPos, const int& yPos) const
 {
-    XPos = x; YPos = y;
-    shipRect.setPosition(x + width / 2, y + height / 2);
+    return shipRect.getGlobalBounds().contains(xPos, yPos);
 }
-
-const Vector2f Ship::getPos() const { return Vector2f(XPos, YPos); }
 
 void Ship::rotateShip(const int& x, const int& y)
 {
+    ++rotateCounter %= 4;
+
     int dx = x - XPos;
     int dy = y - YPos;
 
@@ -103,4 +99,67 @@ void Ship::rotateShip(const int& x, const int& y)
 
     shipRect.rotate(90);
     shipRect.setPosition(x - width / 2 + dy, y + height / 2 - dx);
+}
+
+void Ship::setFieldPosition(std::vector<Field>& leftField, const int& isReleased)
+{
+    int Xindex = (XPos - xCoord) / fieldSize; // number of the row where the ship is located
+    int Yindex = (YPos - yCoord) / fieldSize; // number of the column where the ship is located
+    int Xoffset = (XPos - xCoord) % fieldSize; // x- and y-offset relative to the upper left corner of the cell where the upper left corner of the ship is located 
+    int Yoffset = (YPos - yCoord) % fieldSize; 
+
+    if(Xoffset > fieldSize - Xoffset) Xindex++;
+    if(Yoffset > fieldSize - Yoffset) Yindex++;
+
+    static int prevIndex = 0, prevWidth = width, prevHeight = height;
+    int step, currIndex = Xindex * 10 + Yindex;
+
+    if (isReleased)
+    {
+        if (xCoord <= XPos && yCoord <= YPos && xCoord + 10 * fieldSize >= XPos + width && yCoord + 10 * fieldSize >= YPos + height)
+        {
+            setPos(xCoord + Xindex * fieldSize, yCoord + Yindex * fieldSize);
+            step = width > height ? 10 : 1;
+            for(size_t i = 0; i < deckNumber; i++, currIndex += step) leftField[currIndex].setNeutralColor();
+        }
+        else 
+        {
+            int tmpCounter = 4 - rotateCounter;
+            while(tmpCounter--) rotateShip(x, y);
+            setPos(x, y);
+        }
+        return;
+    }
+
+    if (xCoord <= XPos && yCoord <= YPos && xCoord + 10 * fieldSize >= XPos + width && yCoord + 10 * fieldSize >= YPos + height)
+    {
+        step = prevWidth > prevHeight ? 10 : 1;
+        for(size_t i = 0; i < deckNumber; i++, prevIndex += step) leftField[prevIndex].setNeutralColor();
+
+        step = width > height ? 10 : 1;
+        for(size_t i = 0; i < deckNumber; i++, currIndex += step) leftField[currIndex].setCorrectColor();
+        currIndex -= step * deckNumber;
+
+        prevIndex = currIndex;
+        prevWidth = width; prevHeight = height;
+    }
+    else 
+    {
+        step = prevWidth > prevHeight ? 10 : 1;
+        for(size_t i = 0; i < deckNumber; i++, prevIndex += step) leftField[prevIndex].setNeutralColor();
+        prevIndex = 0;
+    }
+}
+
+
+const Vector2f Ship::getPos() const { return Vector2f(XPos, YPos); }
+
+const int Ship::getWidth() const { return width; }
+
+const int Ship::getHeight() const { return height; }
+
+void Ship::setPos(const int& xPos, const int& yPos) 
+{
+    XPos = xPos; YPos = yPos;
+    shipRect.setPosition(xPos + width / 2, yPos + height / 2);
 }

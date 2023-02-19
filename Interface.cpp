@@ -1,7 +1,6 @@
 #include "Interface.h"
 
 #include <iostream>
-#include <thread>
 
 Text globalTime;
 
@@ -150,7 +149,11 @@ void Interface::mainMenu() const
 
         window->draw(titleText);
 
-        if (buttons[0].isPressed()) gameWindow();           // Play button
+        if (buttons[0].isPressed()) 
+        {
+            gameWindow();           // Play button
+            // std::cout << "OUT!\n";
+        }
         else if (buttons[1].isPressed()) showReference();   // Reference button
         else if (buttons[2].isPressed());                   // Records button
         else if (buttons[3].isPressed()) window->close();   // Exit button
@@ -169,8 +172,7 @@ void Interface::gameWindow() const
     Button exitButton(window, Text(L"Выход", arialFont, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, buttonColor, buttonColorOn);
     exitButton.setTextColor(Color::Black);
 
-    int xCoord = 0.23 * screenWidth, yCoord = 0.206 * screenHeight;
-    int fieldSize = 0.034 * screenWidth;
+    
 
     std::vector<Field> leftField, rightField;
 
@@ -178,8 +180,8 @@ void Interface::gameWindow() const
     {
         for(size_t j = 0; j < 10; j++)
         {
-            leftField.emplace_back(Field(window, xCoord + i * fieldSize, yCoord + j * fieldSize, fieldSize));
-            rightField.emplace_back(Field(window, xCoord + (i + 12) * fieldSize, yCoord + j * fieldSize, fieldSize));
+            leftField.emplace_back(Field(window, xCoord + i * fieldSize, yCoord + j * fieldSize));
+            rightField.emplace_back(Field(window, xCoord + (i + 12) * fieldSize, yCoord + j * fieldSize));
         }
     }
 
@@ -189,15 +191,18 @@ void Interface::gameWindow() const
 
     Thread th(std::bind(&timer, 0, 0, 0));
 
+    std::vector<Ship> ships;
+    for(int i = 3; i >= 0; i--)
+    {
+        for(size_t j = 0; j < i + 1; j++) ships.emplace_back(Ship(window, 4 - i, 0.0261 * screenWidth, 0.3255 * screenHeight + i * fieldSize * 1.1));
+    }
+
+    int movement = -1;
+    int dx, dy;
+
     window->create(VideoMode(screenWidth, screenHeight), "Морской бой", Style::Fullscreen);
 
     Event event;
-
-    std::vector<Ship> ships;
-    for(size_t i = 0; i < 4; i++) ships.emplace_back(Ship(window, i + 1, 0.0261 * screenWidth, 0.3255 * screenHeight + i * fieldSize * 1.1));
-
-    int flag = -1;
-    int dx, dy;
 
     while(window->isOpen())
     {
@@ -210,11 +215,11 @@ void Interface::gameWindow() const
                     {
                         int x = Mouse::getPosition(*window).x;
                         int y = Mouse::getPosition(*window).y;
-                        for(size_t i = 0; i < 4; i++)
+                        for(size_t i = 0; i < 10; i++)
                         {
                             if (ships[i].onShip(x, y))
                             {
-                                flag = i;
+                                movement = i;
                                 Vector2f coord = ships[i].getPos();
                                 dx = x - coord.x;
                                 dy = y - coord.y;
@@ -222,38 +227,40 @@ void Interface::gameWindow() const
                             }
                         }
                     }
-                    else if (event.mouseButton.button == Mouse::Right)
+                    break;
+                case Event::MouseMoved:
+                    if (Mouse::isButtonPressed(Mouse::Left) && movement != -1)
                     {
                         int x = Mouse::getPosition(*window).x;
                         int y = Mouse::getPosition(*window).y;
-                        for(size_t i = 0; i < 4; i++)
+                        ships[movement].setPos(x - dx, y - dy);
+                        ships[movement].setFieldPosition(leftField);
+                    }
+                    break;
+                case Event::MouseButtonReleased:
+                    if (event.mouseButton.button == Mouse::Left && movement != -1) 
+                    {
+                        ships[movement].setFieldPosition(leftField, 1);
+                        movement = -1;
+                        dx = dy = 0;
+                    }
+                    else if (event.mouseButton.button == Mouse::Right && Mouse::isButtonPressed(Mouse::Left))
+                    {
+                        int x = Mouse::getPosition(*window).x;
+                        int y = Mouse::getPosition(*window).y;
+                        for(size_t i = 0; i < 10; i++)
                         {
                             if (ships[i].onShip(x, y))
                             {
                                 ships[i].rotateShip(x, y);
+                                ships[i].setFieldPosition(leftField);
+                                Vector2f coord = ships[i].getPos();
+                                dx = x - coord.x;
+                                dy = y - coord.y;
                                 break;
                             }
                         }
                     }
-                    break;
-                case Event::MouseMoved:
-                    if (Mouse::isButtonPressed(Mouse::Left) && flag != -1)
-                    {
-                        int x = Mouse::getPosition(*window).x;
-                        int y = Mouse::getPosition(*window).y;
-                        ships[flag].setPos(x - dx, y - dy);
-                    }
-                    break;
-                case Event::MouseButtonReleased:
-                    if (event.mouseButton.button == Mouse::Left) 
-                    {
-                        flag = -1;
-                        dx = dy = 0;
-                    }
-                    break;
-                case Event::KeyPressed:
-                    if (event.key.code == Keyboard::Escape)
-                        window->close();
                     break;
             }
         }
@@ -270,10 +277,7 @@ void Interface::gameWindow() const
 
         drawCoordinates(xCoord, yCoord, fieldSize);
 
-        for(size_t i = 0; i < 4; i++) 
-        {
-            ships[i].drawShip();
-        }
+        for(size_t i = 0; i < 10; i++) ships[i].drawShip();
 
         if (startButton.isPressed())
         {

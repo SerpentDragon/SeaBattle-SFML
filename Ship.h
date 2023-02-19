@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "settings.h"
+#include "Field.h"
 
 using namespace sf;
 
@@ -36,13 +37,19 @@ public:
 
     ~Ship();
 
-    bool onShip(const int& x, const int& y) const;
-
     void drawShip() const;
 
-    void setPos(const int&, const int&);
+    bool onShip(const int& x, const int& y) const;  
+
+    void rotateShip(const int&, const int&);
+
+    void setFieldPosition(std::vector<Field>&, const int& = 0);
 
     const Vector2f getPos() const;
 
-    void rotateShip(const int&, const int&);
+    const int getWidth() const;
+
+    const int getHeight() const;
+
+    void setPos(const int&, const int&);
 };

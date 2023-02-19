@@ -42,7 +42,7 @@ public:
 
     ~Button();
     
-    bool isPressed();
+    int isPressed();
 
     void setTextColor(const Color& color);
 
