@@ -172,8 +172,6 @@ void Interface::gameWindow() const
     Button exitButton(window, Text(L"Выход", arialFont, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, buttonColor, buttonColorOn);
     exitButton.setTextColor(Color::Black);
 
-    
-
     std::vector<Field> leftField, rightField;
 
     for(size_t i = 0; i < 10; i++)
@@ -181,6 +179,15 @@ void Interface::gameWindow() const
         for(size_t j = 0; j < 10; j++)
         {
             leftField.emplace_back(Field(window, xCoord + i * fieldSize, yCoord + j * fieldSize));
+            // rightField.emplace_back(Field(window, xCoord + (i + 12) * fieldSize, yCoord + j * fieldSize));
+        }
+    }
+
+    for(size_t i = 0; i < 10; i++)
+    {
+        for(size_t j = 0; j < 10; j++)
+        {
+            // leftField.emplace_back(Field(window, xCoord + i * fieldSize, yCoord + j * fieldSize));
             rightField.emplace_back(Field(window, xCoord + (i + 12) * fieldSize, yCoord + j * fieldSize));
         }
     }
@@ -234,13 +241,13 @@ void Interface::gameWindow() const
                         int x = Mouse::getPosition(*window).x;
                         int y = Mouse::getPosition(*window).y;
                         ships[movement].setPos(x - dx, y - dy);
-                        ships[movement].setFieldPosition(leftField);
+                        ships[movement].setFieldColor(leftField);
                     }
                     break;
                 case Event::MouseButtonReleased:
                     if (event.mouseButton.button == Mouse::Left && movement != -1) 
                     {
-                        ships[movement].setFieldPosition(leftField, 1);
+                        ships[movement].placeShip(leftField);
                         movement = -1;
                         dx = dy = 0;
                     }
@@ -250,10 +257,10 @@ void Interface::gameWindow() const
                         int y = Mouse::getPosition(*window).y;
                         for(size_t i = 0; i < 10; i++)
                         {
-                            if (ships[i].onShip(x, y))
+                            if (ships[i].onShip(x, y) && ships[i].getIsPlaced())
                             {
                                 ships[i].rotateShip(x, y);
-                                ships[i].setFieldPosition(leftField);
+                                ships[i].setFieldColor(leftField);
                                 Vector2f coord = ships[i].getPos();
                                 dx = x - coord.x;
                                 dy = y - coord.y;

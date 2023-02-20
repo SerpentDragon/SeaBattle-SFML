@@ -1,6 +1,8 @@
 #include "Field.h"
 #include <iostream>
 
+int ccc = 0;
+
 template<typename T>
 void Field::Swap(T&& obj)
 {
@@ -19,6 +21,7 @@ Field::Field(const RenderWindow* window, const int& xPos, const int& yPos)
     x = xPos;
     y = yPos;
     this->size = fieldSize;
+    data = 0;
 
     field = RectangleShape(Vector2f(size, size));
     field.setOutlineThickness(2);
@@ -69,6 +72,15 @@ Field::~Field()
 void Field::drawField() const
 {
     window->draw(field);
+}
+
+const Vector2f Field::getPosition() const { return Vector2f(x, y); }
+
+const int Field::getData() const { return data; }
+
+void Field::setData(const int& data)
+{
+    this->data = data;
 }
 
 void Field::setCorrectColor() 

@@ -35,6 +35,12 @@ public:
 
     void drawField() const;
 
+    const Vector2f getPosition() const;
+
+    const int getData() const;
+
+    void setData(const int&);
+
     void setCorrectColor();
 
     void setWrongColor();
