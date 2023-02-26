@@ -11,18 +11,18 @@ class Ship
     RenderWindow* window;
 
     int deckNumber;
-    int x;
+    int x;              // starting coordinates
     int y;
     int width;
     int height;
 
-    int isPlaced;
+    int isPlaced;       // is the ship is placed on the field
 
-    int rotateCounter;
+    int rotateCounter;  // number of rotations of the ship
 
     Texture shipTexture;
     Sprite shipRect;
-    int XPos;
+    int XPos;           // current coordinates
     int YPos;
 
     template <typename T>
@@ -33,8 +33,6 @@ class Ship
     void locateShip(std::vector<Field>&, const int&);
 
     int calculatePosition() const;
-
-    void resetPosition();
 
 public:
     Ship(const RenderWindow* window, const int& deck, const int& xPos, const int& yPos);
@@ -59,7 +57,9 @@ public:
 
     void placeShip(std::vector<Field>&);
 
-    const Vector2f getPos() const;
+    void resetPosition(std::vector<Field>&);
+
+    const Vector2f getPosition() const;
 
     const bool getIsPlaced() const;
 
@@ -67,7 +67,7 @@ public:
 
     const int getHeight() const;
 
-    void setPos(const Vector2f&);
+    void setPosition(const Vector2f&);
 
-    void setPos(const int&, const int&);
+    void setPosition(const int&, const int&);
 };

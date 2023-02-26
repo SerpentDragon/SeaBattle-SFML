@@ -1,8 +1,6 @@
 #include "Field.h"
 #include <iostream>
 
-int ccc = 0;
-
 template<typename T>
 void Field::Swap(T&& obj)
 {
@@ -24,7 +22,8 @@ Field::Field(const RenderWindow* window, const int& xPos, const int& yPos)
     data = 0;
 
     field = RectangleShape(Vector2f(size, size));
-    field.setOutlineThickness(2);
+
+    field.setOutlineThickness(0.0019 * screenHeight);
     field.setOutlineColor(Color::Black);
     field.setFillColor(Color::White);
     field.setPosition(x, y);
@@ -96,4 +95,11 @@ void Field::setWrongColor()
 void Field::setNeutralColor() 
 { 
     field.setFillColor(Color::White); 
+}
+
+void Field::setCurrentColor(const int& valid)
+{
+    if (valid == -1) setWrongColor();
+    else if (valid == 0) setNeutralColor();
+    else if (valid == 1) setCorrectColor();
 }

@@ -15,7 +15,7 @@ class Field
     int y;
     int size;
 
-    int data;
+    int data; // information about field status (free, taken or already used)
 
     template<typename T>
     void Swap(T&&);
@@ -46,4 +46,6 @@ public:
     void setWrongColor();
 
     void setNeutralColor();
+
+    void setCurrentColor(const int&);
 };

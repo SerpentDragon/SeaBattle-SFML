@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <ctime>
 #include "Interface.h"
 #include "settings.h"
 
@@ -27,6 +28,8 @@ void initFonts()
 int main()
 {
     initFonts();
+
+    srand(time(0));
     
     RenderWindow window(VideoMode(Width, Height), L"Морской бой", Style::Close);
     window.setPosition(Vector2i((screenWidth - Width) / 2, (screenHeight - Height) / 2));  

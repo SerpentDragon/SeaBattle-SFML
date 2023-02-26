@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include "Mechanics.h"
 #include "Button.h"
 #include "Field.h"
 #include "Ship.h"
@@ -40,4 +41,6 @@ public:
     void gameWindow() const;
 
     void showReference() const;
+
+    void showWarning() const;
 };

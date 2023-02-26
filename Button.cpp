@@ -18,7 +18,7 @@ void Button::Swap(T&& obj) noexcept
 
 bool Button::OnButton(const int& x, const int& y)
 {
-    return xPos <= x && x <= xPos + width && yPos <= y && y <= yPos + height;
+    return xPos <= x && x <= xPos + width && yPos <= y && y <= yPos + height; // check if the cursor is above the button
 }
 
 Button::Button(RenderWindow *window, const Text& txt, const int& x, const int& y, const int& b_width, const int& b_height, const Color& color, const Color& colorOn)
@@ -108,19 +108,19 @@ int Button::isPressed()
     window->draw(button);
     window->draw(text);
     
-    if (OnButton(x, y))
+    if (OnButton(x, y)) // if the cursor is above the button
     {
-        if (!texture) button.setFillColor(colorOn);
-        if (Mouse::isButtonPressed(Mouse::Left)) 
+        if (!texture) button.setFillColor(colorOn); // if button has no texture paint it "colorOn" color
+        if (Mouse::isButtonPressed(Mouse::Left))  // if left mouse button was pressed
         {
-            while(true)
+            while(true) // while left mouse button is held
             {
-                if (!Mouse::isButtonPressed(Mouse::Left)) break;
+                if (!Mouse::isButtonPressed(Mouse::Left)) break; // if left mouse button was released 
             }
-            if (OnButton(Mouse::getPosition(*window).x, Mouse::getPosition(*window).y)) return ++pressedCounter;
+            if (OnButton(Mouse::getPosition(*window).x, Mouse::getPosition(*window).y)) return ++pressedCounter; // the button was pressed
         }
     }
-    else if (!texture) button.setFillColor(color);
+    else if (!texture) button.setFillColor(color); // else if the cursor is not above the button and it has no texture paint it "color" color
 
     return 0;
 }

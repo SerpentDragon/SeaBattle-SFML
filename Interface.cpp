@@ -6,16 +6,16 @@ Text globalTime;
 
 inline void Interface::drawCoordinates(const int& x, const int& y, const int& size) const
 {
-    Text coordText("", arialFont, static_cast<double>(size) / 1.5);
+    Text coordText("", arialFont, static_cast<double>(size) / 1.5); // text for field's coordinates
     int symbol, offset = (size - coordText.getGlobalBounds().width) / 4;
 
     for(int i = 0, symbol = 1072; i < 10; i++, symbol++)
     {
-        coordText.setString(std::to_string(i + 1));
+        coordText.setString(std::to_string(i + 1)); // numbers
 
         if (i == 9) offset /= 2;
 
-        coordText.setPosition(x + i * size + offset, y - size);
+        coordText.setPosition(x + i * size + offset, y - size); // place numbers next to both fields
         window->draw(coordText);
 
         coordText.setPosition(x + (i + 12) * size + offset, y - size);
@@ -23,9 +23,9 @@ inline void Interface::drawCoordinates(const int& x, const int& y, const int& si
 
         if (symbol == 1081) symbol++;
 
-        coordText.setString(static_cast<wchar_t>(symbol));
+        coordText.setString(static_cast<wchar_t>(symbol)); // letters
 
-        coordText.setPosition(x - size + offset / 2, y + i * size);
+        coordText.setPosition(x - size + offset / 2, y + i * size); // place letters next to both fields
         window->draw(coordText);
 
         coordText.setPosition(x + 11 * size + offset / 2, y + i * size);
@@ -61,7 +61,7 @@ Interface::Interface(const RenderWindow* window)
 {
     this->window = const_cast<RenderWindow*>(window);
 
-    img["landscape"] = std::pair(Texture(), RectangleShape(Vector2f(Height, Height)));
+    img["landscape"] = std::pair(Texture(), RectangleShape(Vector2f(Height, Height))); // load textures for window
     img["landscape"].first.loadFromFile("images/interface/landscape.jpg");
     img["landscape"].second.setTexture(&img["landscape"].first);
 
@@ -120,7 +120,7 @@ void Interface::mainMenu() const
     int button_xPos = 0.7512 * Width;
 
     Text button_text(L"", arialFont, font_size);
-    const std::wstring writing[] = {L"Играть", L"Справка", L"Рекорды", L"Выход"};
+    const std::wstring writing[] = {L"Играть", L"Справка", L"Рекорды", L"Выход"}; // main buttons of the window
     std::vector<Button> buttons;
     for(size_t i = 0; i < 4; i++) 
     {
@@ -149,11 +149,7 @@ void Interface::mainMenu() const
 
         window->draw(titleText);
 
-        if (buttons[0].isPressed()) 
-        {
-            gameWindow();           // Play button
-            // std::cout << "OUT!\n";
-        }
+        if (buttons[0].isPressed()) gameWindow();           // Play button
         else if (buttons[1].isPressed()) showReference();   // Reference button
         else if (buttons[2].isPressed());                   // Records button
         else if (buttons[3].isPressed()) window->close();   // Exit button
@@ -172,33 +168,23 @@ void Interface::gameWindow() const
     Button exitButton(window, Text(L"Выход", arialFont, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, buttonColor, buttonColorOn);
     exitButton.setTextColor(Color::Black);
 
-    std::vector<Field> leftField, rightField;
-
-    for(size_t i = 0; i < 10; i++)
+    std::vector<Field> leftField, rightField; // create game fields
+    for(size_t i = 0; i < 10; i++) 
     {
         for(size_t j = 0; j < 10; j++)
         {
             leftField.emplace_back(Field(window, xCoord + i * fieldSize, yCoord + j * fieldSize));
-            // rightField.emplace_back(Field(window, xCoord + (i + 12) * fieldSize, yCoord + j * fieldSize));
-        }
-    }
-
-    for(size_t i = 0; i < 10; i++)
-    {
-        for(size_t j = 0; j < 10; j++)
-        {
-            // leftField.emplace_back(Field(window, xCoord + i * fieldSize, yCoord + j * fieldSize));
             rightField.emplace_back(Field(window, xCoord + (i + 12) * fieldSize, yCoord + j * fieldSize));
         }
     }
 
-    globalTime = Text("0:0:0", arialFont, 0.0365 * screenWidth);
+    globalTime = Text("0:0:0", arialFont, 0.0365 * screenWidth); // text for timer
     globalTime.setFillColor(Color::Red);
     globalTime.setPosition(0.2605 * screenWidth, 0.88 * screenHeight);
 
-    Thread th(std::bind(&timer, 0, 0, 0));
+    Thread th(std::bind(&timer, 0, 0, 0)); // thread for timer
 
-    std::vector<Ship> ships;
+    std::vector<Ship> ships; // create ships
     for(int i = 3; i >= 0; i--)
     {
         for(size_t j = 0; j < i + 1; j++) ships.emplace_back(Ship(window, 4 - i, 0.0261 * screenWidth, 0.3255 * screenHeight + i * fieldSize * 1.1));
@@ -224,11 +210,11 @@ void Interface::gameWindow() const
                         int y = Mouse::getPosition(*window).y;
                         for(size_t i = 0; i < 10; i++)
                         {
-                            if (ships[i].onShip(x, y))
+                            if (ships[i].onShip(x, y)) // check if the cursor is above teh ship
                             {
                                 movement = i;
-                                Vector2f coord = ships[i].getPos();
-                                dx = x - coord.x;
+                                Vector2f coord = ships[i].getPosition();
+                                dx = x - coord.x; // if "yes" remember current position
                                 dy = y - coord.y;
                                 break;
                             }
@@ -240,14 +226,14 @@ void Interface::gameWindow() const
                     {
                         int x = Mouse::getPosition(*window).x;
                         int y = Mouse::getPosition(*window).y;
-                        ships[movement].setPos(x - dx, y - dy);
+                        ships[movement].setPosition(x - dx, y - dy); // if the cursore is above the ship, move it
                         ships[movement].setFieldColor(leftField);
                     }
                     break;
                 case Event::MouseButtonReleased:
                     if (event.mouseButton.button == Mouse::Left && movement != -1) 
                     {
-                        ships[movement].placeShip(leftField);
+                        ships[movement].placeShip(leftField); // free ship
                         movement = -1;
                         dx = dy = 0;
                     }
@@ -257,11 +243,11 @@ void Interface::gameWindow() const
                         int y = Mouse::getPosition(*window).y;
                         for(size_t i = 0; i < 10; i++)
                         {
-                            if (ships[i].onShip(x, y) && ships[i].getIsPlaced())
+                            if (ships[i].onShip(x, y) && ships[i].getIsPlaced()) // rotate ship relatively to cursor
                             {
                                 ships[i].rotateShip(x, y);
                                 ships[i].setFieldColor(leftField);
-                                Vector2f coord = ships[i].getPos();
+                                Vector2f coord = ships[i].getPosition();
                                 dx = x - coord.x;
                                 dy = y - coord.y;
                                 break;
@@ -282,18 +268,40 @@ void Interface::gameWindow() const
             rightField[i].drawField();
         }
 
-        drawCoordinates(xCoord, yCoord, fieldSize);
+        drawCoordinates(xCoord, yCoord, fieldSize); // draw coordinates of the field's cells
 
         for(size_t i = 0; i < 10; i++) ships[i].drawShip();
 
-        if (startButton.isPressed())
-        {
-            if (startButton.getPressedCounter() % 2) th.launch();
-            else th.terminate();
-        }
-        else if (exitButton.isPressed()) break;
-
         window->draw(globalTime);
+
+        if (exitButton.isPressed()) break;
+        else if (startButton.isPressed())
+        {
+            bool flag = true;
+
+            for(const auto& ship : ships) // check if all the sips were placed 
+            {
+                if (ship.getIsPlaced())
+                {
+                    flag = false;
+                    showWarning();
+                    break;
+                }
+            }
+
+            if (flag) // if they were, start the game
+            {
+                if (startButton.getPressedCounter() % 2) th.launch();
+                else th.terminate();
+
+                Mechanics obj;
+                obj.placeComputerShips(rightField);
+            }
+            else // else reset ships positions
+            {
+                for(auto& ship : ships) ship.resetPosition(leftField);
+            }
+        }     
 
         window->display();
     }
@@ -333,4 +341,24 @@ void Interface::showReference() const
 
         refWindow.display();
     }
+}
+
+void Interface::showWarning() const
+{
+    int windowWidth = fieldSize * 7, windowHeight = fieldSize * 3;
+
+    RectangleShape warningWindow(Vector2f(windowWidth, windowHeight));
+    warningWindow.setPosition((screenWidth - windowWidth) / 2, (screenHeight - windowHeight) / 2);
+    warningWindow.setOutlineThickness(0.0047 * screenHeight);
+    warningWindow.setOutlineColor(Color::Black);
+
+    Text warningText(L"Корабли неверно\n\tрасставлены!", arialFont, 0.03704 * screenHeight);
+    warningText.setFillColor(Color::Black);
+    warningText.setPosition((screenWidth - warningText.getGlobalBounds().width) / 2, (screenHeight - warningText.getGlobalBounds().height) / 2);
+
+    window->draw(warningWindow);
+    window->draw(warningText);
+    window->display();
+
+    sleep(milliseconds(3000));
 }
