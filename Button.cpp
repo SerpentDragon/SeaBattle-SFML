@@ -16,7 +16,7 @@ void Button::Swap(T&& obj) noexcept
     texture = obj.texture ? new Texture(*obj.texture) : nullptr;
 }
 
-bool Button::OnButton(const int& x, const int& y)
+bool Button::OnButton(const int& x, const int& y) const
 {
     return xPos <= x && x <= xPos + width && yPos <= y && y <= yPos + height; // check if the cursor is above the button
 }

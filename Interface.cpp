@@ -192,6 +192,9 @@ void Interface::gameWindow() const
 
     int movement = -1;
     int dx, dy;
+    bool checkGameStarted = true;
+
+    Mechanics mech;
 
     window->create(VideoMode(screenWidth, screenHeight), "Морской бой", Style::Fullscreen);
 
@@ -274,6 +277,8 @@ void Interface::gameWindow() const
 
         window->draw(globalTime);
 
+        if (checkGameStarted) mech.startTheGame(leftField, rightField);
+
         if (exitButton.isPressed()) break;
         else if (startButton.isPressed())
         {
@@ -294,8 +299,7 @@ void Interface::gameWindow() const
                 if (startButton.getPressedCounter() % 2) th.launch();
                 else th.terminate();
 
-                Mechanics obj;
-                obj.placeComputerShips(rightField);
+                mech.placeComputerShips(rightField);
             }
             else // else reset ships positions
             {

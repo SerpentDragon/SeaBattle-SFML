@@ -1,7 +1,5 @@
 #include "Mechanics.h"
 
-#include <vector>
-
 enum directions{up = 0, right, down, left};
 
 void Mechanics::placeComputerShips(std::vector<Field>& rightField) const
@@ -72,7 +70,7 @@ void Mechanics::placeComputerShips(std::vector<Field>& rightField) const
         if (leftYBorder < 0) leftYBorder++;
         else if (rightYBorder > 9) rightYBorder--;
 
-        for(size_t m = leftXBorder; m <= rightXBorder; m++) // border the place where the ship will be placed
+        for(size_t m = leftXBorder; m <= rightXBorder; m++) // border the area where the ship will be placed
         {
             for(size_t n = leftYBorder; n <= rightYBorder; n++) rightField[m * 10 + n].setData(2);
         }
@@ -80,5 +78,64 @@ void Mechanics::placeComputerShips(std::vector<Field>& rightField) const
         for(k = 0; k < deck; k++, (*ptr) += step) rightField[i * 10 + j].setData(1); // place the ship
 
         direct.clear();
+    }
+}
+
+void Mechanics::startTheGame(std::vector<Field>& leftField, std::vector<Field>& rightField)
+{
+    if (playerMove)
+    {
+        for(int i = 0; i < 100; i++)
+        {
+            if (rightField[i].isChosen())
+            {
+                int fieldData = rightField[i].getData();
+
+                if (fieldData == 1) rightField[i].displayHitTexture(); // if the ship is located here
+                else if (fieldData == 0 || fieldData == 2) // otherwise
+                {
+                    rightField[i].displayMissTexture();
+                    playerMove = false;
+                }
+                rightField[i].setData(3);
+                break;
+            }
+        }
+    }
+    else
+    {
+        int i, j;
+
+        while(true)
+        {
+            i = rand() % 10; // choose random position to attack
+            j = rand() % 10;
+
+            bool checkCoordinates = true;
+            for(const auto& pair : moves)
+            {
+                if (pair == std::pair(i, j))
+                {
+                    checkCoordinates = false;
+                    break;
+                }
+            }
+
+            if (checkCoordinates) break;
+        }
+
+        moves.emplace_back(std::pair(i, j));
+
+        int fieldData = leftField[i * 10 + j].getData();
+        if (fieldData == 1)
+        {
+            leftField[i * 10 + j].displayHitTexture();
+        }
+        else if (fieldData == 0 || fieldData == 2)
+        {
+            leftField[i * 10 + j].displayMissTexture();
+            playerMove = true;
+        }
+        leftField[i * 10 + j].setData(3);        
     }
 }

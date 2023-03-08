@@ -11,11 +11,16 @@ class Field
     RenderWindow* window;
     RectangleShape field;
 
-    int x;
+    int x;    // position and size of the fied
     int y;
     int size;
 
     int data; // information about field status (free, taken or already used)
+
+    Texture hit;
+    Texture miss;
+
+    bool onField(const int&, const int&) const;
 
     template<typename T>
     void Swap(T&&);
@@ -48,4 +53,10 @@ public:
     void setNeutralColor();
 
     void setCurrentColor(const int&);
+
+    void displayHitTexture();
+
+    void displayMissTexture();
+
+    bool isChosen() const;
 };
