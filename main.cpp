@@ -2,6 +2,7 @@
 #include <ctime>
 #include "Interface.h"
 #include "settings.h"
+#include "Field.h"
 
 using namespace sf;
 
@@ -19,15 +20,26 @@ Font trebuchetFont;
 Color buttonColor(180, 180, 180);
 Color buttonColorOn(0, 191, 255);
 
+Texture playerHitTexture, playerMissedTexture, computerHitTexture, computerMissedTexture;
+
 void initFonts()
 {
     arialFont.loadFromFile("fonts/arial.ttf");
     trebuchetFont.loadFromFile("fonts/trebuchetms.ttf");
 }
 
+void initTextures()
+{
+    playerHitTexture.loadFromFile("images/marks/playerHit.png");
+    playerMissedTexture.loadFromFile("images/marks/playerMissed.png");
+    computerHitTexture.loadFromFile("images/marks/computerHit.png");
+    computerMissedTexture.loadFromFile("images/marks/computerMissed.png");
+}
+
 int main()
 {
     initFonts();
+    initTextures();
 
     srand(time(0));
     

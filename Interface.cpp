@@ -4,7 +4,7 @@
 
 Text globalTime;
 
-inline void Interface::drawCoordinates(const int& x, const int& y, const int& size) const
+inline void Interface::drawCoordinates(int x, int y, int size) const
 {
     Text coordText("", arialFont, static_cast<double>(size) / 1.5); // text for field's coordinates
     int symbol, offset = (size - coordText.getGlobalBounds().width) / 4;
@@ -194,7 +194,7 @@ void Interface::gameWindow() const
     int dx, dy;
     bool checkGameStarted = true;
 
-    Mechanics mech;
+    Mechanics mech(window, &leftField, &rightField);
 
     window->create(VideoMode(screenWidth, screenHeight), "Морской бой", Style::Fullscreen);
 
@@ -207,7 +207,7 @@ void Interface::gameWindow() const
             switch(event.type)
             {
                 case Event::MouseButtonPressed:
-                    if (event.mouseButton.button == Mouse::Left)
+                    if (event.mouseButton.button == Mouse::Left) // СДЕЛАТЬ ЗАПРЕТ НА ПЕРЕСТАНОВКИ ПОСЛЕ НАЧАЛА ИГРЫ!!!
                     {
                         int x = Mouse::getPosition(*window).x;
                         int y = Mouse::getPosition(*window).y;
@@ -277,7 +277,7 @@ void Interface::gameWindow() const
 
         window->draw(globalTime);
 
-        if (checkGameStarted) mech.startTheGame(leftField, rightField);
+        if (checkGameStarted) mech.startTheGame();
 
         if (exitButton.isPressed()) break;
         else if (startButton.isPressed())
@@ -299,7 +299,7 @@ void Interface::gameWindow() const
                 if (startButton.getPressedCounter() % 2) th.launch();
                 else th.terminate();
 
-                mech.placeComputerShips(rightField);
+                mech.placeComputerShips();
             }
             else // else reset ships positions
             {

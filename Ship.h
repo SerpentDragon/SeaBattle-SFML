@@ -30,12 +30,12 @@ class Ship
 
     bool checkCells(const std::vector<Field>&, int) const;
 
-    void locateShip(std::vector<Field>&, const int&);
+    void locateShip(std::vector<Field>&, int);
 
     int calculatePosition() const;
 
 public:
-    Ship(const RenderWindow* window, const int& deck, const int& xPos, const int& yPos);
+    Ship(const RenderWindow* window, int deck, int xPos, int yPos);
 
     Ship(const Ship& obj);
 
@@ -49,9 +49,9 @@ public:
 
     void drawShip() const;
 
-    bool onShip(const int& x, const int& y) const;  
+    bool onShip(int, int) const;  
 
-    void rotateShip(const int&, const int&);
+    void rotateShip(int, int);
 
     void setFieldColor(std::vector<Field>&);
 
@@ -69,5 +69,5 @@ public:
 
     void setPosition(const Vector2f&);
 
-    void setPosition(const int&, const int&);
+    void setPosition(int, int);
 };

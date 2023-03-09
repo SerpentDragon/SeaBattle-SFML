@@ -4,7 +4,7 @@
 
 using namespace sf;
 
-extern int screenWidth;
+extern Texture playerHitTexture, playerMissedTexture, computerHitTexture, computerMissedTexture;
 
 class Field
 {
@@ -20,13 +20,13 @@ class Field
     Texture hit;
     Texture miss;
 
-    bool onField(const int&, const int&) const;
+    bool onField(int, int) const;
 
     template<typename T>
     void Swap(T&&);
 
 public:
-    Field(const RenderWindow*, const int&, const int&);
+    Field(const RenderWindow*, int, int);
 
     Field(const Field&);
 
@@ -44,7 +44,7 @@ public:
 
     const int getData() const;
 
-    void setData(const int&);
+    void setData(int);
 
     void setCorrectColor();
 
@@ -52,7 +52,7 @@ public:
 
     void setNeutralColor();
 
-    void setCurrentColor(const int&);
+    void setCurrentColor(int);
 
     void displayHitTexture();
 

@@ -6,26 +6,35 @@
 
 class Mechanics
 {
+    RenderWindow *window;
+
     bool playerMove;
 
     int playerShips;
     int computerShips;
 
-    std::vector<std::pair<int, int>> moves;
+    std::vector<int> moves;
+
+    std::vector<RectangleShape> hitPositions;
+
+    std::vector<Field>* leftField;
+    std::vector<Field>* rightField;
 
 public:
-    Mechanics()
-    {
-        playerMove = true;
-        playerShips = computerShips = 10;
-    }
 
-    ~Mechanics()
-    {
-        moves.clear();
-    }
+    Mechanics(const RenderWindow *window, const std::vector<Field>* leftField, const std::vector<Field>* rightField);
 
-    void placeComputerShips(std::vector<Field>&) const;
+    Mechanics(const Mechanics& obj) = delete;
+    
+    Mechanics(Mechanics&& obj) = delete;
 
-    void startTheGame(std::vector<Field>&, std::vector<Field>&);
+    Mechanics& operator=(const Mechanics& obj) = delete;
+
+    Mechanics& operator=(Mechanics&& obj) = delete;
+
+    ~Mechanics();
+
+    void placeComputerShips() const;
+
+    void startTheGame();
 };

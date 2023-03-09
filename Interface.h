@@ -21,7 +21,7 @@ class Interface
 
     mutable std::map<std::string, std::pair<Texture, RectangleShape>> img;
 
-    inline void drawCoordinates(const int&, const int&, const int&) const;
+    inline void drawCoordinates(int, int, int) const;
 
 public:
     Interface(const RenderWindow*);

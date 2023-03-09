@@ -29,7 +29,7 @@ bool Ship::checkCells(const std::vector<Field>& leftField, int currIndex) const
     return true;
 }
 
-void Ship::locateShip(std::vector<Field>& leftField, const int& data)
+void Ship::locateShip(std::vector<Field>& leftField, int data)
 {
     int shipPlace, aroundShip;
     int xIndex, yIndex;
@@ -80,7 +80,7 @@ int Ship::calculatePosition() const
     return xIndex * 10 + yIndex;
 }
 
-Ship::Ship(const RenderWindow* window, const int& deck, const int& xPos, const int& yPos)
+Ship::Ship(const RenderWindow* window, int deck, int xPos, int yPos)
 {
     this->window = const_cast<RenderWindow*>(window);
 
@@ -148,12 +148,12 @@ void Ship::drawShip() const
     window->draw(shipRect);
 }
 
-bool Ship::onShip(const int& xPos, const int& yPos) const
+bool Ship::onShip(int xPos, int yPos) const
 {
     return shipRect.getGlobalBounds().contains(xPos, yPos);
 }
 
-void Ship::rotateShip(const int& x, const int& y)
+void Ship::rotateShip(int x, int y)
 {
     ++rotateCounter %= 4;
 
@@ -243,7 +243,7 @@ void Ship::setPosition(const Vector2f& vec)
     shipRect.setPosition(XPos + width / 2, YPos + height / 2);
 }
 
-void Ship::setPosition(const int& xPos, const int& yPos) 
+void Ship::setPosition(int xPos, int yPos) 
 {
     XPos = xPos; YPos = yPos;
     shipRect.setPosition(xPos + width / 2, yPos + height / 2);

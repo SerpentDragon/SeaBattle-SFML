@@ -25,12 +25,12 @@ class Button
     template <typename T>
     void Swap(T&& obj) noexcept;
 
-    bool OnButton(const int& x, const int& y) const;
+    bool OnButton(int x, int y) const;
 
 public:
-    Button(RenderWindow *window, const Text& txt, const int& x, const int& y, const int& b_width, const int& b_height, const Color& color, const Color& colorOn);
+    Button(RenderWindow *window, const Text& txt, int x, int y, int b_width, int b_height, const Color& color, const Color& colorOn);
 
-    Button(RenderWindow *window, const int& x, const int& y, const int& b_width, const int& b_height, const Texture* texture);
+    Button(RenderWindow *window, int x, int y, int b_width, int b_height, const Texture* texture);
 
     Button (const Button& obj);
 

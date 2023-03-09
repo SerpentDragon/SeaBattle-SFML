@@ -9,7 +9,7 @@ data:
 3 - the field was hit
 */
 
-bool Field::onField(const int& xPos, const int& yPos) const
+bool Field::onField(int xPos, int yPos) const
 {
     return x <= xPos && xPos <= x + size && y <= yPos && yPos <= y + size; // check if the cursor is above the field
 }
@@ -27,7 +27,7 @@ void Field::Swap(T&& obj)
     miss = obj.miss;
 }
 
-Field::Field(const RenderWindow* window, const int& xPos, const int& yPos)
+Field::Field(const RenderWindow* window, int xPos, int yPos)
 {
     this->window = const_cast<RenderWindow*>(window);
 
@@ -36,16 +36,9 @@ Field::Field(const RenderWindow* window, const int& xPos, const int& yPos)
     this->size = fieldSize;
     data = 0;
 
-    if (xPos < xCoord + 12 * fieldSize) // if the field belongs to the left area
-    {
-        hit.loadFromFile("images/marks/computerHit.png");
-        miss.loadFromFile("images/marks/computerMissed.png");
-    }
-    else // else if the field belongs to the right area
-    {
-        hit.loadFromFile("images/marks/playerHit.png");
-        miss.loadFromFile("images/marks/playerMissed.png");
-    }
+    // loading textures depending on what area the field is located
+    hit = xPos < xCoord + 12 * fieldSize ? Texture() : playerHitTexture; 
+    miss = xPos < xCoord + 12 * fieldSize ? computerMissedTexture : playerMissedTexture;
 
     field = RectangleShape(Vector2f(size, size));
 
@@ -103,7 +96,7 @@ const Vector2f Field::getPosition() const { return Vector2f(x, y); }
 
 const int Field::getData() const { return data; }
 
-void Field::setData(const int& data)
+void Field::setData(int data)
 {
     this->data = data;
 }
@@ -123,16 +116,22 @@ void Field::setNeutralColor()
     field.setFillColor(Color::White); 
 }
 
-void Field::setCurrentColor(const int& valid)
+void Field::setCurrentColor(int valid)
 {
     if (valid == -1) setWrongColor();
     else if (valid == 0) setNeutralColor();
     else if (valid == 1) setCorrectColor();
 }
 
-void Field::displayHitTexture() { field.setTexture(&hit); }
+void Field::displayHitTexture() 
+{
+    field.setTexture(&hit);
+}
 
-void Field::displayMissTexture() { field.setTexture(&miss); }
+void Field::displayMissTexture() 
+{ 
+    field.setTexture(&miss); 
+}
 
 bool Field::isChosen() const
 {

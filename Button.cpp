@@ -16,12 +16,12 @@ void Button::Swap(T&& obj) noexcept
     texture = obj.texture ? new Texture(*obj.texture) : nullptr;
 }
 
-bool Button::OnButton(const int& x, const int& y) const
+bool Button::OnButton(int x, int y) const
 {
     return xPos <= x && x <= xPos + width && yPos <= y && y <= yPos + height; // check if the cursor is above the button
 }
 
-Button::Button(RenderWindow *window, const Text& txt, const int& x, const int& y, const int& b_width, const int& b_height, const Color& color, const Color& colorOn)
+Button::Button(RenderWindow *window, const Text& txt, int x, int y, int b_width, int b_height, const Color& color, const Color& colorOn)
 {
     this->window = window;
     xPos = x;
@@ -41,7 +41,7 @@ Button::Button(RenderWindow *window, const Text& txt, const int& x, const int& y
     text.setPosition(x + (width - txt.getLocalBounds().width) / 2 , y + (height - txt.getLocalBounds().height) / 2 - 7);   
 }
 
-Button::Button(RenderWindow *window, const int& x, const int& y, const int& b_width, const int& b_height, const Texture* texture)
+Button::Button(RenderWindow *window, int x, int y, int b_width, int b_height, const Texture* texture)
 {
     this->window = window;
     xPos = x;

@@ -1,8 +1,24 @@
 #include "Mechanics.h"
+#include <iostream>
 
 enum directions{up = 0, right, down, left};
 
-void Mechanics::placeComputerShips(std::vector<Field>& rightField) const
+Mechanics::Mechanics(const RenderWindow *window, const std::vector<Field>* leftField, const std::vector<Field>* rightField)
+{
+    this->window = const_cast<RenderWindow*>(window);
+    this->leftField = const_cast<std::vector<Field>*>(leftField);
+    this->rightField = const_cast<std::vector<Field>*>(rightField);
+
+    playerMove = true;
+    playerShips = computerShips = 10;
+}
+
+Mechanics::~Mechanics()
+{
+    window = nullptr;
+}
+
+void Mechanics::placeComputerShips() const
 {
     int i, j, k;
 
@@ -17,11 +33,11 @@ void Mechanics::placeComputerShips(std::vector<Field>& rightField) const
             i = rand() % 10; // choose the place for a ship
             j = rand() % 10;
 
-            if (rightField[i * 10 + j].getData()) continue; // if the place is taken, choose another
+            if ((*rightField)[i * 10 + j].getData()) continue; // if the place is taken, choose another
 
             if (deck == 1) // if the number of ship's deck is 1 we can place it
             {
-                rightField[i * 10 + j].setData(1);
+                (*rightField)[i * 10 + j].setData(1);
                 direct.emplace_back(0);
                 break;
             }
@@ -43,7 +59,7 @@ void Mechanics::placeComputerShips(std::vector<Field>& rightField) const
 
                 for(k = 0; k < deck && (*ptr) != limit; k++, (*ptr) += step)
                 {
-                    if (rightField[tmpI * 10 + tmpJ].getData()) break; // if cell is taken - break 
+                    if ((*rightField)[tmpI * 10 + tmpJ].getData()) break; // if cell is taken - break 
                 }
                 if (k == deck) direct.emplace_back(direction); // if there number of free cells equals to deck we remember current direction
 
@@ -72,32 +88,32 @@ void Mechanics::placeComputerShips(std::vector<Field>& rightField) const
 
         for(size_t m = leftXBorder; m <= rightXBorder; m++) // border the area where the ship will be placed
         {
-            for(size_t n = leftYBorder; n <= rightYBorder; n++) rightField[m * 10 + n].setData(2);
+            for(size_t n = leftYBorder; n <= rightYBorder; n++) (*rightField)[m * 10 + n].setData(2);
         }
 
-        for(k = 0; k < deck; k++, (*ptr) += step) rightField[i * 10 + j].setData(1); // place the ship
+        for(k = 0; k < deck; k++, (*ptr) += step) (*rightField)[i * 10 + j].setData(1); // place the ship
 
         direct.clear();
     }
 }
 
-void Mechanics::startTheGame(std::vector<Field>& leftField, std::vector<Field>& rightField)
+void Mechanics::startTheGame()
 {
     if (playerMove)
     {
         for(int i = 0; i < 100; i++)
         {
-            if (rightField[i].isChosen())
+            if ((*rightField)[i].isChosen())
             {
-                int fieldData = rightField[i].getData();
+                int fieldData = (*rightField)[i].getData();
 
-                if (fieldData == 1) rightField[i].displayHitTexture(); // if the ship is located here
+                if (fieldData == 1) (*rightField)[i].displayHitTexture(); // if the ship is located here
                 else if (fieldData == 0 || fieldData == 2) // otherwise
                 {
-                    rightField[i].displayMissTexture();
+                    (*rightField)[i].displayMissTexture();
                     playerMove = false;
                 }
-                rightField[i].setData(3);
+                (*rightField)[i].setData(3);
                 break;
             }
         }
@@ -112,9 +128,9 @@ void Mechanics::startTheGame(std::vector<Field>& leftField, std::vector<Field>& 
             j = rand() % 10;
 
             bool checkCoordinates = true;
-            for(const auto& pair : moves)
+            for(const auto& position : moves)
             {
-                if (pair == std::pair(i, j))
+                if (position == i * 10 + j)
                 {
                     checkCoordinates = false;
                     break;
@@ -124,18 +140,27 @@ void Mechanics::startTheGame(std::vector<Field>& leftField, std::vector<Field>& 
             if (checkCoordinates) break;
         }
 
-        moves.emplace_back(std::pair(i, j));
+        moves.emplace_back(i * 10 + j);
 
-        int fieldData = leftField[i * 10 + j].getData();
+        int fieldData = (*leftField)[i * 10 + j].getData();
         if (fieldData == 1)
         {
-            leftField[i * 10 + j].displayHitTexture();
+            RectangleShape shipsDeck(Vector2f(fieldSize, fieldSize));
+            shipsDeck.setTexture(&computerHitTexture);
+            shipsDeck.setPosition((*leftField)[i * 10 + j].getPosition());
+
+            hitPositions.emplace_back(shipsDeck);
+            
+            // (*leftField)[i * 10 + j].displayHitTexture();
         }
         else if (fieldData == 0 || fieldData == 2)
         {
-            leftField[i * 10 + j].displayMissTexture();
+            (*leftField)[i * 10 + j].displayMissTexture();
             playerMove = true;
         }
-        leftField[i * 10 + j].setData(3);        
+        (*leftField)[i * 10 + j].setData(3);        
     }
+
+    for(const auto& position : hitPositions) window->draw(position);
+
 }
