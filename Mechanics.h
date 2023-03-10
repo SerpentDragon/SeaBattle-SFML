@@ -20,6 +20,10 @@ class Mechanics
     std::vector<Field>* leftField;
     std::vector<Field>* rightField;
 
+    void markTheDeck(int, int, std::vector<Field>*);
+
+    bool checkShipIsKilled(int, int, std::vector<Field>*);
+
 public:
 
     Mechanics(const RenderWindow *window, const std::vector<Field>* leftField, const std::vector<Field>* rightField);

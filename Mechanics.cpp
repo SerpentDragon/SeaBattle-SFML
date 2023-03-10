@@ -3,6 +3,68 @@
 
 enum directions{up = 0, right, down, left};
 
+void Mechanics::markTheDeck(int i, int j, std::vector<Field>* fieldArea) // should be optimized
+{
+    if (i - 1 >= 0)
+    {
+        if (j - 1 >= 0) 
+        {
+            (*fieldArea)[(i - 1) * 10 + j - 1].displayMissTexture();
+            if (fieldArea == leftField) moves.emplace_back((i - 1) * 10 + j - 1);
+        }
+        if (j + 1 <= 9) 
+        {
+            (*fieldArea)[(i - 1) * 10 + j + 1].displayMissTexture();
+            if (fieldArea == leftField) moves.emplace_back((i - 1) * 10 + j + 1);
+        }
+    }
+    if (i + 1 <= 9)
+    {
+        if (j - 1 >= 0) 
+        {
+            (*fieldArea)[(i + 1) * 10 + j - 1].displayMissTexture();
+            if (fieldArea == leftField) moves.emplace_back((i + 1) * 10 + j - 1);
+        }
+        if (j + 1 <= 9) 
+        {
+            (*fieldArea)[(i + 1) * 10 + j + 1].displayMissTexture();
+            if (fieldArea == leftField) moves.emplace_back((i + 1) * 10 + j + 1);
+        }
+    }
+}
+
+bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
+{
+    int row = i;
+    int column = j;
+
+    for(int direction = up; direction <= left; direction++) // go through all directions
+    {
+        int limit = direction == up || direction == left ? -1 : 10; // we cannot move out the field (cells with numbers 0 and 9)
+        int orientation = direction == up || direction == left ? -1 : 1; // we can move up or left (-1) and down or right (+1)
+        int *coord = direction == up || direction == down ? &row : &column; // choose variable to change depending on direction (vertical or horizontal)
+
+        for(int k = 1; k < 4; k++)
+        {
+            if ((*coord) + orientation * k != limit) // if this position is inside the area
+            {
+                int tmp = *coord;
+                *coord += orientation * k; 
+
+                int fieldData = (*fieldArea)[row * 10 + column].getData();
+                if (fieldData == 1) return false; // if the cell is still taken for a ship then this one wasn't killed but injured
+                else if (fieldData == 2) break; // if we meet 2 then we are out of the ship placement
+
+                *coord = tmp;
+            }
+        }
+
+        row = i; column = j;
+    }
+
+    return true; // if all the cells of the ship were hit (and no one cell equals 1 what means this cell is taken for a ship) return true - the ship is killed
+}
+
 Mechanics::Mechanics(const RenderWindow *window, const std::vector<Field>* leftField, const std::vector<Field>* rightField)
 {
     this->window = const_cast<RenderWindow*>(window);
@@ -95,6 +157,15 @@ void Mechanics::placeComputerShips() const
 
         direct.clear();
     }
+
+    for(int i = 0; i < 10; i++)
+    {
+        for(int j = 0; j < 10; j++)
+        {
+            std::cout << (*rightField)[j * 10 + i].getData() << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 void Mechanics::startTheGame()
@@ -107,13 +178,18 @@ void Mechanics::startTheGame()
             {
                 int fieldData = (*rightField)[i].getData();
 
-                if (fieldData == 1) (*rightField)[i].displayHitTexture(); // if the ship is located here
+                if (fieldData == 1)
+                {
+                    (*rightField)[i].displayHitTexture(); // if the ship is located here
+                    markTheDeck(i / 10, i % 10, rightField);
+                    (*rightField)[i].setData(3);
+                    std::cout << (checkShipIsKilled(i / 10, i % 10, rightField) ? "Killed\n" : "Injured\n");
+                }
                 else if (fieldData == 0 || fieldData == 2) // otherwise
                 {
                     (*rightField)[i].displayMissTexture();
                     playerMove = false;
                 }
-                (*rightField)[i].setData(3);
                 break;
             }
         }
@@ -122,7 +198,7 @@ void Mechanics::startTheGame()
     {
         int i, j;
 
-        while(true)
+        while(true) // THINK ABOUT IT
         {
             i = rand() % 10; // choose random position to attack
             j = rand() % 10;
@@ -145,20 +221,20 @@ void Mechanics::startTheGame()
         int fieldData = (*leftField)[i * 10 + j].getData();
         if (fieldData == 1)
         {
+            (*leftField)[i * 10 + j].setData(3);
+
             RectangleShape shipsDeck(Vector2f(fieldSize, fieldSize));
             shipsDeck.setTexture(&computerHitTexture);
             shipsDeck.setPosition((*leftField)[i * 10 + j].getPosition());
 
             hitPositions.emplace_back(shipsDeck);
-            
-            // (*leftField)[i * 10 + j].displayHitTexture();
+            // markTheDeck(i, j, leftField);
         }
         else if (fieldData == 0 || fieldData == 2)
         {
             (*leftField)[i * 10 + j].displayMissTexture();
             playerMove = true;
-        }
-        (*leftField)[i * 10 + j].setData(3);        
+        }       
     }
 
     for(const auto& position : hitPositions) window->draw(position);
