@@ -285,34 +285,15 @@ void Interface::gameWindow() const
         {
             bool flag = true;
 
-            // std::fstream file("tmp.txt", std::ios_base::out | std::ios_base::binary);
-
-            // for(int k = 0; k < 100; k++)
-            // {
-            //     mech.placeComputerShips();
-            //     for(int i = 0; i < 10; i++)
-            //     {
-            //         for(int j = 0; j < 10; j++)
-            //         {
-            //             file << rightField[j * 10 + i].getData() << " ";
-            //         }
-            //         file << std::endl;
-            //     }
-            //     file << std::endl;
-
-            //     for(int i = 0; i < 100; i++) rightField[i].setData(0);
-            // }
-
-
-            // for(const auto& ship : ships) // check if all the sips were placed 
-            // {
-            //     if (ship.getIsPlaced())
-            //     {
-            //         flag = false;
-            //         showWarning();
-            //         break;
-            //     }
-            // }
+            for(const auto& ship : ships) // check if all the sips were placed 
+            {
+                if (ship.getIsPlaced())
+                {
+                    flag = false;
+                    showWarning();
+                    break;
+                }
+            }
 
             if (flag) // if they were, start the game
             {
