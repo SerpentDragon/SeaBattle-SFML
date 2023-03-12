@@ -7,6 +7,7 @@ data:
 1 - the field is taken for the ship
 2 - the field is free but there is a ship next to it
 3 - hit ship
+4 - hit field
 */
 
 bool Field::onField(int xPos, int yPos) const

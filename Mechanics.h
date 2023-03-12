@@ -24,17 +24,19 @@ class Mechanics
 
     bool checkShipIsKilled(int, int, std::vector<Field>*);
 
+    void markKilledShip(int, int, std::vector<Field>*, bool, int);
+
 public:
 
-    Mechanics(const RenderWindow *window, const std::vector<Field>* leftField, const std::vector<Field>* rightField);
+    Mechanics(const RenderWindow*, const std::vector<Field>*, const std::vector<Field>*);
 
-    Mechanics(const Mechanics& obj) = delete;
+    Mechanics(const Mechanics&) = delete;
     
-    Mechanics(Mechanics&& obj) = delete;
+    Mechanics(Mechanics&&) = delete;
 
-    Mechanics& operator=(const Mechanics& obj) = delete;
+    Mechanics& operator=(const Mechanics&) = delete;
 
-    Mechanics& operator=(Mechanics&& obj) = delete;
+    Mechanics& operator=(Mechanics&&) = delete;
 
     ~Mechanics();
 

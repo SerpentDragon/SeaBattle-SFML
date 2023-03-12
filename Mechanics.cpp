@@ -1,5 +1,6 @@
 #include "Mechanics.h"
 #include <iostream>
+#include <algorithm>
 
 enum directions{up = 0, right, down, left};
 
@@ -33,16 +34,51 @@ void Mechanics::markTheDeck(int i, int j, std::vector<Field>* fieldArea) // shou
     }
 }
 
+void Mechanics::markKilledShip(int i, int j, std::vector<Field>* fieldArea, bool vertical, int deckNumber)
+{
+    int row = i;
+    int column = j;
+    int *coord = vertical ? &row : &column; // variable to change inside the loop
+    int numberOfLoops = deckNumber == 1 ? 2 : 1; // check if killed ship had only 1 deck. In this case we should mark it up, left, right and down
+
+    for(int num = 0; num < numberOfLoops; num++) // this loop allow go throught vertical and horizontal directions if the ship had 1 deck. Otherwise we will go just through one direction (vert or hor)
+    {
+        for(int direction = -1; direction < 2; direction += 2) // go through up/left and down/right directions
+        {
+            int limit = direction == -1 ? -1 : 10; // we cannot move away from area
+
+            while((*coord) + direction != limit) // if we are still inside the area
+            {
+                *coord += direction;
+                if ((*fieldArea)[row * 10 + column].getData() != 3) break; // if current field is not a hit deck of the ship
+            }
+            if ((*fieldArea)[row * 10 + column].getData() != 3) // check if this field is not a hit deck
+            {
+                (*fieldArea)[row * 10 + column].setData(4); // mark this field as hit
+                (*fieldArea)[row * 10 + column].displayMissTexture(); // set appropriate texture
+            }
+
+            row = i; column = j;
+        }
+
+        vertical = vertical ? false : true; // change direction (in case the ship had 1 deck)
+        coord = vertical ? &row : &column;
+    }
+}
+
 bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
 {
     int row = i;
     int column = j;
+    int deckNumber = 1;
+
+    bool vertical;
 
     for(int direction = up; direction <= left; direction++) // go through all directions
     {
         int limit = direction == up || direction == left ? -1 : 10; // we cannot move out the field (cells with numbers 0 and 9)
         int orientation = direction == up || direction == left ? -1 : 1; // we can move up or left (-1) and down or right (+1)
-        int *coord = direction == up || direction == down ? &row : &column; // choose variable to change depending on direction (vertical or horizontal)
+        int *coord = direction % 2 ? &row : &column; // choose variable to change depending on direction (vertical or horizontal)
 
         for(int k = 1; k < 4; k++)
         {
@@ -53,14 +89,22 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
 
                 int fieldData = (*fieldArea)[row * 10 + column].getData();
                 if (fieldData == 1) return false; // if the cell is still taken for a ship then this one wasn't killed but injured
-                else if (fieldData == 2) break; // if we meet 2 then we are out of the ship placement
+                else if (fieldData == 2 || fieldData == 4) break; // if we meet 2 or 4 then we are out of the ship placement
+                else if (fieldData == 3) 
+                {
+                    vertical = direction % 2 ? true : false; // if direction == up or direction == down
+                    deckNumber++;
+                }
 
                 *coord = tmp;
             }
+            else break;
         }
 
         row = i; column = j;
     }
+
+    markKilledShip(i, j, fieldArea, vertical, deckNumber);
 
     return true; // if all the cells of the ship were hit (and no one cell equals 1 what means this cell is taken for a ship) return true - the ship is killed
 }
@@ -73,6 +117,9 @@ Mechanics::Mechanics(const RenderWindow *window, const std::vector<Field>* leftF
 
     playerMove = true;
     playerShips = computerShips = 10;
+
+    moves.resize(100);
+    for(int i = 0; i < 100; i++) moves[i] = i;
 }
 
 Mechanics::~Mechanics()
@@ -82,6 +129,8 @@ Mechanics::~Mechanics()
 
 void Mechanics::placeComputerShips() const
 {
+    bool tmp = false;
+
     int i, j, k;
 
     int decks[] = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
@@ -174,11 +223,12 @@ void Mechanics::startTheGame()
                     (*rightField)[i].displayHitTexture(); // if the ship is located here
                     markTheDeck(i / 10, i % 10, rightField);
                     (*rightField)[i].setData(3);
-                    std::cout << (checkShipIsKilled(i / 10, i % 10, rightField) ? "Killed\n" : "Injured\n");
+                    checkShipIsKilled(i / 10, i % 10, rightField);
                 }
                 else if (fieldData == 0 || fieldData == 2) // otherwise
                 {
                     (*rightField)[i].displayMissTexture();
+                    (*rightField)[i].setData(4);
                     playerMove = false;
                 }
                 break;
@@ -187,25 +237,11 @@ void Mechanics::startTheGame()
     }
     else
     {
-        int i, j;
+        int fieldNum = moves[rand() % moves.size()];
+        moves.erase(std::find(moves.begin(), moves.end(), fieldNum));
 
-        while(true) // THINK ABOUT IT
-        {
-            i = rand() % 10; // choose random position to attack
-            j = rand() % 10;
-
-            bool checkCoordinates = true;
-            for(const auto& position : moves)
-            {
-                if (position == i * 10 + j)
-                {
-                    checkCoordinates = false;
-                    break;
-                }
-            }
-
-            if (checkCoordinates) break;
-        }
+        int i = fieldNum / 10;
+        int j = fieldNum % 10;
 
         moves.emplace_back(i * 10 + j);
 
@@ -219,7 +255,7 @@ void Mechanics::startTheGame()
             shipsDeck.setPosition((*leftField)[i * 10 + j].getPosition());
 
             hitPositions.emplace_back(shipsDeck);
-            // markTheDeck(i, j, leftField);
+            markTheDeck(i, j, leftField);
         }
         else if (fieldData == 0 || fieldData == 2)
         {
