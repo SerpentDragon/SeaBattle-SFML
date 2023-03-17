@@ -11,12 +11,20 @@ void Mechanics::markTheDeck(int i, int j, std::vector<Field>* fieldArea) // shou
         if (j - 1 >= 0) 
         {
             (*fieldArea)[(i - 1) * 10 + j - 1].displayMissTexture();
-            if (fieldArea == leftField) moves.emplace_back((i - 1) * 10 + j - 1);
+            if (fieldArea == leftField) 
+            {
+                auto it = std::find(moves.begin(), moves.end(), (i - 1) * 10 + j - 1);
+                if (it != moves.end()) moves.erase(it);
+            }
         }
         if (j + 1 <= 9) 
         {
             (*fieldArea)[(i - 1) * 10 + j + 1].displayMissTexture();
-            if (fieldArea == leftField) moves.emplace_back((i - 1) * 10 + j + 1);
+            if (fieldArea == leftField) 
+            {
+                auto it = std::find(moves.begin(), moves.end(), (i - 1) * 10 + j + 1);
+                if (it != moves.end()) moves.erase(it);
+            }
         }
     }
     if (i + 1 <= 9)
@@ -24,12 +32,20 @@ void Mechanics::markTheDeck(int i, int j, std::vector<Field>* fieldArea) // shou
         if (j - 1 >= 0) 
         {
             (*fieldArea)[(i + 1) * 10 + j - 1].displayMissTexture();
-            if (fieldArea == leftField) moves.emplace_back((i + 1) * 10 + j - 1);
+            if (fieldArea == leftField) 
+            {
+                auto it = std::find(moves.begin(), moves.end(), (i + 1) * 10 + j - 1);
+                if (it != moves.end()) moves.erase(it);
+            }
         }
         if (j + 1 <= 9) 
         {
             (*fieldArea)[(i + 1) * 10 + j + 1].displayMissTexture();
-            if (fieldArea == leftField) moves.emplace_back((i + 1) * 10 + j + 1);
+            if (fieldArea == leftField) 
+            {
+                auto it = std::find(moves.begin(), moves.end(), (i + 1) * 10 + j + 1);
+                if (it != moves.end()) moves.erase(it);
+            }
         }
     }
 }
@@ -56,6 +72,9 @@ void Mechanics::markKilledShip(int i, int j, std::vector<Field>* fieldArea, bool
             {
                 (*fieldArea)[row * 10 + column].setData(4); // mark this field as hit
                 (*fieldArea)[row * 10 + column].displayMissTexture(); // set appropriate texture
+
+                auto it = std::find(moves.begin(), moves.end(), row * 10 + column);
+                if (it != moves.end()) moves.erase(it);
             }
 
             row = i; column = j;
@@ -105,6 +124,9 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
     }
 
     markKilledShip(i, j, fieldArea, vertical, deckNumber);
+
+    if (fieldArea == leftField) playerShips--;
+    else computerShips--;
 
     return true; // if all the cells of the ship were hit (and no one cell equals 1 what means this cell is taken for a ship) return true - the ship is killed
 }
@@ -208,21 +230,27 @@ void Mechanics::placeComputerShips() const
     }
 }
 
-void Mechanics::startTheGame()
+bool Mechanics::startTheGame()
 {
+    bool flag = false;
+
     if (playerMove)
     {
         for(int i = 0; i < 100; i++)
         {
             if ((*rightField)[i].isChosen())
             {
+                std::cout << "checkSize: " << possibleDirections.size() << std::endl;
+
                 int fieldData = (*rightField)[i].getData();
 
-                if (fieldData == 1)
+                if (fieldData == 1) // if the ship is located here
                 {
-                    (*rightField)[i].displayHitTexture(); // if the ship is located here
-                    markTheDeck(i / 10, i % 10, rightField);
                     (*rightField)[i].setData(3);
+
+                    (*rightField)[i].displayHitTexture(); 
+                    markTheDeck(i / 10, i % 10, rightField);
+                    
                     checkShipIsKilled(i / 10, i % 10, rightField);
                 }
                 else if (fieldData == 0 || fieldData == 2) // otherwise
@@ -231,39 +259,173 @@ void Mechanics::startTheGame()
                     (*rightField)[i].setData(4);
                     playerMove = false;
                 }
-                break;
             }
         }
     }
     else
     {
-        int fieldNum = moves[rand() % moves.size()];
-        moves.erase(std::find(moves.begin(), moves.end(), fieldNum));
+        static int i, j;
+        static int prevI, prevJ;
 
-        int i = fieldNum / 10;
-        int j = fieldNum % 10;
-
-        moves.emplace_back(i * 10 + j);
-
-        int fieldData = (*leftField)[i * 10 + j].getData();
-        if (fieldData == 1)
+        if (possibleDirections.size())
         {
-            (*leftField)[i * 10 + j].setData(3);
+            std::cout << "pos: " << j << " " << i << std::endl;
+            try
+            {
+                std::cout << "data: " << (*leftField)[i * 10 + j].getData() << std::endl;
+            }
+            catch(...)
+            {
 
-            RectangleShape shipsDeck(Vector2f(fieldSize, fieldSize));
-            shipsDeck.setTexture(&computerHitTexture);
-            shipsDeck.setPosition((*leftField)[i * 10 + j].getPosition());
+            }
+            
+            static int direct = -1;
+            if (direct < 0) direct = possibleDirections[rand() % possibleDirections.size()];
 
-            hitPositions.emplace_back(shipsDeck);
-            markTheDeck(i, j, leftField);
+            int step = direct == up || direct == left ? -1 : 1;
+            int limit = direct == up || direct == left ? -1 : 10;
+            int *coord = direct % 2 ? &j : &i;
+            *coord += step;
+
+            if (*coord == limit)
+            {
+                std::cout << "LIMIT!\n";
+                possibleDirections.erase(find(possibleDirections.begin(), possibleDirections.end(), direct));
+                direct = -1;
+                i = prevI; j = prevJ;
+            }
+            else
+            {
+                std::cout << possibleDirections.size() << std::endl;
+
+                for(const auto& el : possibleDirections)
+                {
+                    if (el == up) std::cout << "up";
+                    else if(el == right) std::cout << "right";
+                    else if (el == down) std::cout << "down";
+                    else if (el == left) std::cout << "left";
+                    std::cout << " ";
+                }
+                std::cout << std::endl;
+
+                std::cout << "direction: " << direct << std::endl;
+
+
+                int fieldData = (*leftField)[i * 10 + j].getData();
+
+                auto it = std::find(moves.begin(), moves.end(), i * 10 + j);
+                if (it != moves.end()) moves.erase(it);
+
+                if (fieldData == 1)
+                {
+                    std::cout << "GOAL\n";
+                    for(int i = 0; i < possibleDirections.size(); i++)
+                    {
+                        if (possibleDirections[i] % 2 != direct % 2)
+                        {
+                            possibleDirections.erase(possibleDirections.begin() + i);
+                            i--;
+                        }
+                    }
+
+                    (*leftField)[i * 10 + j].setData(3);
+
+                    RectangleShape shipsDeck(Vector2f(fieldSize, fieldSize));
+                    shipsDeck.setTexture(&computerHitTexture);
+                    shipsDeck.setPosition((*leftField)[i * 10 + j].getPosition());
+                    hitPositions.emplace_back(shipsDeck);
+
+                    markTheDeck(i, j, leftField);
+
+                    if (checkShipIsKilled(i, j, leftField)) possibleDirections.clear();
+                }
+                else
+                {
+                    std::cout << "MISSED\n";
+                    (*leftField)[i * 10 + j].displayMissTexture();
+                    moves.erase(std::find(moves.begin(), moves.end(), i * 10 + j));
+
+                    possibleDirections.erase(find(possibleDirections.begin(), possibleDirections.end(), direct));
+                    direct = -1;
+                    i = prevI; j = prevJ;
+                    playerMove = true;
+
+                    std::cout << "prevPos: " << j << " " << i << std::endl;
+                    for(const auto& el : possibleDirections)
+                    {
+                        if (el == up) std::cout << "up";
+                        else if(el == right) std::cout << "right";
+                        else if (el == down) std::cout << "down";
+                        else if (el == left) std::cout << "left";
+                        std::cout << " ";
+                    }
+                    std::cout << std::endl;
+
+                }
+
+                flag = true;
+            }           
         }
-        else if (fieldData == 0 || fieldData == 2)
+        else
         {
-            (*leftField)[i * 10 + j].displayMissTexture();
-            playerMove = true;
-        }       
+            std::cout << "NEW MOVE!\n";
+            int fieldNum = moves[rand() % moves.size()];
+            moves.erase(std::find(moves.begin(), moves.end(), fieldNum));
+
+            i = fieldNum / 10;
+            j = fieldNum % 10;
+
+            std::cout << j << " " << i << std::endl;
+
+            int fieldData = (*leftField)[i * 10 + j].getData();
+            if (fieldData == 1)
+            {
+                prevI = i; prevJ = j;
+
+                std::cout << "rememberPOS: " << prevJ << " " << prevI << std::endl;
+
+                (*leftField)[i * 10 + j].setData(3);
+
+                RectangleShape shipsDeck(Vector2f(fieldSize, fieldSize));
+                shipsDeck.setTexture(&computerHitTexture);
+                shipsDeck.setPosition((*leftField)[i * 10 + j].getPosition());
+                hitPositions.emplace_back(shipsDeck);
+
+                markTheDeck(i, j, leftField);
+
+                if (!checkShipIsKilled(i, j, leftField))
+                {
+                    if (i - 1 >= 0) possibleDirections.emplace_back(up);
+                    if (j + 1 <= 9) possibleDirections.emplace_back(right);
+                    if (i + 1 <= 9) possibleDirections.emplace_back(down);
+                    if (j - 1 >= 0) possibleDirections.emplace_back(left);
+                }
+            }
+            else if (fieldData == 0 || fieldData == 2)
+            {
+                (*leftField)[i * 10 + j].displayMissTexture();
+                playerMove = true;
+            }  
+
+            flag = true;  
+        }
     }
 
-    for(const auto& position : hitPositions) window->draw(position);
+    return flag;
+}
 
+void Mechanics::drawPositions() const
+{
+    for(const auto& position : hitPositions) window->draw(position);
+}
+
+bool Mechanics::checkEndGame() const
+{
+    return playerShips == 0 || computerShips == 0;
+}
+
+const wchar_t* Mechanics::getResult() const
+{
+    if (!playerShips) return L"Поражение!";
+    return L"Победа!";
 }

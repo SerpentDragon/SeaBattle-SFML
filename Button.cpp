@@ -136,4 +136,9 @@ void Button::setButtonColor(const Color& color)
     button.setFillColor(color);
 }
 
+void Button::setString(const wchar_t* string)
+{
+    text.setString(string);
+}
+
 int Button::getPressedCounter() const { return pressedCounter; }

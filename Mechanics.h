@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <vector>
 #include "Field.h"
 #include "settings.h"
@@ -8,17 +9,19 @@ class Mechanics
 {
     RenderWindow *window;
 
-    bool playerMove;
+    bool playerMove; // flag to check whether a user or a computer is making a move now
 
-    int playerShips;
-    int computerShips;
+    int playerShips;   // counter of player's ships
+    int computerShips; // counter of computer's ships
 
-    std::vector<int> moves;
+    std::vector<int> possibleDirections;
 
-    std::vector<RectangleShape> hitPositions;
+    std::vector<int> moves; // list of comupter's move. Keep it to not hit a field which already hit
 
-    std::vector<Field>* leftField;
-    std::vector<Field>* rightField;
+    std::vector<RectangleShape> hitPositions; // textures to mark player's hit ships
+
+    std::vector<Field>* leftField;  // player's field
+    std::vector<Field>* rightField; // computer's field
 
     void markTheDeck(int, int, std::vector<Field>*);
 
@@ -42,5 +45,11 @@ public:
 
     void placeComputerShips() const;
 
-    void startTheGame();
+    bool startTheGame();
+
+    void drawPositions() const;
+
+    bool checkEndGame() const;
+
+    const wchar_t* getResult() const;
 };

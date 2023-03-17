@@ -23,30 +23,32 @@ class Button
     Texture* texture; // button texture
 
     template <typename T>
-    void Swap(T&& obj) noexcept;
+    void Swap(T&&) noexcept;
 
-    bool OnButton(int x, int y) const;
+    bool OnButton(int, int) const;
 
 public:
-    Button(RenderWindow *window, const Text& txt, int x, int y, int b_width, int b_height, const Color& color, const Color& colorOn);
+    Button(RenderWindow*, const Text&, int, int, int, int, const Color&, const Color&);
 
-    Button(RenderWindow *window, int x, int y, int b_width, int b_height, const Texture* texture);
+    Button(RenderWindow*, int, int, int, int, const Texture*);
 
-    Button (const Button& obj);
+    Button (const Button&);
 
-    Button(Button&& obj) noexcept;
+    Button(Button&&) noexcept;
 
-    Button& operator=(const Button& obj);
+    Button& operator=(const Button&);
 
-    Button& operator=(Button&& obj) noexcept;
+    Button& operator=(Button&&) noexcept;
 
     ~Button();
     
     int isPressed();
 
-    void setTextColor(const Color& color);
+    void setTextColor(const Color&);
 
-    void setButtonColor(const Color& color);
+    void setButtonColor(const Color&);
+
+    void setString(const wchar_t*);
 
     int getPressedCounter() const;
 };

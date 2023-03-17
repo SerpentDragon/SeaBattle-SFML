@@ -1,7 +1,6 @@
 #include "Interface.h"
 
 #include <iostream>
-#include <fstream>
 
 Text globalTime;
 
@@ -69,39 +68,6 @@ Interface::Interface(const RenderWindow* window)
     img["sea"] = std::pair(Texture(), RectangleShape(Vector2f(screenWidth, screenHeight)));
     img["sea"].first.loadFromFile("images/interface/sea.jpg");
     img["sea"].second.setTexture(&img["sea"].first);
-}
-
-Interface::Interface(const Interface& obj)
-{
-    window = obj.window;
-    img = obj.img;
-}
-
-Interface::Interface(Interface&& obj) noexcept : window(obj.window), img(obj.img)
-{
-    obj.window = nullptr;
-}
-
-Interface& Interface::operator=(const Interface& obj)
-{
-    if (this != &obj)
-    {
-        window = obj.window;
-        img = obj.img;
-    }
-    return *this;
-}
-
-Interface& Interface::operator=(Interface&& obj) noexcept
-{
-    if (this != &obj)
-    {
-        window = obj.window;
-        img = obj.img;
-
-        obj.window = nullptr;
-    }
-    return *this;
 }
 
 Interface::~Interface()
@@ -193,7 +159,7 @@ void Interface::gameWindow() const
 
     int movement = -1;
     int dx, dy;
-    bool checkGameStarted = true;
+    bool checkGameStarted = false, checkPause = false;
 
     Mechanics mech(window, &leftField, &rightField);
 
@@ -208,7 +174,7 @@ void Interface::gameWindow() const
             switch(event.type)
             {
                 case Event::MouseButtonPressed:
-                    if (event.mouseButton.button == Mouse::Left) // СДЕЛАТЬ ЗАПРЕТ НА ПЕРЕСТАНОВКИ ПОСЛЕ НАЧАЛА ИГРЫ!!!
+                    if (event.mouseButton.button == Mouse::Left && !checkGameStarted) // СДЕЛАТЬ ЗАПРЕТ НА ПЕРЕСТАНОВКИ ПОСЛЕ НАЧАЛА ИГРЫ!!!
                     {
                         int x = Mouse::getPosition(*window).x;
                         int y = Mouse::getPosition(*window).y;
@@ -226,7 +192,7 @@ void Interface::gameWindow() const
                     }
                     break;
                 case Event::MouseMoved:
-                    if (Mouse::isButtonPressed(Mouse::Left) && movement != -1)
+                    if (Mouse::isButtonPressed(Mouse::Left) && movement != -1 && !checkGameStarted)
                     {
                         int x = Mouse::getPosition(*window).x;
                         int y = Mouse::getPosition(*window).y;
@@ -235,13 +201,13 @@ void Interface::gameWindow() const
                     }
                     break;
                 case Event::MouseButtonReleased:
-                    if (event.mouseButton.button == Mouse::Left && movement != -1) 
+                    if (event.mouseButton.button == Mouse::Left && movement != -1 && !checkGameStarted) 
                     {
                         ships[movement].placeShip(leftField); // free ship
                         movement = -1;
                         dx = dy = 0;
                     }
-                    else if (event.mouseButton.button == Mouse::Right && Mouse::isButtonPressed(Mouse::Left))
+                    else if (event.mouseButton.button == Mouse::Right && Mouse::isButtonPressed(Mouse::Left) && !checkGameStarted)
                     {
                         int x = Mouse::getPosition(*window).x;
                         int y = Mouse::getPosition(*window).y;
@@ -278,10 +244,8 @@ void Interface::gameWindow() const
 
         window->draw(globalTime);
 
-        if (checkGameStarted) mech.startTheGame();
-
         if (exitButton.isPressed()) break;
-        else if (startButton.isPressed())
+        else if (startButton.isPressed()) // Проверить, что игра уже была начата
         {
             bool flag = true;
 
@@ -290,25 +254,58 @@ void Interface::gameWindow() const
                 if (ship.getIsPlaced())
                 {
                     flag = false;
-                    showWarning();
+                    showMessage(L"Корабли неверно\n\tрасставлены!");
                     break;
                 }
             }
 
             if (flag) // if they were, start the game
             {
-                if (startButton.getPressedCounter() % 2) th.launch();
-                else th.terminate();
-
-                mech.placeComputerShips();
+                std::cout << "PRESSED! " << startButton.getPressedCounter() << std::endl;
+                if (!checkGameStarted) 
+                {
+                    th.launch();
+                    checkGameStarted = true;
+                    mech.placeComputerShips();
+                }
+                else
+                {
+                    if (startButton.getPressedCounter() % 2 == 0) 
+                    {
+                        std::cout << "PAUSE!\n";
+                        th.terminate();
+                        checkPause = true;
+                        startButton.setString(L"Продолжить");
+                    }
+                    else 
+                    {
+                        std::cout << "CONTINUE!\n";
+                        th.launch();
+                        checkPause = false;
+                        startButton.setString(L"Пауза");
+                    }
+                }         
             }
             else // else reset ships positions
             {
                 for(auto& ship : ships) ship.resetPosition(leftField);
             }
-        }     
+        }
+
+        mech.drawPositions();     
 
         window->display();
+
+        if (checkGameStarted && !checkPause)
+        {
+            if(mech.startTheGame()) sleep(milliseconds(500));
+
+            if (mech.checkEndGame()) 
+            {
+                showMessage(mech.getResult());
+                break;
+            }
+        }
     }
 
     th.terminate();
@@ -348,7 +345,7 @@ void Interface::showReference() const
     }
 }
 
-void Interface::showWarning() const
+void Interface::showMessage(const wchar_t* msg) const
 {
     int windowWidth = fieldSize * 7, windowHeight = fieldSize * 3;
 
@@ -357,7 +354,7 @@ void Interface::showWarning() const
     warningWindow.setOutlineThickness(0.0047 * screenHeight);
     warningWindow.setOutlineColor(Color::Black);
 
-    Text warningText(L"Корабли неверно\n\tрасставлены!", arialFont, 0.03704 * screenHeight);
+    Text warningText(msg, arialFont, 0.03704 * screenHeight);
     warningText.setFillColor(Color::Black);
     warningText.setPosition((screenWidth - warningText.getGlobalBounds().width) / 2, (screenHeight - warningText.getGlobalBounds().height) / 2);
 

@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <functional>
+#include <fstream>
 #include <sstream>
 #include <vector>
 #include <map>
@@ -26,13 +27,13 @@ class Interface
 public:
     Interface(const RenderWindow*);
 
-    Interface(const Interface&);
+    Interface(const Interface&) = delete;
 
-    Interface(Interface&&) noexcept;
+    Interface(Interface&&) = delete;
 
-    Interface& operator=(const Interface&);
+    Interface& operator=(const Interface&) = delete;
 
-    Interface& operator=(Interface&&) noexcept;
+    Interface& operator=(Interface&&) = delete;
 
     ~Interface();
 
@@ -42,5 +43,5 @@ public:
 
     void showReference() const;
 
-    void showWarning() const;
+    void showMessage(const wchar_t*) const;
 };
