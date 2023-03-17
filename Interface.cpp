@@ -167,6 +167,12 @@ void Interface::gameWindow() const
 
     Event event;
 
+    RectangleShape tmp(Vector2f(100, 100));
+    tmp.setPosition(500, 500);
+    tmp.setFillColor(Color::Red);
+
+    std::vector<RectangleShape> vec;
+
     while(window->isOpen())
     {
         while(window->pollEvent(event))
@@ -232,6 +238,11 @@ void Interface::gameWindow() const
 
         window->draw(img["sea"].second);
 
+        if (checkGameStarted && !checkPause)
+        {
+            if (mech.startTheGame()) sleep(milliseconds(500));
+        }
+
         for(int i = 0; i < 100; i++) 
         {
             leftField[i].drawField();
@@ -244,8 +255,10 @@ void Interface::gameWindow() const
 
         window->draw(globalTime);
 
+        if (checkGameStarted) mech.drawPositions();
+
         if (exitButton.isPressed()) break;
-        else if (startButton.isPressed()) // Проверить, что игра уже была начата
+        else if (startButton.isPressed())
         {
             bool flag = true;
 
@@ -261,7 +274,7 @@ void Interface::gameWindow() const
 
             if (flag) // if they were, start the game
             {
-                std::cout << "PRESSED! " << startButton.getPressedCounter() << std::endl;
+                // std::cout << "PRESSED! " << startButton.getPressedCounter() << std::endl;
                 if (!checkGameStarted) 
                 {
                     th.launch();
@@ -272,7 +285,7 @@ void Interface::gameWindow() const
                 {
                     if (startButton.getPressedCounter() % 2 == 0) 
                     {
-                        std::cout << "PAUSE!\n";
+                        // std::cout << "PAUSE!\n";
                         th.terminate();
                         checkPause = true;
                         startButton.setString(L"Продолжить");
@@ -291,18 +304,15 @@ void Interface::gameWindow() const
                 for(auto& ship : ships) ship.resetPosition(leftField);
             }
         }
-
-        mech.drawPositions();     
-
-        window->display();
+        
+        window->display(); 
 
         if (checkGameStarted && !checkPause)
         {
-            if(mech.startTheGame()) sleep(milliseconds(500));
-
-            if (mech.checkEndGame()) 
+            if (mech.checkEndGame())
             {
                 showMessage(mech.getResult());
+                sleep(milliseconds(500));
                 break;
             }
         }
@@ -349,17 +359,17 @@ void Interface::showMessage(const wchar_t* msg) const
 {
     int windowWidth = fieldSize * 7, windowHeight = fieldSize * 3;
 
-    RectangleShape warningWindow(Vector2f(windowWidth, windowHeight));
-    warningWindow.setPosition((screenWidth - windowWidth) / 2, (screenHeight - windowHeight) / 2);
-    warningWindow.setOutlineThickness(0.0047 * screenHeight);
-    warningWindow.setOutlineColor(Color::Black);
+    RectangleShape messageWindow(Vector2f(windowWidth, windowHeight));
+    messageWindow.setPosition((screenWidth - windowWidth) / 2, (screenHeight - windowHeight) / 2);
+    messageWindow.setOutlineThickness(0.0047 * screenHeight);
+    messageWindow.setOutlineColor(Color::Black);
 
-    Text warningText(msg, arialFont, 0.03704 * screenHeight);
-    warningText.setFillColor(Color::Black);
-    warningText.setPosition((screenWidth - warningText.getGlobalBounds().width) / 2, (screenHeight - warningText.getGlobalBounds().height) / 2);
+    Text messageText(msg, arialFont, 0.03704 * screenHeight);
+    messageText.setFillColor(Color::Black);
+    messageText.setPosition((screenWidth - messageText.getGlobalBounds().width) / 2, (screenHeight - messageText.getGlobalBounds().height) / 2);
 
-    window->draw(warningWindow);
-    window->draw(warningText);
+    window->draw(messageWindow);
+    window->draw(messageText);
     window->display();
 
     sleep(milliseconds(3000));

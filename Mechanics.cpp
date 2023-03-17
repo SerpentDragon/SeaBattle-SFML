@@ -73,8 +73,11 @@ void Mechanics::markKilledShip(int i, int j, std::vector<Field>* fieldArea, bool
                 (*fieldArea)[row * 10 + column].setData(4); // mark this field as hit
                 (*fieldArea)[row * 10 + column].displayMissTexture(); // set appropriate texture
 
-                auto it = std::find(moves.begin(), moves.end(), row * 10 + column);
-                if (it != moves.end()) moves.erase(it);
+                if (fieldArea == leftField)
+                {
+                    auto it = std::find(moves.begin(), moves.end(), row * 10 + column);
+                    if (it != moves.end()) moves.erase(it);
+                }
             }
 
             row = i; column = j;
@@ -138,7 +141,7 @@ Mechanics::Mechanics(const RenderWindow *window, const std::vector<Field>* leftF
     this->rightField = const_cast<std::vector<Field>*>(rightField);
 
     playerMove = true;
-    playerShips = computerShips = 10;
+    playerShips = computerShips = 1;
 
     moves.resize(100);
     for(int i = 0; i < 100; i++) moves[i] = i;
@@ -236,29 +239,32 @@ bool Mechanics::startTheGame()
 
     if (playerMove)
     {
-        for(int i = 0; i < 100; i++)
+        for(int k = 0; k < 100; k++)
         {
-            if ((*rightField)[i].isChosen())
+            if ((*rightField)[k].isChosen())
             {
-                std::cout << "checkSize: " << possibleDirections.size() << std::endl;
+                // std::cout << "checkSize: " << possibleDirections.size() << std::endl;
 
-                int fieldData = (*rightField)[i].getData();
+                int fieldData = (*rightField)[k].getData();
 
                 if (fieldData == 1) // if the ship is located here
                 {
-                    (*rightField)[i].setData(3);
+                    (*rightField)[k].setData(3);
 
-                    (*rightField)[i].displayHitTexture(); 
-                    markTheDeck(i / 10, i % 10, rightField);
+                    (*rightField)[k].displayHitTexture(); 
+                    markTheDeck(k / 10, k % 10, rightField);
                     
-                    checkShipIsKilled(i / 10, i % 10, rightField);
+                    checkShipIsKilled(k / 10, k % 10, rightField);
                 }
                 else if (fieldData == 0 || fieldData == 2) // otherwise
                 {
-                    (*rightField)[i].displayMissTexture();
-                    (*rightField)[i].setData(4);
+                    std::cout << "HERE!\n";
+                    (*rightField)[k].displayMissTexture();
+                    (*rightField)[k].setData(4);
                     playerMove = false;
                 }
+                break;
+                // std::cout << (flag ? "TRUE" : "FALSE") << " " << i % 10 << " " << i / 10 << std::endl;
             }
         }
     }
@@ -269,10 +275,10 @@ bool Mechanics::startTheGame()
 
         if (possibleDirections.size())
         {
-            std::cout << "pos: " << j << " " << i << std::endl;
+            // std::cout << "pos: " << j << " " << i << std::endl;
             try
             {
-                std::cout << "data: " << (*leftField)[i * 10 + j].getData() << std::endl;
+                // std::cout << "data: " << (*leftField)[i * 10 + j].getData() << std::endl;
             }
             catch(...)
             {
@@ -289,26 +295,26 @@ bool Mechanics::startTheGame()
 
             if (*coord == limit)
             {
-                std::cout << "LIMIT!\n";
+                // std::cout << "LIMIT!\n";
                 possibleDirections.erase(find(possibleDirections.begin(), possibleDirections.end(), direct));
                 direct = -1;
                 i = prevI; j = prevJ;
             }
             else
             {
-                std::cout << possibleDirections.size() << std::endl;
+                // std::cout << possibleDirections.size() << std::endl;
 
-                for(const auto& el : possibleDirections)
-                {
-                    if (el == up) std::cout << "up";
-                    else if(el == right) std::cout << "right";
-                    else if (el == down) std::cout << "down";
-                    else if (el == left) std::cout << "left";
-                    std::cout << " ";
-                }
-                std::cout << std::endl;
+                // for(const auto& el : possibleDirections)
+                // {
+                //     if (el == up) std::cout << "up";
+                //     else if(el == right) std::cout << "right";
+                //     else if (el == down) std::cout << "down";
+                //     else if (el == left) std::cout << "left";
+                //     std::cout << " ";
+                // }
+                // std::cout << std::endl;
 
-                std::cout << "direction: " << direct << std::endl;
+                // std::cout << "direction: " << direct << std::endl;
 
 
                 int fieldData = (*leftField)[i * 10 + j].getData();
@@ -318,7 +324,7 @@ bool Mechanics::startTheGame()
 
                 if (fieldData == 1)
                 {
-                    std::cout << "GOAL\n";
+                    // std::cout << "GOAL\n";
                     for(int i = 0; i < possibleDirections.size(); i++)
                     {
                         if (possibleDirections[i] % 2 != direct % 2)
@@ -341,48 +347,45 @@ bool Mechanics::startTheGame()
                 }
                 else
                 {
-                    std::cout << "MISSED\n";
+                    // std::cout << "MISSED\n";
                     (*leftField)[i * 10 + j].displayMissTexture();
-                    moves.erase(std::find(moves.begin(), moves.end(), i * 10 + j));
 
                     possibleDirections.erase(find(possibleDirections.begin(), possibleDirections.end(), direct));
                     direct = -1;
                     i = prevI; j = prevJ;
                     playerMove = true;
 
-                    std::cout << "prevPos: " << j << " " << i << std::endl;
-                    for(const auto& el : possibleDirections)
-                    {
-                        if (el == up) std::cout << "up";
-                        else if(el == right) std::cout << "right";
-                        else if (el == down) std::cout << "down";
-                        else if (el == left) std::cout << "left";
-                        std::cout << " ";
-                    }
-                    std::cout << std::endl;
+                    // std::cout << "prevPos: " << j << " " << i << std::endl;
+                    // for(const auto& el : possibleDirections)
+                    // {
+                    //     if (el == up) std::cout << "up";
+                    //     else if(el == right) std::cout << "right";
+                    //     else if (el == down) std::cout << "down";
+                    //     else if (el == left) std::cout << "left";
+                    //     std::cout << " ";
+                    // }
+                    // std::cout << std::endl;
 
                 }
-
-                flag = true;
             }           
         }
         else
         {
-            std::cout << "NEW MOVE!\n";
+            // std::cout << "NEW MOVE! " << moves.size() << std::endl;
             int fieldNum = moves[rand() % moves.size()];
             moves.erase(std::find(moves.begin(), moves.end(), fieldNum));
 
             i = fieldNum / 10;
             j = fieldNum % 10;
 
-            std::cout << j << " " << i << std::endl;
+            // std::cout << j << " " << i << std::endl;
 
             int fieldData = (*leftField)[i * 10 + j].getData();
             if (fieldData == 1)
             {
                 prevI = i; prevJ = j;
 
-                std::cout << "rememberPOS: " << prevJ << " " << prevI << std::endl;
+                // std::cout << "rememberPOS: " << prevJ << " " << prevI << std::endl;
 
                 (*leftField)[i * 10 + j].setData(3);
 
@@ -407,8 +410,10 @@ bool Mechanics::startTheGame()
                 playerMove = true;
             }  
 
-            flag = true;  
+            // std::cout << "MADE!\n";
         }
+    
+        flag = true;
     }
 
     return flag;
@@ -418,6 +423,8 @@ void Mechanics::drawPositions() const
 {
     for(const auto& position : hitPositions) window->draw(position);
 }
+
+const std::vector<RectangleShape> Mechanics::getPositions() const { return hitPositions; }
 
 bool Mechanics::checkEndGame() const
 {

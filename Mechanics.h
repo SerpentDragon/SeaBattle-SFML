@@ -49,6 +49,8 @@ public:
 
     void drawPositions() const;
 
+    const std::vector<RectangleShape> getPositions() const;
+
     bool checkEndGame() const;
 
     const wchar_t* getResult() const;
