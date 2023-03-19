@@ -42,13 +42,15 @@ public:
 
     ~Button();
     
+    void drawButton() const;
+    
     int isPressed();
 
     void setTextColor(const Color&);
 
     void setButtonColor(const Color&);
 
-    void setString(const wchar_t*);
+    void setText(const wchar_t*);
 
     int getPressedCounter() const;
 };

@@ -156,6 +156,7 @@ void Interface::gameWindow() const
     {
         for(size_t j = 0; j < i + 1; j++) ships.emplace_back(Ship(window, 4 - i, 0.0261 * screenWidth, 0.3255 * screenHeight + i * fieldSize * 1.1));
     }
+    
 
     int movement = -1;
     int dx, dy;
@@ -172,6 +173,8 @@ void Interface::gameWindow() const
     tmp.setFillColor(Color::Red);
 
     std::vector<RectangleShape> vec;
+
+    
 
     while(window->isOpen())
     {
@@ -238,6 +241,9 @@ void Interface::gameWindow() const
 
         window->draw(img["sea"].second);
 
+        exitButton.drawButton();
+        startButton.drawButton();
+
         if (checkGameStarted && !checkPause)
         {
             if (mech.startTheGame()) sleep(milliseconds(500));
@@ -251,11 +257,20 @@ void Interface::gameWindow() const
 
         drawCoordinates(xCoord, yCoord, fieldSize); // draw coordinates of the field's cells
 
-        for(size_t i = 0; i < 10; i++) ships[i].drawShip();
+        for(size_t i = 0; i < 10; i++) ships[i].drawShip(); // draw ships
 
-        window->draw(globalTime);
+        window->draw(globalTime); // draw timer
 
-        if (checkGameStarted) mech.drawPositions();
+        if (checkGameStarted) mech.drawPositions(); // draw hit positions
+
+        if (checkGameStarted && !checkPause)
+        {
+            if (mech.checkEndGame())
+            {
+                showMessage(mech.getResult());
+                break;
+            }
+        }
 
         if (exitButton.isPressed()) break;
         else if (startButton.isPressed())
@@ -267,14 +282,13 @@ void Interface::gameWindow() const
                 if (ship.getIsPlaced())
                 {
                     flag = false;
-                    showMessage(L"Корабли неверно\n\tрасставлены!");
+                    showMessage(L"Корабли неверно\n\tрасставлены!");//, mech, leftField, rightField);
                     break;
                 }
             }
 
             if (flag) // if they were, start the game
             {
-                // std::cout << "PRESSED! " << startButton.getPressedCounter() << std::endl;
                 if (!checkGameStarted) 
                 {
                     th.launch();
@@ -285,17 +299,15 @@ void Interface::gameWindow() const
                 {
                     if (startButton.getPressedCounter() % 2 == 0) 
                     {
-                        // std::cout << "PAUSE!\n";
                         th.terminate();
                         checkPause = true;
-                        startButton.setString(L"Продолжить");
+                        startButton.setText(L"Продолжить");
                     }
                     else 
                     {
-                        std::cout << "CONTINUE!\n";
                         th.launch();
                         checkPause = false;
-                        startButton.setString(L"Пауза");
+                        startButton.setText (L"Пауза");
                     }
                 }         
             }
@@ -307,15 +319,6 @@ void Interface::gameWindow() const
         
         window->display(); 
 
-        if (checkGameStarted && !checkPause)
-        {
-            if (mech.checkEndGame())
-            {
-                showMessage(mech.getResult());
-                sleep(milliseconds(500));
-                break;
-            }
-        }
     }
 
     th.terminate();

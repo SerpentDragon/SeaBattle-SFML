@@ -100,6 +100,12 @@ Button::~Button()
     if (texture) delete texture;
 }
 
+void Button::drawButton() const
+{
+    window->draw(button);
+    window->draw(text);
+}
+
 int Button::isPressed()
 {
     int x = Mouse::getPosition(*window).x;
@@ -136,9 +142,10 @@ void Button::setButtonColor(const Color& color)
     button.setFillColor(color);
 }
 
-void Button::setString(const wchar_t* string)
+void Button::setText(const wchar_t* string)
 {
     text.setString(string);
+    text.setPosition(xPos + (width - text.getLocalBounds().width) / 2 , yPos + (height - text.getLocalBounds().height) / 2 - 7); 
 }
 
 int Button::getPressedCounter() const { return pressedCounter; }
