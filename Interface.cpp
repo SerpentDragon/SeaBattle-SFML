@@ -156,7 +156,6 @@ void Interface::gameWindow() const
     {
         for(size_t j = 0; j < i + 1; j++) ships.emplace_back(Ship(window, 4 - i, 0.0261 * screenWidth, 0.3255 * screenHeight + i * fieldSize * 1.1));
     }
-    
 
     int movement = -1;
     int dx, dy;
@@ -167,14 +166,6 @@ void Interface::gameWindow() const
     window->create(VideoMode(screenWidth, screenHeight), "Морской бой", Style::Fullscreen);
 
     Event event;
-
-    RectangleShape tmp(Vector2f(100, 100));
-    tmp.setPosition(500, 500);
-    tmp.setFillColor(Color::Red);
-
-    std::vector<RectangleShape> vec;
-
-    
 
     while(window->isOpen())
     {
@@ -277,13 +268,16 @@ void Interface::gameWindow() const
         {
             bool flag = true;
 
-            for(const auto& ship : ships) // check if all the sips were placed 
+            if (!checkGameStarted)
             {
-                if (ship.getIsPlaced())
+                for(const auto& ship : ships) // check if all the sips were placed 
                 {
-                    flag = false;
-                    showMessage(L"Корабли неверно\n\tрасставлены!");//, mech, leftField, rightField);
-                    break;
+                    if (ship.getIsPlaced())
+                    {
+                        flag = false;
+                        showMessage(L"Корабли неверно\n\tрасставлены!");//, mech, leftField, rightField);
+                        break;
+                    }
                 }
             }
 
@@ -294,6 +288,14 @@ void Interface::gameWindow() const
                     th.launch();
                     checkGameStarted = true;
                     mech.placeComputerShips();
+                    // for(int i = 0; i < 10; i++)
+                    // {
+                    //     for(int j = 0; j < 10; j++)
+                    //     {
+                    //         std::cout << rightField[j * 10 + i].getData() << " ";
+                    //     }
+                    //     std::cout << std::endl;
+                    // }
                 }
                 else
                 {
@@ -318,7 +320,6 @@ void Interface::gameWindow() const
         }
         
         window->display(); 
-
     }
 
     th.terminate();

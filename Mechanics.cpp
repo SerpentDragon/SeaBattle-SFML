@@ -1,5 +1,7 @@
 #include "Mechanics.h"
 
+#include <iostream>
+
 enum directions{up = 0, right, down, left};
 
 void Mechanics::markTheDeck(int i, int j, std::vector<Field>* fieldArea) // should be optimized
@@ -25,14 +27,104 @@ void Mechanics::markTheDeck(int i, int j, std::vector<Field>* fieldArea) // shou
     }
 }
 
-void Mechanics::markKilledShip(int i, int j, std::vector<Field>* fieldArea, bool vertical, int deckNumber)
+void Mechanics::markKilledShip(const std::vector<int>& positions, std::vector<Field>* fieldArea)
 {
+    for(const auto& position : positions)
+    {
+        (*fieldArea)[position].setData(4);
+        
+        if (fieldArea == leftField)
+        {
+            RectangleShape hitPos(Vector2f(fieldSize, fieldSize));
+            hitPos.setPosition((*fieldArea)[position].getPosition());
+            hitPos.setTexture(&computerMissedTexture);
 
+            hitPositions.emplace_back(hitPos);
+
+            auto it = std::find(moves.begin(), moves.end(), position);
+            if (it != moves.end()) moves.erase(it);
+            
+        }
+        else
+        {
+            (*fieldArea)[position].displayMissTexture();
+        }
+    }
 }
 
 bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
 {
+    bool vertical = false, horizontal = false;
+    int row, column, *coord;
 
+    std::vector<int> positions;
+
+    for(int direct = up; direct <= left; direct++)
+    {
+        // std::cout << "d: " << direct << std::endl;
+        row = i; column = j;
+
+        int step = direct == up || direct == left ? -1 : 1;
+        int limit = direct == up || direct == left ? -1 : 10;
+        coord = direct % 2 ? &column : &row;
+        *coord += step;
+
+        if (*coord == limit) continue;
+
+        int fieldData = (*fieldArea)[row * 10 + column].getData();
+        if (fieldData == 1 || fieldData == 3)
+        {
+            direct % 2 ? horizontal = true : vertical = true;
+            break;
+        }
+    }
+
+    row = i; column = j;
+
+    // std::cout << vertical << " " << horizontal << std::endl;
+
+    if (!vertical && !horizontal)
+    {
+        if (i - 1 >= 0) positions.emplace_back((i - 1) * 10 + j);
+        if (i + 1 <= 9) positions.emplace_back((i + 1) * 10 + j);
+        if (j - 1 >= 0) positions.emplace_back(i * 10 + j - 1);
+        if (j + 1 <= 9) positions.emplace_back(i * 10 + j + 1);
+    }
+    else
+    {
+        coord = vertical ? &row : &column;
+        for(int step = -1; step <= 1; step += 2)
+        {
+            // std::cout << "step: " << step << std::endl;
+            row = i; column = j;
+
+            int limit = step == -1 ? -1 : 10;
+           
+            while(true)
+            {
+                *coord += step;
+                if (*coord == limit) break;
+
+                int fieldData = (*fieldArea)[row * 10 + column].getData();
+                if (fieldData == 1) 
+                {
+                    // std::cout << "Injured!\n";
+                    return false;
+                }
+                else if (fieldData != 3)
+                {
+                    positions.emplace_back(row * 10 + column);
+                    break;
+                }
+            }
+        }
+    }
+
+    // std::cout << "Killed!\n";
+
+    markKilledShip(positions, fieldArea);
+
+    return true;
 }
 
 Mechanics::Mechanics(const RenderWindow *window, const std::vector<Field>* leftField, const std::vector<Field>* rightField)
@@ -136,7 +228,39 @@ void Mechanics::placeComputerShips() const
 
 bool Mechanics::startTheGame()
 {
-    
+    bool flag = true;
+
+    if (playerMove)
+    {
+        for(int k = 0; k < 100; k++)
+        {
+            if ((*rightField)[k].isChosen())
+            {
+                int fieldData = (*rightField)[k].getData();
+                if (fieldData == 1)
+                {
+                    (*rightField)[k].setData(3);
+                    (*rightField)[k].displayHitTexture();
+
+                    markTheDeck(k / 10, k % 10, rightField);
+                    checkShipIsKilled(k / 10, k % 10, rightField);
+                }
+                else // if (fieldData == 0 || fieldData == 2)
+                {
+                    (*rightField)[k].setData(4);
+                    (*rightField)[k].displayMissTexture();
+                    playerMove = false;
+                }
+                break;
+            }
+        }
+    }
+    else
+    {
+        playerMove = true;
+    }
+
+    return !flag;
 }
 
 void Mechanics::drawPositions() const

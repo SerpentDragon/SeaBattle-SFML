@@ -27,7 +27,7 @@ class Mechanics
 
     bool checkShipIsKilled(int, int, std::vector<Field>*);
 
-    void markKilledShip(int, int, std::vector<Field>*, bool, int);
+    void markKilledShip(const std::vector<int>&, std::vector<Field>*);
 
 public:
 
