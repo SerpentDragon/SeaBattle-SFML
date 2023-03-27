@@ -51,5 +51,5 @@ public:
 
     bool checkEndGame() const;
 
-    const wchar_t* getResult() const;
+    std::wstring getResult() const;
 };

@@ -4,6 +4,56 @@
 
 Text globalTime;
 
+void timer(int hours, int minutes, int seconds)
+{
+    std::stringstream time;
+    while(true)
+    {
+        time << hours << ":" << minutes << ":" << seconds;
+        globalTime.setString(time.str());
+        time.str(""); 
+
+        seconds++;
+        if (seconds % 60 == 0 && seconds)
+        {
+            minutes++;
+            seconds = 0;
+        }
+        if (minutes % 60 == 0 && minutes)
+        {
+            hours++;
+            seconds = minutes = 0;
+        }
+        sleep(milliseconds(1000));
+    }
+}
+
+bool comparator(const std::string& str1, const std::string str2)
+{
+    int str1FirstIndex = str1.find(":"), str1SecondIndex = str1.rfind(":");
+    int str2FirstIndex = str2.find(":"), str2SecondIndex = str2.rfind(":");
+
+    int str1Hours = stoi(str1.substr(0, str1FirstIndex));
+    int str1Minutes = stoi(str1.substr(str1FirstIndex + 1, 2));
+    int str1Seconds = stoi(str1.substr(str1SecondIndex + 1));
+
+    int str2Hours = stoi(str2.substr(0, str2FirstIndex));
+    int str2Minutes = stoi(str2.substr(str2FirstIndex + 1, 2));
+    int str2Seconds = stoi(str2.substr(str2SecondIndex + 1));
+
+    if (str1Hours < str2Hours) return true;
+    else if (str1Hours > str2Hours) return false;
+    else
+    {
+        if (str1Minutes < str2Minutes) return true;
+        else if (str1Minutes > str2Minutes) return false;
+        else
+        {
+            return str1Seconds < str2Seconds;
+        }
+    }
+}
+
 inline void Interface::drawCoordinates(int x, int y, int size) const
 {
     Text coordText("", arialFont, static_cast<double>(size) / 1.5); // text for field's coordinates
@@ -33,28 +83,103 @@ inline void Interface::drawCoordinates(int x, int y, int size) const
     }
 }
 
-void timer(int& hours, int& minutes, int& seconds)
+void Interface::showMessage(const std::wstring& msg) const
 {
-    std::stringstream time;
+    int windowWidth = fieldSize * 7, windowHeight = fieldSize * 3;
+
+    RectangleShape messageWindow(Vector2f(windowWidth, windowHeight));
+    messageWindow.setPosition((screenWidth - windowWidth) / 2, (screenHeight - windowHeight) / 2);
+    messageWindow.setOutlineThickness(0.0047 * screenHeight);
+    messageWindow.setOutlineColor(Color::Black);
+
+    Text messageText(msg, arialFont, 0.03704 * screenHeight);
+    messageText.setFillColor(Color::Black);
+    messageText.setPosition((screenWidth - messageText.getGlobalBounds().width) / 2, (screenHeight - messageText.getGlobalBounds().height) / 2);
+
+    window->draw(messageWindow);
+    window->draw(messageText);
+    window->display();
+
+    sleep(milliseconds(3000));
+}
+
+bool Interface::showWarning(const std::wstring& msg) const
+{
+    int windowWidth = fieldSize * 7, windowHeight = fieldSize * 4;
+    int windowXPos = (window->getSize().x - windowWidth) / 2;
+    int windowYPos = (window->getSize().y - windowHeight) / 2;
+
+    RectangleShape messageWindow(Vector2f(windowWidth, windowHeight));
+    messageWindow.setPosition(windowXPos, windowYPos);
+    messageWindow.setOutlineThickness(0.0047 * screenHeight);
+    messageWindow.setOutlineColor(Color::Black);
+
+    Text messageText(msg, arialFont, 0.03704 * screenHeight);
+    messageText.setFillColor(Color::Black);
+    messageText.setPosition(windowXPos + (windowWidth - messageText.getGlobalBounds().width) / 2, windowYPos + fieldSize / 2);
+
+    Button yesButton(window, Text(L"Да", arialFont, 0.0157 * screenWidth), windowXPos + fieldSize, windowYPos + fieldSize * 2.5, fieldSize * 2, fieldSize, Color::Blue, Color::Green);
+    Button noButton(window, Text(L"Нет", arialFont, 0.0157 * screenWidth), windowXPos + fieldSize * 4, windowYPos + fieldSize * 2.5, fieldSize * 2, fieldSize, Color::Blue, Color::Green);
+
+    
+    window->draw(messageWindow);
+    window->draw(messageText);
+
+    yesButton.drawButton();
+    noButton.drawButton();
+
+    window->display();
+
     while(true)
     {
-        time << hours << ":" << minutes << ":" << seconds;
-        globalTime.setString(time.str());
-        time.str(""); 
-
-        seconds++;
-        if (seconds % 60 == 0 && seconds)
-        {
-            minutes++;
-            seconds = 0;
-        }
-        if (minutes % 60 == 0 && minutes)
-        {
-            hours++;
-            seconds = minutes = 0;
-        }
-        sleep(milliseconds(1000));
+        if (yesButton.isPressed()) return true;
+        else if (noButton.isPressed()) return false;   
     }
+}
+
+std::vector<std::string> Interface::readRecords() const
+{
+    std::vector<std::string> records;
+
+    std::fstream file("data/records.ltx", std::ios_base::in | std::ios_base::binary);
+    if (!file)
+    {
+        std::filesystem::create_directories("data");
+        std::ifstream tmpFile("data/records.ltx");
+        tmpFile.close();
+    }
+    else
+    {
+        std::string record;
+        std::regex regexTemplate("[0-9]{2,}:[0-9]{2}:[0-9]{2}");
+
+        while(std::getline(file, record))
+        {
+            if (std::regex_match(record, regexTemplate))
+            {
+                int minutes = stoi(record.substr(record.find(":") + 1, 2));
+                int seconds = stoi(record.substr(record.rfind(":") + 1));
+
+                if (minutes < 59 && seconds < 59) records.emplace_back(record);
+            }
+        }
+        file.close();
+
+        std::sort(records.begin(), records.end(), comparator);
+    }
+
+    return records;
+}
+
+void Interface::writeRecords() const
+{
+    std::vector<std::string> records = readRecords();
+    records.emplace_back(globalTime.getString());
+    std::sort(records.begin(), records.end(), comparator);
+
+    std::fstream file("data/records.ltx", std::ios_base::out | std::ios_base::binary);
+    for(int i = 0; i < 5 && i < records.size(); i++) file << records[i] << std::endl;
+    file.close();
 }
 
 Interface::Interface(const RenderWindow* window)
@@ -68,6 +193,10 @@ Interface::Interface(const RenderWindow* window)
     img["sea"] = std::pair(Texture(), RectangleShape(Vector2f(screenWidth, screenHeight)));
     img["sea"].first.loadFromFile("images/interface/sea.jpg");
     img["sea"].second.setTexture(&img["sea"].first);
+
+    img["stars"] = std::pair(Texture(), RectangleShape(Vector2f(screenWidth / 5, screenHeight / 5)));
+    img["stars"].first.loadFromFile("images/interface/stars.jpg");
+    img["stars"].second.setTexture(&img["stars"].first);
 }
 
 Interface::~Interface()
@@ -118,8 +247,14 @@ void Interface::mainMenu() const
 
         if (buttons[0].isPressed()) gameWindow();           // Play button
         else if (buttons[1].isPressed()) showReference();   // Reference button
-        else if (buttons[2].isPressed());                   // Records button
-        else if (buttons[3].isPressed()) window->close();   // Exit button
+        else if (buttons[2].isPressed())                    // Records button
+        {
+            showRecords();
+        }                   
+        else if (buttons[3].isPressed())                    // Exit button
+        {
+            if (showWarning(L"Вы уверены, что\n  хотите выйти?")) window->close(); 
+        }
 
         window->display();
     }
@@ -258,12 +393,18 @@ void Interface::gameWindow() const
         {
             if (mech.checkEndGame())
             {
-                showMessage(mech.getResult());
+                std::wstring result = mech.getResult();
+                if (result == L"Победа!") writeRecords();
+                showMessage(result);
                 break;
             }
         }
 
-        if (exitButton.isPressed()) break;
+        if (exitButton.isPressed())
+        {
+            showWarning(L"Вы уверены, что\n  хотите выйти?");
+            break;
+        }
         else if (startButton.isPressed())
         {
             bool flag = true;
@@ -330,7 +471,11 @@ void Interface::gameWindow() const
 void Interface::showReference() const
 {
     RenderWindow refWindow(VideoMode(0.5 * Width, 0.6 * Height), L"Справка", Style::Default);
-    refWindow.setPosition(Vector2i((screenWidth - 0.5 * Width) / 2, (screenHeight - 0.6 * Height) / 2));
+
+    int windowXPos = window->getPosition().x + (window->getSize().x - 0.5 * Width) / 2;
+    int windowYPos = window->getPosition().y + (window->getSize().y - 0.6 * Height) / 2;
+
+    refWindow.setPosition(Vector2i(windowXPos, windowYPos));
     Event event;
 
     Text text(L"В начале игры вам необходимо расставить свои \nкорабли на левом поле:\n1 - четырёхпалубный\n2 - трёхпалубных\n3 - двухпалубных\n4 - однопалубных\n\
@@ -359,22 +504,51 @@ void Interface::showReference() const
     }
 }
 
-void Interface::showMessage(const wchar_t* msg) const
+void Interface::showRecords() const
 {
-    int windowWidth = fieldSize * 7, windowHeight = fieldSize * 3;
+    int windowWidth = screenWidth / 5, windowHeight = screenHeight / 2;
+    int windowXPos = window->getPosition().x + (window->getSize().x - windowWidth) / 2;
+    int windowYPos = window->getPosition().y + (window->getSize().y - windowHeight) / 2;
 
-    RectangleShape messageWindow(Vector2f(windowWidth, windowHeight));
-    messageWindow.setPosition((screenWidth - windowWidth) / 2, (screenHeight - windowHeight) / 2);
-    messageWindow.setOutlineThickness(0.0047 * screenHeight);
-    messageWindow.setOutlineColor(Color::Black);
+    img["stars"].second.setPosition(0, 0);
 
-    Text messageText(msg, arialFont, 0.03704 * screenHeight);
-    messageText.setFillColor(Color::Black);
-    messageText.setPosition((screenWidth - messageText.getGlobalBounds().width) / 2, (screenHeight - messageText.getGlobalBounds().height) / 2);
+    std::vector<std::string> records = readRecords();
+    if (records.size() > 5) records.erase(records.begin() + 5, records.end());
 
-    window->draw(messageWindow);
-    window->draw(messageText);
-    window->display();
+    std::vector<Text> recordsTexts(records.size());
+    for(int i = 0; i < records.size(); i++)
+    {
+        recordsTexts[i] = Text(std::to_string(i + 1) + ") " + records[i], arialFont, 50);
+        recordsTexts[i].setFillColor(Color::Red);
+        recordsTexts[i].setPosition(0.1823 * windowWidth, screenHeight / 6 + i * 1.2 * recordsTexts[i].getGlobalBounds().height);
+    }
 
-    sleep(milliseconds(3000));
+    RenderWindow recordsWindow(VideoMode(windowWidth, windowHeight), L"Рекорды", Style::Close);
+    recordsWindow.setPosition(Vector2i(windowXPos, windowYPos));
+
+    Event event;
+
+    while(recordsWindow.isOpen())
+    {
+        while(recordsWindow.pollEvent(event))
+        {
+            switch(event.type)
+            {
+                case Event::Closed:
+                    recordsWindow.close();
+                    break;
+            }
+        }
+
+        recordsWindow.clear(Color::White);
+
+        recordsWindow.draw(img["stars"].second);
+
+        for(const auto& recordText : recordsTexts)
+        {
+            recordsWindow.draw(recordText);
+        }
+
+        recordsWindow.display();
+    }
 }

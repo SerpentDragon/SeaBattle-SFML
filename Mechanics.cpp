@@ -134,7 +134,7 @@ Mechanics::Mechanics(const RenderWindow *window, const std::vector<Field>* leftF
     this->rightField = const_cast<std::vector<Field>*>(rightField);
 
     playerMove = true;
-    playerShips = computerShips = 10;
+    playerShips = computerShips = 1;
 
     moves.resize(100);
     for(int i = 0; i < 100; i++) moves[i] = i;
@@ -273,7 +273,7 @@ bool Mechanics::checkEndGame() const
     return playerShips == 0 || computerShips == 0;
 }
 
-const wchar_t* Mechanics::getResult() const
+std::wstring Mechanics::getResult() const
 {
     if (!playerShips) return L"Поражение!";
     return L"Победа!";

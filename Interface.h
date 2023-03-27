@@ -1,10 +1,12 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <filesystem>
 #include <functional>
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <regex>
 #include <map>
 #include "Mechanics.h"
 #include "Button.h"
@@ -16,6 +18,10 @@ using namespace sf;
 
 extern int screenWidth;
 
+void timer(int, int, int);
+
+bool comparator(const std::string&, const std::string);
+
 class Interface
 {
     RenderWindow* window;
@@ -23,6 +29,14 @@ class Interface
     mutable std::map<std::string, std::pair<Texture, RectangleShape>> img;
 
     inline void drawCoordinates(int, int, int) const;
+
+    void showMessage(const std::wstring&) const;
+
+    bool showWarning(const std::wstring&) const;
+
+    std::vector<std::string> readRecords() const;
+
+    void writeRecords() const;
 
 public:
     Interface(const RenderWindow*);
@@ -43,5 +57,5 @@ public:
 
     void showReference() const;
 
-    void showMessage(const wchar_t*) const;
+    void showRecords() const;
 };
