@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <array>
 #include "Field.h"
 #include "settings.h"
 

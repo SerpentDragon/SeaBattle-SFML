@@ -35,11 +35,7 @@ void Mechanics::markKilledShip(const std::vector<int>& positions, std::vector<Fi
         
         if (fieldArea == leftField)
         {
-            RectangleShape hitPos(Vector2f(fieldSize, fieldSize));
-            hitPos.setPosition((*fieldArea)[position].getPosition());
-            hitPos.setTexture(&computerMissedTexture);
-
-            hitPositions.emplace_back(hitPos);
+            (*fieldArea)[position].displayMissTexture();
 
             auto it = std::find(moves.begin(), moves.end(), position);
             if (it != moves.end()) moves.erase(it);
@@ -124,6 +120,17 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
 
     markKilledShip(positions, fieldArea);
 
+    if (fieldArea == leftField) 
+    {
+        // std::cout << "playerShips--\n";
+        playerShips--;
+    }
+    else 
+    {
+        // std::cout << "computerShips--\n";
+        computerShips--;
+    }
+
     return true;
 }
 
@@ -134,7 +141,7 @@ Mechanics::Mechanics(const RenderWindow *window, const std::vector<Field>* leftF
     this->rightField = const_cast<std::vector<Field>*>(rightField);
 
     playerMove = true;
-    playerShips = computerShips = 1;
+    playerShips = computerShips = 10;
 
     moves.resize(100);
     for(int i = 0; i < 100; i++) moves[i] = i;
@@ -228,7 +235,7 @@ void Mechanics::placeComputerShips() const
 
 bool Mechanics::startTheGame()
 {
-    bool flag = true;
+    bool flag = false;
 
     if (playerMove)
     {
@@ -257,10 +264,137 @@ bool Mechanics::startTheGame()
     }
     else
     {
-        playerMove = true;
+        static int i, j;
+        static int prevI, prevJ;
+
+        if (possibleDirections.size())
+        {
+            static int currentDirection = -1;
+            if (currentDirection == -1) currentDirection = possibleDirections[rand() % possibleDirections.size()];
+
+            int *coord = currentDirection % 2 ? &j : &i;
+            int step = currentDirection == up || currentDirection == left ? -1 : 1;
+            int limit = currentDirection == up || currentDirection == left ? -1 : 10;
+
+            *coord += step;
+            if (*coord == limit)
+            {
+                possibleDirections.erase(std::find(possibleDirections.begin(), possibleDirections.end(), currentDirection));
+                currentDirection = -1;
+                i = prevI; j = prevJ;
+                return false;
+            }
+
+            auto check = std::find(moves.begin(), moves.end(), i * 10 + j);
+
+            int fieldData = (*leftField)[i * 10 + j].getData();
+            if (fieldData == 1 || fieldData == 3)
+            {
+                for(auto it = possibleDirections.begin(); it != possibleDirections.end(); it++)
+                {
+                    if (*it % 2 != currentDirection % 2)
+                    {
+                        possibleDirections.erase(it);
+                        it--;
+                    }
+                }
+
+                if (fieldData == 1)
+                {
+                    (*leftField)[i * 10 + j].setData(3);
+                    moves.erase(check);
+
+                    markTheDeck(i, j, leftField);
+                    if (checkShipIsKilled(i, j, leftField))
+                    {
+                        possibleDirections.clear();
+                        currentDirection = -1;
+                    }
+
+                    RectangleShape hitPos(Vector2f(fieldSize, fieldSize));
+                    hitPos.setPosition((*leftField)[i * 10 + j].getPosition());
+                    hitPos.setTexture(&computerHitTexture);
+
+                    hitPositions.emplace_back(hitPos);
+                }
+            }
+            else 
+            {
+                if (check != moves.end())
+                {
+                    moves.erase(check);
+
+                    (*leftField)[i * 10 + j].setData(4);
+                    (*leftField)[i * 10 + j].displayMissTexture();
+                    playerMove = true;
+                }
+
+                possibleDirections.erase(std::find(possibleDirections.begin(), possibleDirections.end(), currentDirection));
+                currentDirection = -1;
+                i = prevI; j = prevJ;
+            }
+        }
+        else
+        {
+            int k = moves[rand() % moves.size()];
+            int fieldData = (*leftField)[k].getData();
+
+            i = k / 10; prevI = i;
+            j = k % 10; prevJ = j;
+
+            auto it = std::find(moves.begin(), moves.end(), k);
+            if (it != moves.end()) moves.erase(it);
+
+            if (fieldData == 1)
+            {
+                (*leftField)[k].setData(3);
+
+                markTheDeck(i, j, leftField);
+
+                RectangleShape hitPos(Vector2f(fieldSize, fieldSize));
+                hitPos.setPosition((*leftField)[k].getPosition());
+                hitPos.setTexture(&computerHitTexture);
+
+                hitPositions.emplace_back(hitPos);
+
+                if (!checkShipIsKilled(i, j, leftField))
+                {
+                    std::array<int, 2> taken{3, 4};
+
+                    if (i - 1 >= 0) 
+                    {
+                        if (std::find(taken.begin(), taken.end(), (*leftField)[(i - 1) * 10 + j].getData()) == taken.end())
+                            possibleDirections.emplace_back(up);
+                    }
+                    if (i + 1 <= 9) 
+                    {
+                        if (std::find(taken.begin(), taken.end(), (*leftField)[(i + 1) * 10 + j].getData()) == taken.end())
+                            possibleDirections.emplace_back(down);
+                    }
+                    if (j - 1 >= 0) 
+                    {
+                        if (std::find(taken.begin(), taken.end(), (*leftField)[i * 10 + j - 1].getData()) == taken.end())
+                            possibleDirections.emplace_back(left);
+                    }
+                    if (j + 1 <= 9) 
+                    {
+                        if (std::find(taken.begin(), taken.end(), (*leftField)[i * 10 + j + 1].getData()) == taken.end())
+                            possibleDirections.emplace_back(right);
+                    }
+                }
+            }
+            else if (fieldData == 0 || fieldData == 2)
+            {
+                (*leftField)[k].setData(4);
+                (*leftField)[k].displayMissTexture();
+                playerMove = true;
+            }
+        }
+
+        flag = true;
     }
 
-    return !flag;
+    return flag;
 }
 
 void Mechanics::drawPositions() const

@@ -151,7 +151,7 @@ std::vector<std::string> Interface::readRecords() const
     else
     {
         std::string record;
-        std::regex regexTemplate("[0-9]{2,}:[0-9]{2}:[0-9]{2}");
+        std::regex regexTemplate("[0-9]{2,}:[0-9]{1,2}:[0-9]{1,2}");
 
         while(std::getline(file, record))
         {
@@ -437,6 +437,7 @@ void Interface::gameWindow() const
                     //     }
                     //     std::cout << std::endl;
                     // }
+                    startButton.setText(L"Пауза");
                 }
                 else
                 {
