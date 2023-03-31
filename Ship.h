@@ -16,7 +16,7 @@ class Ship
     int width;
     int height;
 
-    int isPlaced;       // is the ship is placed on the field
+    int IsPlaced;       // is the ship is placed on the field
 
     int rotateCounter;  // number of rotations of the ship
 
@@ -61,7 +61,9 @@ public:
 
     const Vector2f getPosition() const;
 
-    const bool getIsPlaced() const;
+    const bool isPlaced() const;
+
+    void setIsPlaced(int);
 
     const int getWidth() const;
 

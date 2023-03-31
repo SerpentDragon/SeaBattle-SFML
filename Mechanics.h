@@ -5,6 +5,7 @@
 #include <array>
 #include "Field.h"
 #include "settings.h"
+#include "Ship.h"
 
 class Mechanics
 {
@@ -44,7 +45,7 @@ public:
 
     ~Mechanics();
 
-    void placeComputerShips() const;
+    void placeShips(std::vector<Field>*, std::vector<Ship>* = nullptr) const;
 
     bool startTheGame();
 

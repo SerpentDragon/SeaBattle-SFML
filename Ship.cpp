@@ -10,7 +10,7 @@ void Ship::Swap(T&& obj) noexcept
     y = obj.y;
     width = obj.width;
     height = obj.height;
-    isPlaced = obj.isPlaced;
+    IsPlaced = obj.IsPlaced;
     rotateCounter = obj.rotateCounter;
     shipTexture = obj.shipTexture;
     shipRect = obj.shipRect;
@@ -38,16 +38,16 @@ void Ship::locateShip(std::vector<Field>& leftField, int data)
     if (!data) 
     {
         shipPlace = aroundShip = 0; // id not data we should free cells
-        xIndex = isPlaced / 10;
-        yIndex = isPlaced % 10;
-        isPlaced = -1;
+        xIndex = IsPlaced / 10;
+        yIndex = IsPlaced % 10;
+        IsPlaced = -1;
     }
     else 
     {
         shipPlace = 1; aroundShip = 2; // otherwise we should mark them as taken
         xIndex = (XPos - xCoord) / fieldSize;
         yIndex = (YPos - yCoord) / fieldSize;
-        isPlaced = xIndex * 10 + yIndex;
+        IsPlaced = xIndex * 10 + yIndex;
     }
 
     int leftXBorder = xIndex - 1, rightXBorder = width > height ? xIndex + deckNumber : xIndex + 1; // calculate positions of the left upper and lower right corners of 
@@ -90,7 +90,7 @@ Ship::Ship(const RenderWindow* window, int deck, int xPos, int yPos)
     width = deck * 0.034 * screenWidth;
     height = 0.034 * screenWidth;
 
-    isPlaced = -1;
+    IsPlaced = -1;
 
     shipTexture.loadFromFile("images/ships/" + std::to_string(deck) + "deck.png");
 
@@ -112,7 +112,7 @@ Ship::Ship(Ship&& obj) noexcept
     obj.window = nullptr;
     obj.deckNumber = obj.x = obj.y = obj.width = 0;
     obj.height = obj.XPos = obj.YPos = obj.rotateCounter = 0;
-    obj.isPlaced = false;
+    obj.IsPlaced = false;
 }
 
 Ship& Ship::operator=(const Ship& obj)
@@ -133,7 +133,7 @@ Ship& Ship::operator=(Ship&& obj) noexcept
         obj.window = nullptr;
         obj.deckNumber = obj.x = obj.y = obj.width = 0;
         obj.height = obj.XPos = obj.YPos = obj.rotateCounter = 0;
-        obj.isPlaced = false;
+        obj.IsPlaced = false;
     }
     return *this;
 }
@@ -173,7 +173,7 @@ void Ship::setFieldColor(std::vector<Field>& leftField)
     static int prevIndex = 0, prevWidth = width, prevHeight = height;
     int step, currIndex = calculatePosition();
 
-    if (isPlaced != -1) locateShip(leftField, 0); // check if the ship is placed on the field
+    if (IsPlaced != -1) locateShip(leftField, 0); // check if the ship is placed on the field
 
     if (xCoord <= XPos && yCoord <= YPos && xCoord + 10 * fieldSize >= XPos + width && yCoord + 10 * fieldSize >= YPos + height) // check if the ship is inside the user field
     {
@@ -218,10 +218,10 @@ void Ship::placeShip(std::vector<Field>& leftField)
 
 void Ship::resetPosition(std::vector<Field>& leftField) 
 {
-    if (isPlaced != -1) // if the ship is placed we should free area around it
+    if (IsPlaced != -1) // if the ship is placed we should free area around it
     {
         locateShip(leftField, 0);
-        isPlaced = -1;
+        IsPlaced = -1;
     }
     
     int tmpCounter = 4 - rotateCounter;
@@ -231,7 +231,9 @@ void Ship::resetPosition(std::vector<Field>& leftField)
 
 const Vector2f Ship::getPosition() const { return Vector2f(XPos, YPos); }
 
-const bool Ship::getIsPlaced() const { return isPlaced == -1; }
+const bool Ship::isPlaced() const { return IsPlaced == -1; }
+
+void Ship::setIsPlaced(int position) { IsPlaced = position; }
 
 const int Ship::getWidth() const { return width; }
 

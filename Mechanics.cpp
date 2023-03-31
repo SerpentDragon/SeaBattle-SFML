@@ -41,10 +41,7 @@ void Mechanics::markKilledShip(const std::vector<int>& positions, std::vector<Fi
             if (it != moves.end()) moves.erase(it);
             
         }
-        else
-        {
-            (*fieldArea)[position].displayMissTexture();
-        }
+        else (*fieldArea)[position].displayMissTexture();
     }
 }
 
@@ -57,7 +54,6 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
 
     for(int direct = up; direct <= left; direct++)
     {
-        // std::cout << "d: " << direct << std::endl;
         row = i; column = j;
 
         int step = direct == up || direct == left ? -1 : 1;
@@ -77,8 +73,6 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
 
     row = i; column = j;
 
-    // std::cout << vertical << " " << horizontal << std::endl;
-
     if (!vertical && !horizontal)
     {
         if (i - 1 >= 0) positions.emplace_back((i - 1) * 10 + j);
@@ -91,7 +85,6 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
         coord = vertical ? &row : &column;
         for(int step = -1; step <= 1; step += 2)
         {
-            // std::cout << "step: " << step << std::endl;
             row = i; column = j;
 
             int limit = step == -1 ? -1 : 10;
@@ -102,11 +95,7 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
                 if (*coord == limit) break;
 
                 int fieldData = (*fieldArea)[row * 10 + column].getData();
-                if (fieldData == 1) 
-                {
-                    // std::cout << "Injured!\n";
-                    return false;
-                }
+                if (fieldData == 1) return false;
                 else if (fieldData != 3)
                 {
                     positions.emplace_back(row * 10 + column);
@@ -116,20 +105,10 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
         }
     }
 
-    // std::cout << "Killed!\n";
-
     markKilledShip(positions, fieldArea);
 
-    if (fieldArea == leftField) 
-    {
-        // std::cout << "playerShips--\n";
-        playerShips--;
-    }
-    else 
-    {
-        // std::cout << "computerShips--\n";
-        computerShips--;
-    }
+    if (fieldArea == leftField) playerShips--;
+    else computerShips--;
 
     return true;
 }
@@ -152,28 +131,28 @@ Mechanics::~Mechanics()
     window = nullptr;
 }
 
-void Mechanics::placeComputerShips() const
+void Mechanics::placeShips(std::vector<Field>* fieldArea, std::vector<Ship>* ships) const
 {
     bool tmp = false;
 
     int i, j, k;
 
-    int decks[] = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
+    int decks[] = {1, 1, 1, 1, 2, 2, 2, 3, 3, 4};
 
     std::vector<int> direct;
 
-    for(const int& deck : decks)
+    for(int count = 0; count < 10; count++)
     {
         while(true)
         {
             i = rand() % 10; // choose the place for a ship
             j = rand() % 10;
 
-            if ((*rightField)[i * 10 + j].getData()) continue; // if the place is taken, choose another
+            if ((*fieldArea)[i * 10 + j].getData()) continue; // if the place is taken, choose another
 
-            if (deck == 1) // if the number of ship's deck is 1 we can place it
+            if (decks[count] == 1) // if the number of ship's deck is 1 we can place it
             {
-                (*rightField)[i * 10 + j].setData(1);
+                (*fieldArea)[i * 10 + j].setData(1);
                 direct.emplace_back(0);
                 break;
             }
@@ -193,11 +172,11 @@ void Mechanics::placeComputerShips() const
                     limit = 10; // cannot step on the cell number 10 - it doesn't exist!
                 }
 
-                for(k = 0; k < deck && (*ptr) != limit; k++, (*ptr) += step)
+                for(k = 0; k < decks[count] && (*ptr) != limit; k++, (*ptr) += step)
                 {
-                    if ((*rightField)[tmpI * 10 + tmpJ].getData()) break; // if cell is taken - break 
+                    if ((*fieldArea)[tmpI * 10 + tmpJ].getData()) break; // if cell is taken - break 
                 }
-                if (k == deck) direct.emplace_back(direction); // if there number of free cells equals to deck we remember current direction
+                if (k == decks[count]) direct.emplace_back(direction); // if there number of free cells equals to deck we remember current direction
 
                 tmpI = i; tmpJ = j;
             }
@@ -212,10 +191,10 @@ void Mechanics::placeComputerShips() const
 
         int leftXBorder = i - 1, leftYBorder = j - 1, rightXBorder = i + 1, rightYBorder = j + 1;
 
-        if (direct[num] == up) leftXBorder = i - deck;
-        else if (direct[num] == right) rightYBorder = j + deck;
-        else if (direct[num] == down) rightXBorder = i + deck;
-        else if (direct[num] == left) leftYBorder = j - deck;
+        if (direct[num] == up) leftXBorder = i - decks[count];
+        else if (direct[num] == right) rightYBorder = j + decks[count];
+        else if (direct[num] == down) rightXBorder = i + decks[count];
+        else if (direct[num] == left) leftYBorder = j - decks[count];
 
         if (leftXBorder < 0) leftXBorder++;
         else if (rightXBorder > 9) rightXBorder--;
@@ -224,10 +203,22 @@ void Mechanics::placeComputerShips() const
 
         for(size_t m = leftXBorder; m <= rightXBorder; m++) // border the area where the ship will be placed
         {
-            for(size_t n = leftYBorder; n <= rightYBorder; n++) (*rightField)[m * 10 + n].setData(2);
+            for(size_t n = leftYBorder; n <= rightYBorder; n++) (*fieldArea)[m * 10 + n].setData(2);
         }
 
-        for(k = 0; k < deck; k++, (*ptr) += step) (*rightField)[i * 10 + j].setData(1); // place the ship
+        if (fieldArea == leftField)
+        {
+            std::cout << j << " " << i << std::endl;
+            if (direct[num] % 2) (*ships)[count].rotateShip((*ships)[count].getPosition().x, (*ships)[count].getPosition().y);
+            // for(int rotateCount = 0; rotateCount < abs(direct[num] - left); rotateCount++)
+            // {
+            //     (*ships)[count].rotateShip((*ships)[count].getPosition().x, (*ships)[count].getPosition().y);
+            // }
+            // (*ships)[count].setPosition((*fieldArea)[i * 10 + j].getPosition());
+            (*ships)[count].setIsPlaced(i * 10 + j);
+        }
+
+        for(k = 0; k < decks[count]; k++, (*ptr) += step) (*fieldArea)[i * 10 + j].setData(1); // place the ship
 
         direct.clear();
     }
@@ -252,7 +243,7 @@ bool Mechanics::startTheGame()
                     markTheDeck(k / 10, k % 10, rightField);
                     checkShipIsKilled(k / 10, k % 10, rightField);
                 }
-                else // if (fieldData == 0 || fieldData == 2)
+                else if (fieldData == 0 || fieldData == 2)
                 {
                     (*rightField)[k].setData(4);
                     (*rightField)[k].displayMissTexture();

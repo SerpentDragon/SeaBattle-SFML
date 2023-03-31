@@ -269,6 +269,8 @@ void Interface::gameWindow() const
     startButton.setTextColor(Color::Black);
     Button exitButton(window, Text(L"Выход", arialFont, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, buttonColor, buttonColorOn);
     exitButton.setTextColor(Color::Black);
+    Button autoButton(window, Text(L"Авто", arialFont, font_size), 0.185 * screenWidth, 0.88 * screenHeight, button_width, button_height, buttonColor, buttonColorOn);
+    autoButton.setTextColor(Color::Black);
 
     std::vector<Field> leftField, rightField; // create game fields
     for(size_t i = 0; i < 10; i++) 
@@ -282,14 +284,17 @@ void Interface::gameWindow() const
 
     globalTime = Text("0:0:0", arialFont, 0.0365 * screenWidth); // text for timer
     globalTime.setFillColor(Color::Red);
-    globalTime.setPosition(0.2605 * screenWidth, 0.88 * screenHeight);
+    globalTime.setPosition(0.35 * screenWidth, 0.88 * screenHeight);
 
     Thread th(std::bind(&timer, 0, 0, 0)); // thread for timer
 
     std::vector<Ship> ships; // create ships
     for(int i = 3; i >= 0; i--)
     {
-        for(size_t j = 0; j < i + 1; j++) ships.emplace_back(Ship(window, 4 - i, 0.0261 * screenWidth, 0.3255 * screenHeight + i * fieldSize * 1.1));
+        for(size_t j = 0; j < i + 1; j++) 
+        {
+            ships.emplace_back(Ship(window, 4 - i, 0.0261 * screenWidth, 0.3255 * screenHeight + i * fieldSize * 1.1));
+        }
     }
 
     int movement = -1;
@@ -348,7 +353,7 @@ void Interface::gameWindow() const
                         int y = Mouse::getPosition(*window).y;
                         for(size_t i = 0; i < 10; i++)
                         {
-                            if (ships[i].onShip(x, y) && ships[i].getIsPlaced()) // rotate ship relatively to cursor
+                            if (ships[i].onShip(x, y) && ships[i].isPlaced()) // rotate ship relatively to cursor
                             {
                                 ships[i].rotateShip(x, y);
                                 ships[i].setFieldColor(leftField);
@@ -369,6 +374,7 @@ void Interface::gameWindow() const
 
         exitButton.drawButton();
         startButton.drawButton();
+        autoButton.drawButton();
 
         if (checkGameStarted && !checkPause)
         {
@@ -400,12 +406,7 @@ void Interface::gameWindow() const
             }
         }
 
-        if (exitButton.isPressed())
-        {
-            showWarning(L"Вы уверены, что\n  хотите выйти?");
-            break;
-        }
-        else if (startButton.isPressed())
+        if (startButton.isPressed())
         {
             bool flag = true;
 
@@ -413,7 +414,7 @@ void Interface::gameWindow() const
             {
                 for(const auto& ship : ships) // check if all the sips were placed 
                 {
-                    if (ship.getIsPlaced())
+                    if (ship.isPlaced())
                     {
                         flag = false;
                         showMessage(L"Корабли неверно\n\tрасставлены!");//, mech, leftField, rightField);
@@ -428,15 +429,17 @@ void Interface::gameWindow() const
                 {
                     th.launch();
                     checkGameStarted = true;
-                    mech.placeComputerShips();
-                    // for(int i = 0; i < 10; i++)
-                    // {
-                    //     for(int j = 0; j < 10; j++)
-                    //     {
-                    //         std::cout << rightField[j * 10 + i].getData() << " ";
-                    //     }
-                    //     std::cout << std::endl;
-                    // }
+                    mech.placeShips(&rightField);
+                    std::cout << "rightField:\n";
+                    for(int i = 0; i < 10; i++)
+                    {
+                        for(int j = 0; j < 10; j++)
+                        {
+                            std::cout << rightField[j * 10 + i].getData() << " ";
+                        }
+                        std::cout << std::endl;
+                    }
+                    std::cout << std::endl;
                     startButton.setText(L"Пауза");
                 }
                 else
@@ -459,6 +462,29 @@ void Interface::gameWindow() const
             {
                 for(auto& ship : ships) ship.resetPosition(leftField);
             }
+        }
+        else if (autoButton.isPressed())
+        {
+            for(auto& ship : ships) ship.resetPosition(leftField);
+            for(auto& field : leftField) field.setData(0);
+
+            mech.placeShips(&leftField, &ships);
+            std::cout << "leftField:\n";
+            for(int i = 0; i < 10; i++)
+            {
+                for(int j = 0; j < 10; j++)
+                {
+                    std::cout << leftField[j * 10 + i].getData() << " ";
+                }
+                std::cout << std::endl;
+            }
+            std::cout << std::endl;
+            
+        }
+        else if (exitButton.isPressed())
+        {
+            showWarning(L"Вы уверены, что\n  хотите выйти?");
+            break;
         }
         
         window->display(); 
