@@ -430,16 +430,6 @@ void Interface::gameWindow() const
                     th.launch();
                     checkGameStarted = true;
                     mech.placeShips(&rightField);
-                    std::cout << "rightField:\n";
-                    for(int i = 0; i < 10; i++)
-                    {
-                        for(int j = 0; j < 10; j++)
-                        {
-                            std::cout << rightField[j * 10 + i].getData() << " ";
-                        }
-                        std::cout << std::endl;
-                    }
-                    std::cout << std::endl;
                     startButton.setText(L"Пауза");
                 }
                 else
@@ -468,18 +458,7 @@ void Interface::gameWindow() const
             for(auto& ship : ships) ship.resetPosition(leftField);
             for(auto& field : leftField) field.setData(0);
 
-            mech.placeShips(&leftField, &ships);
-            std::cout << "leftField:\n";
-            for(int i = 0; i < 10; i++)
-            {
-                for(int j = 0; j < 10; j++)
-                {
-                    std::cout << leftField[j * 10 + i].getData() << " ";
-                }
-                std::cout << std::endl;
-            }
-            std::cout << std::endl;
-            
+            mech.placeShips(&leftField, &ships);            
         }
         else if (exitButton.isPressed())
         {

@@ -208,13 +208,21 @@ void Mechanics::placeShips(std::vector<Field>* fieldArea, std::vector<Ship>* shi
 
         if (fieldArea == leftField)
         {
-            std::cout << j << " " << i << std::endl;
             if (direct[num] % 2) (*ships)[count].rotateShip((*ships)[count].getPosition().x, (*ships)[count].getPosition().y);
-            // for(int rotateCount = 0; rotateCount < abs(direct[num] - left); rotateCount++)
-            // {
-            //     (*ships)[count].rotateShip((*ships)[count].getPosition().x, (*ships)[count].getPosition().y);
-            // }
-            // (*ships)[count].setPosition((*fieldArea)[i * 10 + j].getPosition());
+
+            if (direct[num] == up)
+            {
+                (*ships)[count].setPosition((*fieldArea)[(i - decks[count] + 1) * 10 + j].getPosition());
+            }
+            else if (direct[num] == right || direct[num] == down)
+            {
+                (*ships)[count].setPosition((*fieldArea)[i * 10 + j].getPosition());
+            }
+            else if (direct[num] == left)
+            {
+                (*ships)[count].setPosition((*fieldArea)[i * 10 + j - decks[count] + 1].getPosition());
+            }
+
             (*ships)[count].setIsPlaced(i * 10 + j);
         }
 
