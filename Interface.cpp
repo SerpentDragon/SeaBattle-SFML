@@ -3,26 +3,27 @@
 #include <iostream>
 
 Text globalTime;
+int hour = 0, minute = 0, second = 0;
 
-void timer(int hours, int minutes, int seconds)
+void timer()
 {
     std::stringstream time;
     while(true)
     {
-        time << hours << ":" << minutes << ":" << seconds;
+        time << hour << ":" << minute << ":" << second;
         globalTime.setString(time.str());
         time.str(""); 
 
-        seconds++;
-        if (seconds % 60 == 0 && seconds)
+        second++;
+        if (second % 60 == 0 && second)
         {
-            minutes++;
-            seconds = 0;
+            minute++;
+            second = 0;
         }
-        if (minutes % 60 == 0 && minutes)
+        if (minute % 60 == 0 && minute)
         {
-            hours++;
-            seconds = minutes = 0;
+            hour++;
+            second = minute = 0;
         }
         sleep(milliseconds(1000));
     }
@@ -151,16 +152,16 @@ std::vector<std::string> Interface::readRecords() const
     else
     {
         std::string record;
-        std::regex regexTemplate("[0-9]{2,}:[0-9]{1,2}:[0-9]{1,2}");
+        std::regex regexTemplate("[0-9]{1,}:[0-9]{1,2}:[0-9]{1,2}");
 
         while(std::getline(file, record))
         {
             if (std::regex_match(record, regexTemplate))
             {
-                int minutes = stoi(record.substr(record.find(":") + 1, 2));
-                int seconds = stoi(record.substr(record.rfind(":") + 1));
+                int min = stoi(record.substr(record.find(":") + 1, 2));
+                int sec = stoi(record.substr(record.rfind(":") + 1));
 
-                if (minutes < 59 && seconds < 59) records.emplace_back(record);
+                if (min < 59 && sec < 59) records.emplace_back(record);
             }
         }
         file.close();
@@ -286,7 +287,7 @@ void Interface::gameWindow() const
     globalTime.setFillColor(Color::Red);
     globalTime.setPosition(0.35 * screenWidth, 0.88 * screenHeight);
 
-    Thread th(std::bind(&timer, 0, 0, 0)); // thread for timer
+    Thread th(&timer);
 
     std::vector<Ship> ships; // create ships
     for(int i = 3; i >= 0; i--)
@@ -300,6 +301,7 @@ void Interface::gameWindow() const
     int movement = -1;
     int dx, dy;
     bool checkGameStarted = false, checkPause = false;
+    hour = minute = second = 0;
 
     Mechanics mech(window, &leftField, &rightField);
 
@@ -417,7 +419,7 @@ void Interface::gameWindow() const
                     if (ship.isPlaced())
                     {
                         flag = false;
-                        showMessage(L"Корабли неверно\n\tрасставлены!");//, mech, leftField, rightField);
+                        showMessage(L"Корабли неверно\n\tрасставлены!");
                         break;
                     }
                 }
@@ -453,7 +455,7 @@ void Interface::gameWindow() const
                 for(auto& ship : ships) ship.resetPosition(leftField);
             }
         }
-        else if (autoButton.isPressed())
+        else if (autoButton.isPressed() && !checkGameStarted)
         {
             for(auto& ship : ships) ship.resetPosition(leftField);
             for(auto& field : leftField) field.setData(0);
@@ -462,8 +464,8 @@ void Interface::gameWindow() const
         }
         else if (exitButton.isPressed())
         {
-            showWarning(L"Вы уверены, что\n  хотите выйти?");
-            break;
+            hour = minute = second = 0;
+            if (showWarning(L"Вы уверены, что\n  хотите выйти?")) break;
         }
         
         window->display(); 
@@ -476,7 +478,7 @@ void Interface::gameWindow() const
 
 void Interface::showReference() const
 {
-    RenderWindow refWindow(VideoMode(0.5 * Width, 0.6 * Height), L"Справка", Style::Default);
+    RenderWindow refWindow(VideoMode(0.5 * Width, 0.6 * Height), L"Справка", Style::Close);
 
     int windowXPos = window->getPosition().x + (window->getSize().x - 0.5 * Width) / 2;
     int windowYPos = window->getPosition().y + (window->getSize().y - 0.6 * Height) / 2;

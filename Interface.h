@@ -18,7 +18,7 @@ using namespace sf;
 
 extern int screenWidth;
 
-void timer(int, int, int);
+void timer();
 
 bool comparator(const std::string&, const std::string);
 

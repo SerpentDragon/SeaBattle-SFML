@@ -4,7 +4,7 @@
 
 enum directions{up = 0, right, down, left};
 
-void Mechanics::markTheDeck(int i, int j, std::vector<Field>* fieldArea) // should be optimized
+void Mechanics::markTheDeck(int i, int j, std::vector<Field>* fieldArea)
 {
     for(int row = -1; row <= 1; row += 2)
     {
@@ -29,74 +29,72 @@ void Mechanics::markTheDeck(int i, int j, std::vector<Field>* fieldArea) // shou
 
 void Mechanics::markKilledShip(const std::vector<int>& positions, std::vector<Field>* fieldArea)
 {
-    for(const auto& position : positions)
+    for(const auto& position : positions) // check all chosen positions around the ship
     {
-        (*fieldArea)[position].setData(4);
+        (*fieldArea)[position].setData(4); // mark this field as used
+        (*fieldArea)[position].displayMissTexture(); // display appropriate texture
         
-        if (fieldArea == leftField)
+        if (fieldArea == leftField) // if the field is located on player's field
         {
-            (*fieldArea)[position].displayMissTexture();
-
-            auto it = std::find(moves.begin(), moves.end(), position);
+            auto it = std::find(moves.begin(), moves.end(), position); // erase this field from the list of afordable moves
             if (it != moves.end()) moves.erase(it);
-            
         }
-        else (*fieldArea)[position].displayMissTexture();
+        
     }
 }
 
 bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
 {
-    bool vertical = false, horizontal = false;
+    bool vertical = false, horizontal = false; // variables to check ship's orientation 
     int row, column, *coord;
 
-    std::vector<int> positions;
+    std::vector<int> positions; // positions to mark as used
 
-    for(int direct = up; direct <= left; direct++)
+    for(int direct = up; direct <= left; direct++) // check all directions
     {
         row = i; column = j;
 
-        int step = direct == up || direct == left ? -1 : 1;
-        int limit = direct == up || direct == left ? -1 : 10;
-        coord = direct % 2 ? &column : &row;
+        int step = direct == up || direct == left ? -1 : 1; // move up or left: -1; down or right: +1
+        int limit = direct == up || direct == left ? -1 : 10; // can not move away the area
+        coord = direct % 2 ? &column : &row; // coordinate to change
         *coord += step;
 
-        if (*coord == limit) continue;
+        if (*coord == limit) continue; // if moved away the area
 
-        int fieldData = (*fieldArea)[row * 10 + column].getData();
-        if (fieldData == 1 || fieldData == 3)
+        int fieldData = (*fieldArea)[row * 10 + column].getData(); // get data of the field
+        if (fieldData == 1 || fieldData == 3) // if ship or wrecked deck is located here
         {
-            direct % 2 ? horizontal = true : vertical = true;
+            direct % 2 ? horizontal = true : vertical = true; // remember orientation of the ship
             break;
         }
     }
 
-    row = i; column = j;
+    row = i; column = j; // restore current position after changing using the pointer
 
-    if (!vertical && !horizontal)
+    if (!vertical && !horizontal) // if vertical == false and horizontal == false => this ship has the only deck
     {
-        if (i - 1 >= 0) positions.emplace_back((i - 1) * 10 + j);
+        if (i - 1 >= 0) positions.emplace_back((i - 1) * 10 + j); // positions around this ship must be marked as used because no one ship can be here
         if (i + 1 <= 9) positions.emplace_back((i + 1) * 10 + j);
         if (j - 1 >= 0) positions.emplace_back(i * 10 + j - 1);
         if (j + 1 <= 9) positions.emplace_back(i * 10 + j + 1);
     }
     else
     {
-        coord = vertical ? &row : &column;
-        for(int step = -1; step <= 1; step += 2)
+        coord = vertical ? &row : &column; // choose an orientation
+        for(int step = -1; step <= 1; step += 2) // check right and left or up and down directions
         {
             row = i; column = j;
 
-            int limit = step == -1 ? -1 : 10;
+            int limit = step == -1 ? -1 : 10; // can not move away the area
            
             while(true)
             {
                 *coord += step;
-                if (*coord == limit) break;
+                if (*coord == limit) break; // if moved away the area
 
-                int fieldData = (*fieldArea)[row * 10 + column].getData();
-                if (fieldData == 1) return false;
-                else if (fieldData != 3)
+                int fieldData = (*fieldArea)[row * 10 + column].getData(); // get data of the field
+                if (fieldData == 1) return false; // if data is 1 - this ship is not destroued yed
+                else if (fieldData != 3) // if data is not 1 or 3 - this positions must be marked as used
                 {
                     positions.emplace_back(row * 10 + column);
                     break;
@@ -105,10 +103,10 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
         }
     }
 
-    markKilledShip(positions, fieldArea);
+    markKilledShip(positions, fieldArea); // mark fields around this ship as used because no ship can be here
 
-    if (fieldArea == leftField) playerShips--;
-    else computerShips--;
+    if (fieldArea == leftField) playerShips--; // if this ship was destroyed on the player's field - decrease number of player's ships
+    else computerShips--; // otherwise decrease number of computer's ships
 
     return true;
 }
