@@ -59,6 +59,8 @@ public:
 
     void resetPosition(std::vector<Field>&);
 
+    const int getDeckNumber() const;
+
     const Vector2f getPosition() const;
 
     const bool isPlaced() const;

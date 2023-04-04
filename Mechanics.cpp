@@ -1,6 +1,7 @@
 #include "Mechanics.h"
 
 #include <iostream>
+#include <fstream>
 
 enum directions{up = 0, right, down, left};
 
@@ -47,6 +48,7 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
 {
     bool vertical = false, horizontal = false; // variables to check ship's orientation 
     int row, column, *coord;
+    int deckCounter = 0;
 
     std::vector<int> positions; // positions to mark as used
 
@@ -93,8 +95,9 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
                 if (*coord == limit) break; // if moved away the area
 
                 int fieldData = (*fieldArea)[row * 10 + column].getData(); // get data of the field
-                if (fieldData == 1) return false; // if data is 1 - this ship is not destroued yed
-                else if (fieldData != 3) // if data is not 1 or 3 - this positions must be marked as used
+                if (fieldData == 1) return false; // if data is 1 - this ship is not destroued yet
+                else if (fieldData == 3) deckCounter++;
+                else // if data is not 1 or 3 - this positions must be marked as used
                 {
                     positions.emplace_back(row * 10 + column);
                     break;
@@ -106,9 +109,26 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
     markKilledShip(positions, fieldArea); // mark fields around this ship as used because no ship can be here
 
     if (fieldArea == leftField) playerShips--; // if this ship was destroyed on the player's field - decrease number of player's ships
-    else computerShips--; // otherwise decrease number of computer's ships
+    else 
+    {
+        computerShips--; // otherwise decrease number of computer's ships
+
+        for(auto it = shipList.begin(); it != shipList.end(); it++)
+        {
+            if (it->getDeckNumber() == deckCounter)
+            {
+                shipList.erase(it);
+                break;
+            }
+        }
+    }
 
     return true;
+}
+
+void Mechanics::drawSurvivedShips() const
+{
+    for(const auto& ship : shipList) ship.drawShip();
 }
 
 Mechanics::Mechanics(const RenderWindow *window, const std::vector<Field>* leftField, const std::vector<Field>* rightField)
@@ -135,21 +155,21 @@ void Mechanics::placeShips(std::vector<Field>* fieldArea, std::vector<Ship>* shi
 
     int i, j, k;
 
-    int decks[] = {1, 1, 1, 1, 2, 2, 2, 3, 3, 4};
+    int decks[] = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
 
     std::vector<int> direct;
 
     for(int count = 0; count < 10; count++)
     {
         while(true)
-        {
+        {           
             i = rand() % 10; // choose the place for a ship
             j = rand() % 10;
 
-            if ((*fieldArea)[i * 10 + j].getData()) continue; // if the place is taken, choose another
-
             if (decks[count] == 1) // if the number of ship's deck is 1 we can place it
             {
+                if ((*fieldArea)[i * 10 + j].getData()) continue;
+
                 (*fieldArea)[i * 10 + j].setData(1);
                 direct.emplace_back(0);
                 break;
@@ -181,7 +201,7 @@ void Mechanics::placeShips(std::vector<Field>* fieldArea, std::vector<Ship>* shi
 
             if (direct.size()) break;
         }
-
+        
         int num = rand() % direct.size(); // random direction   
 
         int step = direct[num] == up || direct[num] == left ? -1 : 1;
@@ -204,24 +224,34 @@ void Mechanics::placeShips(std::vector<Field>* fieldArea, std::vector<Ship>* shi
             for(size_t n = leftYBorder; n <= rightYBorder; n++) (*fieldArea)[m * 10 + n].setData(2);
         }
 
-        if (fieldArea == leftField)
+        Ship *shipPtr;
+
+        if (fieldArea == leftField) 
         {
-            if (direct[num] % 2) (*ships)[count].rotateShip((*ships)[count].getPosition().x, (*ships)[count].getPosition().y);
+            shipPtr = &(*ships)[9 - count];
+            shipPtr->setIsPlaced(i * 10 + j);
+        }
+        else
+        {
+            shipList.emplace_back((*ships)[9 - count]);
+            shipList[count].setIsPlaced(-1);
+            shipList[count].resetPosition(*leftField);
 
-            if (direct[num] == up)
-            {
-                (*ships)[count].setPosition((*fieldArea)[(i - decks[count] + 1) * 10 + j].getPosition());
-            }
-            else if (direct[num] == right || direct[num] == down)
-            {
-                (*ships)[count].setPosition((*fieldArea)[i * 10 + j].getPosition());
-            }
-            else if (direct[num] == left)
-            {
-                (*ships)[count].setPosition((*fieldArea)[i * 10 + j - decks[count] + 1].getPosition());
-            }
+            shipPtr = &shipList[count];
+        }
 
-            (*ships)[count].setIsPlaced(i * 10 + j);
+        if (direct[num] % 2) shipPtr->rotateShip(shipPtr->getPosition().x, shipPtr->getPosition().y);
+        if (direct[num] == up)
+        {
+            shipPtr->setPosition((*fieldArea)[(i - decks[count] + 1) * 10 + j].getPosition());
+        }
+        else if (direct[num] == right || direct[num] == down)
+        {
+            shipPtr->setPosition((*fieldArea)[i * 10 + j].getPosition());
+        }
+        else if (direct[num] == left)
+        {
+            shipPtr->setPosition((*fieldArea)[i * 10 + j - decks[count] + 1].getPosition());
         }
 
         for(k = 0; k < decks[count]; k++, (*ptr) += step) (*fieldArea)[i * 10 + j].setData(1); // place the ship
@@ -249,7 +279,7 @@ bool Mechanics::startTheGame()
                     markTheDeck(k / 10, k % 10, rightField);
                     checkShipIsKilled(k / 10, k % 10, rightField);
                 }
-                else if (fieldData == 0 || fieldData == 2)
+                else // if (fieldData == 0 || fieldData == 2)
                 {
                     (*rightField)[k].setData(4);
                     (*rightField)[k].displayMissTexture();
@@ -406,6 +436,10 @@ bool Mechanics::checkEndGame() const
 
 std::wstring Mechanics::getResult() const
 {
-    if (!playerShips) return L"Поражение!";
+    if (!playerShips) 
+    {
+        drawSurvivedShips();
+        return L"Поражение!";
+    }
     return L"Победа!";
 }

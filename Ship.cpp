@@ -229,6 +229,8 @@ void Ship::resetPosition(std::vector<Field>& leftField)
     setPosition(x, y);
 }
 
+const int Ship::getDeckNumber() const { return deckNumber; }
+
 const Vector2f Ship::getPosition() const { return Vector2f(XPos, YPos); }
 
 const bool Ship::isPlaced() const { return IsPlaced == -1; }

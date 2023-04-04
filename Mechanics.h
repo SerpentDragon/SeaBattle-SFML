@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <vector>
 #include <array>
+#include "Ship.h"
 #include "Field.h"
 #include "settings.h"
-#include "Ship.h"
 
 class Mechanics
 {
@@ -16,7 +16,7 @@ class Mechanics
     int playerShips;   // counter of player's ships
     int computerShips; // counter of computer's ships
 
-    std::vector<int> possibleDirections;
+    std::vector<int> possibleDirections; // possible directions to check ariund the ship to destroy it
 
     std::vector<int> moves; // list of comupter's move. Keep it to not hit a field which already hit
 
@@ -25,11 +25,15 @@ class Mechanics
     std::vector<Field>* leftField;  // player's field
     std::vector<Field>* rightField; // computer's field
 
+    mutable std::vector<Ship> shipList;
+
     void markTheDeck(int, int, std::vector<Field>*);
 
     bool checkShipIsKilled(int, int, std::vector<Field>*);
 
     void markKilledShip(const std::vector<int>&, std::vector<Field>*);
+
+    void drawSurvivedShips() const;
 
 public:
 
@@ -45,7 +49,7 @@ public:
 
     ~Mechanics();
 
-    void placeShips(std::vector<Field>*, std::vector<Ship>* = nullptr) const;
+    void placeShips(std::vector<Field>*, std::vector<Ship>*) const;
 
     bool startTheGame();
 

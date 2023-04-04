@@ -15,6 +15,7 @@ class Field
     int y;
     int size;
 
+    int dataCounter;
     int data; // information about field status (free, taken or already used)
 
     Texture hit;
@@ -39,6 +40,8 @@ public:
     ~Field();
 
     void drawField() const;
+
+    void resetData();
 
     const Vector2f getPosition() const;
 

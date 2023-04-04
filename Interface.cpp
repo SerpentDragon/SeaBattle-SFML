@@ -10,7 +10,13 @@ void timer()
     std::stringstream time;
     while(true)
     {
-        time << hour << ":" << minute << ":" << second;
+        if (hour < 10) time << 0;
+        time << hour << ":";
+        if (minute < 10) time << 0;
+        time << minute << ":";
+        if (second < 10) time << 0;
+        time << second;
+
         globalTime.setString(time.str());
         time.str(""); 
 
@@ -152,7 +158,7 @@ std::vector<std::string> Interface::readRecords() const
     else
     {
         std::string record;
-        std::regex regexTemplate("[0-9]{1,}:[0-9]{1,2}:[0-9]{1,2}");
+        std::regex regexTemplate("[0-9]{2,}:[0-9]{2}:[0-9]{2}");
 
         while(std::getline(file, record))
         {
@@ -234,9 +240,9 @@ void Interface::mainMenu() const
         {
             switch (event.type)
             {
-                case Event::Closed:
-                    window->close();
-                    break;
+                // case Event::Closed:
+                    // window->close();
+                    // break;
             }
         }
 
@@ -283,7 +289,7 @@ void Interface::gameWindow() const
         }
     }
 
-    globalTime = Text("0:0:0", arialFont, 0.0365 * screenWidth); // text for timer
+    globalTime = Text("00:00:00", arialFont, 0.0365 * screenWidth); // text for timer
     globalTime.setFillColor(Color::Red);
     globalTime.setPosition(0.35 * screenWidth, 0.88 * screenHeight);
 
@@ -431,7 +437,17 @@ void Interface::gameWindow() const
                 {
                     th.launch();
                     checkGameStarted = true;
-                    mech.placeShips(&rightField);
+                    mech.placeShips(&rightField, &ships);
+                    
+                    // for(int i = 0; i < 10; i++)
+                    // {
+                    //     for(int j = 0; j < 10; j++)
+                    //     {
+                    //         std::cout << rightField[j * 10 + i].getData() << " ";
+                    //     }
+                    //     std::cout << std::endl;
+                    // }
+                    // std::cout << std::endl;
                     startButton.setText(L"Пауза");
                 }
                 else
@@ -458,9 +474,9 @@ void Interface::gameWindow() const
         else if (autoButton.isPressed() && !checkGameStarted)
         {
             for(auto& ship : ships) ship.resetPosition(leftField);
-            for(auto& field : leftField) field.setData(0);
+            for(auto& field : leftField) field.resetData();
 
-            mech.placeShips(&leftField, &ships);            
+            mech.placeShips(&leftField, &ships);           
         }
         else if (exitButton.isPressed())
         {

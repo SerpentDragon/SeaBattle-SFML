@@ -24,6 +24,7 @@ void Field::Swap(T&& obj)
     y = obj.y;
     size = obj.size;
     data = obj.data;
+    dataCounter = obj.dataCounter;
     hit = obj.hit;
     miss = obj.miss;
 }
@@ -35,6 +36,7 @@ Field::Field(const RenderWindow* window, int xPos, int yPos)
     x = xPos;
     y = yPos;
     this->size = fieldSize;
+    dataCounter = 0;
     data = 0;
 
     // loading textures depending on what area the field is located
@@ -59,7 +61,7 @@ Field::Field(Field&& obj)
     Swap(obj);
 
     obj.window = nullptr;
-    obj.x = obj.y = obj.size = obj.data = 0;
+    obj.x = obj.y = obj.size = obj.data = obj.dataCounter = 0;
 }
 
 Field& Field::operator=(const Field& obj)
@@ -78,7 +80,7 @@ Field& Field::operator=(Field&& obj)
         Swap(obj);
 
         obj.window = nullptr;
-        obj.x = obj.y = obj.size = obj.data = 0;
+        obj.x = obj.y = obj.size = obj.data = obj.dataCounter = 0;
     }
     return *this;
 }
@@ -93,13 +95,27 @@ void Field::drawField() const
     window->draw(field);
 }
 
+void Field::resetData()
+{
+    dataCounter = 0;
+    data = 0;
+}
+
 const Vector2f Field::getPosition() const { return Vector2f(x, y); }
 
 const int Field::getData() const { return data; }
 
 void Field::setData(int data)
 {
-    this->data = data;
+    if (data == 0) 
+    {
+        if (--dataCounter == 0) this->data = 0;
+    }
+    else
+    {
+        dataCounter++;
+        this->data = data;
+    }
 }
 
 void Field::setCorrectColor() 
