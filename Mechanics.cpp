@@ -262,28 +262,28 @@ void Mechanics::placeShips(std::vector<Field>* fieldArea, std::vector<Ship>* shi
 
 bool Mechanics::startTheGame()
 {
-    bool flag = false;
+    bool flag = false; // check if the current move is for player or computer
 
-    if (playerMove)
+    if (playerMove) // if player's turn
     {
         for(int k = 0; k < 100; k++)
         {
-            if ((*rightField)[k].isChosen())
+            if ((*rightField)[k].isChosen()) // choose field
             {
                 int fieldData = (*rightField)[k].getData();
-                if (fieldData == 1)
+                if (fieldData == 1) // if the ship is located here
                 {
-                    (*rightField)[k].setData(3);
-                    (*rightField)[k].displayHitTexture();
+                    (*rightField)[k].setData(3); // mark deck as destroyed
+                    (*rightField)[k].displayHitTexture(); // set appropriate texture
 
-                    markTheDeck(k / 10, k % 10, rightField);
-                    checkShipIsKilled(k / 10, k % 10, rightField);
+                    markTheDeck(k / 10, k % 10, rightField); // mark corners of the deck
+                    checkShipIsKilled(k / 10, k % 10, rightField); // check whether the ships is destroyed or not
                 }
-                else // if (fieldData == 0 || fieldData == 2)
+                else if (fieldData == 0 || fieldData == 2) // otherwise
                 {
-                    (*rightField)[k].setData(4);
-                    (*rightField)[k].displayMissTexture();
-                    playerMove = false;
+                    (*rightField)[k].setData(4); // mark deck as used
+                    (*rightField)[k].displayMissTexture(); // set appropriate texture
+                    playerMove = false; // the next move is for computer
                 }
                 break;
             }
@@ -294,30 +294,32 @@ bool Mechanics::startTheGame()
         static int i, j;
         static int prevI, prevJ;
 
-        if (possibleDirections.size())
+        flag = true;
+
+        if (possibleDirections.size()) // if there are directions around the ship to check
         {
             static int currentDirection = -1;
-            if (currentDirection == -1) currentDirection = possibleDirections[rand() % possibleDirections.size()];
+            if (currentDirection == -1) currentDirection = possibleDirections[rand() % possibleDirections.size()]; // choose random direction
 
-            int *coord = currentDirection % 2 ? &j : &i;
-            int step = currentDirection == up || currentDirection == left ? -1 : 1;
-            int limit = currentDirection == up || currentDirection == left ? -1 : 10;
+            int *coord = currentDirection % 2 ? &j : &i; // veriable to change 
+            int step = currentDirection == up || currentDirection == left ? -1 : 1; // can move left/up: -1; right/down: +1
+            int limit = currentDirection == up || currentDirection == left ? -1 : 10; // can't move away the area
 
             *coord += step;
-            if (*coord == limit)
+            if (*coord == limit) // if moved away the field area
             {
-                possibleDirections.erase(std::find(possibleDirections.begin(), possibleDirections.end(), currentDirection));
+                possibleDirections.erase(std::find(possibleDirections.begin(), possibleDirections.end(), currentDirection)); // erase current direction
                 currentDirection = -1;
-                i = prevI; j = prevJ;
+                i = prevI; j = prevJ; // restore start position
                 return false;
             }
 
             auto check = std::find(moves.begin(), moves.end(), i * 10 + j);
 
-            int fieldData = (*leftField)[i * 10 + j].getData();
-            if (fieldData == 1 || fieldData == 3)
+            int fieldData = (*leftField)[i * 10 + j].getData(); // check filed's data
+            if (fieldData == 1 || fieldData == 3) // if there is a ship or destroyed deck
             {
-                for(auto it = possibleDirections.begin(); it != possibleDirections.end(); it++)
+                for(auto it = possibleDirections.begin(); it != possibleDirections.end(); it++) // erase opposite directions
                 {
                     if (*it % 2 != currentDirection % 2)
                     {
@@ -326,15 +328,15 @@ bool Mechanics::startTheGame()
                     }
                 }
 
-                if (fieldData == 1)
+                if (fieldData == 1) // if the ship is located here
                 {
-                    (*leftField)[i * 10 + j].setData(3);
-                    moves.erase(check);
+                    (*leftField)[i * 10 + j].setData(3); // mark this field as destroyed deck
+                    moves.erase(check); // erase this positions from possible computer moves
 
-                    markTheDeck(i, j, leftField);
-                    if (checkShipIsKilled(i, j, leftField))
+                    markTheDeck(i, j, leftField); // mark corners of the deck as used
+                    if (checkShipIsKilled(i, j, leftField)) // check whether this ship is destroyed or not
                     {
-                        possibleDirections.clear();
+                        possibleDirections.clear(); // if destroyed - erase or possible directions
                         currentDirection = -1;
                     }
 
@@ -342,52 +344,55 @@ bool Mechanics::startTheGame()
                     hitPos.setPosition((*leftField)[i * 10 + j].getPosition());
                     hitPos.setTexture(&computerHitTexture);
 
-                    hitPositions.emplace_back(hitPos);
+                    hitPositions.emplace_back(hitPos); // add destroyed position to vector to display
                 }
             }
-            else 
+            else // there's no ship here
             {
-                if (check != moves.end())
+                if (check != moves.end())  // if this position is in the list of possible computer positions
                 {
-                    moves.erase(check);
+                    moves.erase(check); // erase it
 
-                    (*leftField)[i * 10 + j].setData(4);
+                    (*leftField)[i * 10 + j].setData(4); // set appropriate data and texture
                     (*leftField)[i * 10 + j].displayMissTexture();
-                    playerMove = true;
+                    playerMove = true; // the next turn is for player
                 }
 
-                possibleDirections.erase(std::find(possibleDirections.begin(), possibleDirections.end(), currentDirection));
+                possibleDirections.erase(std::find(possibleDirections.begin(), possibleDirections.end(), currentDirection)); // erase current direction
                 currentDirection = -1;
-                i = prevI; j = prevJ;
+                i = prevI; j = prevJ; // restore start position
+                flag = false;
             }
         }
         else
         {
-            int k = moves[rand() % moves.size()];
+            int k = moves[rand() % moves.size()]; // choose random position
             int fieldData = (*leftField)[k].getData();
 
-            i = k / 10; prevI = i;
+            i = k / 10; prevI = i; // get coordinates of this position and remember start position
             j = k % 10; prevJ = j;
 
-            auto it = std::find(moves.begin(), moves.end(), k);
+            auto it = std::find(moves.begin(), moves.end(), k); // erase this position from the list of possible computer moves
             if (it != moves.end()) moves.erase(it);
 
-            if (fieldData == 1)
+            if (fieldData == 1) // if there's a ship here
             {
-                (*leftField)[k].setData(3);
+                (*leftField)[k].setData(3); // mark position as destroyed deck
 
-                markTheDeck(i, j, leftField);
+                markTheDeck(i, j, leftField); // mark corners of the field
 
                 RectangleShape hitPos(Vector2f(fieldSize, fieldSize));
                 hitPos.setPosition((*leftField)[k].getPosition());
                 hitPos.setTexture(&computerHitTexture);
 
-                hitPositions.emplace_back(hitPos);
+                hitPositions.emplace_back(hitPos); // add texture to display
 
-                if (!checkShipIsKilled(i, j, leftField))
+                if (!checkShipIsKilled(i, j, leftField)) // check whether this ship is destroyed
                 {
                     std::array<int, 2> taken{3, 4};
 
+                    // checking positions at the top, bottom, left and right of the current one
+                    // if position is free - add it to list of possible directions to check orientation of the ship and destroy it later
                     if (i - 1 >= 0) 
                     {
                         if (std::find(taken.begin(), taken.end(), (*leftField)[(i - 1) * 10 + j].getData()) == taken.end())
@@ -410,18 +415,16 @@ bool Mechanics::startTheGame()
                     }
                 }
             }
-            else if (fieldData == 0 || fieldData == 2)
+            else if (fieldData == 0 || fieldData == 2) // if computer has missed
             {
-                (*leftField)[k].setData(4);
+                (*leftField)[k].setData(4); // set appropriate data and texture
                 (*leftField)[k].displayMissTexture();
-                playerMove = true;
+                playerMove = true; // the next turn is for player
             }
         }
-
-        flag = true;
     }
 
-    return flag;
+    return flag; // make a delay depending on who made this move
 }
 
 void Mechanics::drawPositions() const

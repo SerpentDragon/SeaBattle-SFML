@@ -438,16 +438,6 @@ void Interface::gameWindow() const
                     th.launch();
                     checkGameStarted = true;
                     mech.placeShips(&rightField, &ships);
-                    
-                    // for(int i = 0; i < 10; i++)
-                    // {
-                    //     for(int j = 0; j < 10; j++)
-                    //     {
-                    //         std::cout << rightField[j * 10 + i].getData() << " ";
-                    //     }
-                    //     std::cout << std::endl;
-                    // }
-                    // std::cout << std::endl;
                     startButton.setText(L"Пауза");
                 }
                 else
