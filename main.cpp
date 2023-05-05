@@ -42,10 +42,10 @@ int main()
     initTextures();
 
     srand(time(0));
-    
+
     RenderWindow window(VideoMode(Width, Height), L"Морской бой", Style::Close);
-    window.setPosition(Vector2i((screenWidth - Width) / 2, (screenHeight - Height) / 2));  
-    
+    window.setPosition(Vector2i((screenWidth - Width) / 2, (screenHeight - Height) / 2));
+
     Interface interface(&window);
 
     interface.mainMenu();
