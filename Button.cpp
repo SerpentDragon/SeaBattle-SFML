@@ -1,5 +1,7 @@
 #include "Button.h"
 
+#include <iostream>
+
 template <typename T>
 void Button::Swap(T&& obj) noexcept
 {
@@ -14,6 +16,7 @@ void Button::Swap(T&& obj) noexcept
     colorOn = obj.colorOn;
     text = obj.text;
     texture = obj.texture ? new Texture(*obj.texture) : nullptr;
+    textureOn = obj.textureOn ? new Texture(*obj.textureOn) : nullptr;
 }
 
 bool Button::OnButton(int x, int y) const
@@ -21,7 +24,7 @@ bool Button::OnButton(int x, int y) const
     return xPos <= x && x <= xPos + width && yPos <= y && y <= yPos + height; // check if the cursor is above the button
 }
 
-Button::Button(RenderWindow *window, const Text& txt, int x, int y, int b_width, int b_height, const Color& color, const Color& colorOn)
+Button::Button(RenderWindow *window, const Text& text, int x, int y, int b_width, int b_height, const Color& color, const Color& colorOn)
 {
     this->window = window;
     xPos = x;
@@ -31,14 +34,34 @@ Button::Button(RenderWindow *window, const Text& txt, int x, int y, int b_width,
     pressedCounter = 0;
     this->color = color;
     this->colorOn = colorOn;
-    text = txt;
-    texture = nullptr;
+    this->text = text;
+    texture = textureOn = nullptr;
 
     button = RectangleShape(Vector2f(width, height));
     button.setPosition(x, y);
     button.setFillColor(color);
 
-    text.setPosition(x + (width - txt.getLocalBounds().width) / 2 , y + (height - txt.getLocalBounds().height) / 2 - 7);   
+    this->text.setPosition(x + (width - this->text.getLocalBounds().width) / 2 , y + (height - this->text.getLocalBounds().height) / 2 - 7);   
+}
+
+Button::Button(RenderWindow* window, const Text& text, int x, int y, int b_width, int b_height, const Texture* texture, const Texture* textureOn, const Color& textColor, const Color& textColorOn)
+{
+    this->window = window;
+    xPos = x;
+    yPos = y;
+    width = b_width;
+    height = b_height;
+    pressedCounter = 0;
+    color = textColor;
+    colorOn = textColorOn;
+    this->text = text;
+    this->texture = texture ? new Texture(*texture) : new Texture();
+    this->textureOn = textureOn ? new Texture(*textureOn) : new Texture();
+
+    button = RectangleShape(Vector2f(width, height));
+    button.setPosition(x, y);
+
+    this->text.setPosition(x + (width - this->text.getLocalBounds().width) / 2 , y + (height - this->text.getLocalBounds().height) / 2 - 7);   
 }
 
 Button::Button(RenderWindow *window, int x, int y, int b_width, int b_height, const Texture* texture)
@@ -69,7 +92,7 @@ Button::Button(Button&& obj) noexcept
 
     obj.window = nullptr;
     obj.width = obj.height = obj.xPos = obj.yPos = obj.pressedCounter = 0;
-    obj.texture = nullptr;
+    obj.texture = obj.textureOn = nullptr;
 }
 
 Button& Button::operator=(const Button& obj)
@@ -89,7 +112,7 @@ Button& Button::operator=(Button&& obj) noexcept
 
         obj.window = nullptr;
         obj.width = obj.height = obj.xPos = obj.yPos = obj.pressedCounter = 0;
-        obj.texture = nullptr;
+        obj.texture = obj.textureOn = nullptr;
     }
     return *this;
 }
@@ -98,6 +121,7 @@ Button::~Button()
 {
     window = nullptr;
     if (texture) delete texture;
+    if (textureOn) delete textureOn;
 }
 
 void Button::drawButton() const
@@ -117,6 +141,11 @@ int Button::isPressed()
     if (OnButton(x, y)) // if the cursor is above the button
     {
         if (!texture) button.setFillColor(colorOn); // if button has no texture paint it "colorOn" color
+        else 
+        {
+            text.setFillColor(colorOn);
+            button.setTexture(textureOn);
+        }
         if (Mouse::isButtonPressed(Mouse::Left))  // if left mouse button was pressed
         {
             while(true) // while left mouse button is held
@@ -126,7 +155,15 @@ int Button::isPressed()
             if (OnButton(Mouse::getPosition(*window).x, Mouse::getPosition(*window).y)) return ++pressedCounter; // the button was pressed
         }
     }
-    else if (!texture) button.setFillColor(color); // else if the cursor is not above the button and it has no texture paint it "color" color
+    else 
+    {
+        if (!texture) button.setFillColor(color); // else if the cursor is not above the button and it has no texture paint it "color" color
+        else if (texture)
+        {
+            text.setFillColor(color);
+            button.setTexture(texture);
+        }
+    }
 
     return 0;
 }

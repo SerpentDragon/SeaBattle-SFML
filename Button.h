@@ -21,6 +21,7 @@ class Button
     Color colorOn; // button color when the cursore is over it
     Text text; // button text
     Texture* texture; // button texture
+    Texture *textureOn;
 
     template <typename T>
     void Swap(T&&) noexcept;
@@ -29,6 +30,8 @@ class Button
 
 public:
     Button(RenderWindow*, const Text&, int, int, int, int, const Color&, const Color&);
+
+    Button(RenderWindow*, const Text&, int, int, int, int, const Texture*, const Texture*, const Color&, const Color&);
 
     Button(RenderWindow*, int, int, int, int, const Texture*);
 

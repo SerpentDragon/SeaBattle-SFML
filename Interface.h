@@ -3,6 +3,8 @@
 #include <SFML/Graphics.hpp>
 #include <filesystem>
 #include <functional>
+#include <chrono>
+#include <thread>
 #include <fstream>
 #include <sstream>
 #include <vector>

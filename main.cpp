@@ -16,6 +16,7 @@ int yCoord = 0.206 * screenHeight;
 
 Font arialFont;
 Font trebuchetFont;
+Font optimaFont;
 
 Color buttonColor(180, 180, 180);
 Color buttonColorOn(0, 191, 255);
@@ -26,6 +27,7 @@ void initFonts()
 {
     arialFont.loadFromFile("fonts/arial.ttf");
     trebuchetFont.loadFromFile("fonts/trebuchetms.ttf");
+    optimaFont.loadFromFile("fonts/optima.ttf");
 }
 
 void initTextures()

@@ -12,6 +12,7 @@ extern int fieldSize;
 
 extern sf::Font arialFont;
 extern sf::Font trebuchetFont;
+extern sf::Font optimaFont;
 
 extern sf::Color buttonColor;
 extern sf::Color buttonColorOn;
