@@ -1,5 +1,4 @@
 #include "Ship.h"
-#include <iostream>
 
 template <typename T>
 void Ship::Swap(T&& obj) noexcept
@@ -91,6 +90,7 @@ Ship::Ship(const RenderWindow* window, int deck, int xPos, int yPos)
     height = 0.034 * screenWidth;
 
     IsPlaced = -1;
+    rotateCounter = 0;
 
     shipTexture.loadFromFile("images/ships/" + std::to_string(deck) + "deck.png");
 

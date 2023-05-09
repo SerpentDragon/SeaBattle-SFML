@@ -1,5 +1,5 @@
 all:
-	g++ -c Interface.cpp
+	g++ -c Interface.cpp Ship.cpp
 	# g++ -c *.cpp
 	# g++ -c Interface.cpp Mechanics.cpp
 	# g++ -c Interface.cpp Ship.cpp Field.cpp

@@ -252,6 +252,7 @@ void Interface::mainMenu() const
 
             }
         }
+
         window->clear(Color(240, 240, 240));
 
         window->draw(img["startWindow"].second);
@@ -326,7 +327,7 @@ void Interface::gameWindow() const
             switch(event.type)
             {
                 case Event::MouseButtonPressed:
-                    if (event.mouseButton.button == Mouse::Left && !checkGameStarted) // СДЕЛАТЬ ЗАПРЕТ НА ПЕРЕСТАНОВКИ ПОСЛЕ НАЧАЛА ИГРЫ!!!
+                    if (event.mouseButton.button == Mouse::Left && !checkGameStarted) 
                     {
                         int x = Mouse::getPosition(*window).x;
                         int y = Mouse::getPosition(*window).y;
@@ -480,6 +481,8 @@ void Interface::gameWindow() const
         }
         
         window->display(); 
+
+        
     }
 
     th.terminate();
