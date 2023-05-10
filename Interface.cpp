@@ -204,19 +204,18 @@ Interface::Interface(const RenderWindow* window)
     img["referenceWindow"].first.loadFromFile("images/interface/windows/ReferenceWindowBackground.png");
     img["referenceWindow"].second.setTexture(&img["referenceWindow"].first);
 
-    img["button"] = std::pair(Texture(), RectangleShape(Vector2f(0.5 * Width, 0.07831 * Height)));
-    img["button"].first.loadFromFile("images/interface/buttons/Button.png");
-    img["button"].second.setTexture(&img["button"].first);
+    img["mainWindowsButton"] = std::pair(Texture(), RectangleShape(Vector2f(0.5 * Width, 0.07831 * Height)));
+    img["mainWindowsButton"].first.loadFromFile("images/interface/buttons/MainWindowsButton.png");
+    img["mainWindowsButton"].second.setTexture(&img["mainWindowsButton"].first);
 
-    img["selectedButton"] = std::pair(Texture(), RectangleShape(Vector2f(0.255 * Width, 0.07831 * Height)));
-    img["selectedButton"].first.loadFromFile("images/interface/buttons/SelectedButton.png");
-    img["selectedButton"].second.setTexture(&img["selectedButton"].first);
+    img["mainWindowsSelectedButton"] = std::pair(Texture(), RectangleShape(Vector2f(0.255 * Width, 0.07831 * Height)));
+    img["mainWindowsSelectedButton"].first.loadFromFile("images/interface/buttons/MainWindowsSelectedButton.png");
+    img["mainWindowsSelectedButton"].second.setTexture(&img["mainWindowsSelectedButton"].first);
 
     img["fieldBackground"] = std::pair(Texture(), RectangleShape(Vector2f(24 * fieldSize, 12 * fieldSize)));
     img["fieldBackground"].first.loadFromFile("images/interface/windows/FieldBackground.png");
     img["fieldBackground"].second.setTexture(&img["fieldBackground"].first);
     img["fieldBackground"].second.setPosition(350, 130);
-
 }
 
 Interface::~Interface()
@@ -237,7 +236,7 @@ void Interface::mainMenu() const
     for(size_t i = 0; i < 4; i++) 
     {
         button_text.setString(writing[i]);
-        buttons.emplace_back(Button(window, button_text, button_xPos, (0.3358 + i * 0.1092) * Height, button_width, button_height, img["button"].second.getTexture(), img["selectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91)));
+        buttons.emplace_back(Button(window, button_text, button_xPos, (0.3358 + i * 0.1092) * Height, button_width, button_height, img["mainWindowsButton"].second.getTexture(), img["mainWindowsSelectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91)));
         buttons[i].setTextColor(Color::Black);
     }
 
@@ -277,11 +276,11 @@ void Interface::gameWindow() const
     int button_width = 0.1178 * screenWidth, button_height = 0.078 * screenHeight;
     int font_size = 0.025 * screenWidth;
 
-    Button startButton(window, Text(L"Старт", optimaFont, font_size), 0.0418 * screenWidth, 0.88 * screenHeight, button_width, button_height, img["button"].second.getTexture(), img["selectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91));
+    Button startButton(window, Text(L"Старт", optimaFont, font_size), 0.0418 * screenWidth, 0.88 * screenHeight, button_width, button_height, img["mainWindowsButton"].second.getTexture(), img["mainWindowsSelectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91));
     startButton.setTextColor(Color::Black);
-    Button exitButton(window, Text(L"Выход", optimaFont, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, img["button"].second.getTexture(), img["selectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91));
+    Button exitButton(window, Text(L"Выход", optimaFont, font_size), 0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, img["mainWindowsButton"].second.getTexture(), img["mainWindowsSelectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91));
     exitButton.setTextColor(Color::Black);
-    Button autoButton(window, Text(L"Авто", optimaFont, font_size), 0.185 * screenWidth, 0.88 * screenHeight, button_width, button_height, img["button"].second.getTexture(), img["selectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91));
+    Button autoButton(window, Text(L"Авто", optimaFont, font_size), 0.185 * screenWidth, 0.88 * screenHeight, button_width, button_height, img["mainWindowsButton"].second.getTexture(), img["mainWindowsSelectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91));
     autoButton.setTextColor(Color::Black);
 
     std::vector<Field> leftField, rightField; // create game fields
