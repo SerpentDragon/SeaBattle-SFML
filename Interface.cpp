@@ -200,9 +200,20 @@ Interface::Interface(const RenderWindow* window)
     img["gameWindow"].first.loadFromFile("images/interface/windows/GameWindowBackground.jpg");
     img["gameWindow"].second.setTexture(&img["gameWindow"].first);
 
-    img["referenceWindow"] = std::pair(Texture(), RectangleShape(Vector2f(0.5 * Width, 0.6 * Height)));
+    img["referenceWindow"] = std::pair(Texture(), RectangleShape(Vector2f(0.6 * Width, 0.73 * Height)));
     img["referenceWindow"].first.loadFromFile("images/interface/windows/ReferenceWindowBackground.png");
     img["referenceWindow"].second.setTexture(&img["referenceWindow"].first);
+    img["referenceWindow"].second.setPosition(-50, -43);
+
+    img["fieldBackground"] = std::pair(Texture(), RectangleShape(Vector2f(24 * fieldSize, 12 * fieldSize)));
+    img["fieldBackground"].first.loadFromFile("images/interface/windows/FieldBackground.png");
+    img["fieldBackground"].second.setTexture(&img["fieldBackground"].first);
+    img["fieldBackground"].second.setPosition(350, 130);
+
+    img["recordsWindow"] = std::pair(Texture(), RectangleShape(Vector2f(screenWidth / 4.5, screenHeight / 1.5)));
+    img["recordsWindow"].first.loadFromFile("images/interface/windows/RecordsWindowBackground.png");
+    img["recordsWindow"].second.setTexture(&img["recordsWindow"].first);
+    img["recordsWindow"].second.setPosition(-23, -13);
 
     img["mainWindowsButton"] = std::pair(Texture(), RectangleShape(Vector2f(0.5 * Width, 0.07831 * Height)));
     img["mainWindowsButton"].first.loadFromFile("images/interface/buttons/MainWindowsButton.png");
@@ -211,11 +222,6 @@ Interface::Interface(const RenderWindow* window)
     img["mainWindowsSelectedButton"] = std::pair(Texture(), RectangleShape(Vector2f(0.255 * Width, 0.07831 * Height)));
     img["mainWindowsSelectedButton"].first.loadFromFile("images/interface/buttons/MainWindowsSelectedButton.png");
     img["mainWindowsSelectedButton"].second.setTexture(&img["mainWindowsSelectedButton"].first);
-
-    img["fieldBackground"] = std::pair(Texture(), RectangleShape(Vector2f(24 * fieldSize, 12 * fieldSize)));
-    img["fieldBackground"].first.loadFromFile("images/interface/windows/FieldBackground.png");
-    img["fieldBackground"].second.setTexture(&img["fieldBackground"].first);
-    img["fieldBackground"].second.setPosition(350, 130);
 }
 
 Interface::~Interface()
@@ -236,7 +242,8 @@ void Interface::mainMenu() const
     for(size_t i = 0; i < 4; i++) 
     {
         button_text.setString(writing[i]);
-        buttons.emplace_back(Button(window, button_text, button_xPos, (0.3358 + i * 0.1092) * Height, button_width, button_height, img["mainWindowsButton"].second.getTexture(), img["mainWindowsSelectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91)));
+        buttons.emplace_back(Button(window, button_text, button_xPos, (0.3358 + i * 0.1092) * Height, button_width, button_height, \
+        img["mainWindowsButton"].second.getTexture(), img["mainWindowsSelectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91)));
         buttons[i].setTextColor(Color::Black);
     }
 
@@ -534,21 +541,23 @@ void Interface::showRecords() const
     int windowXPos = window->getPosition().x + (window->getSize().x - windowWidth) / 2;
     int windowYPos = window->getPosition().y + (window->getSize().y - windowHeight) / 2;
 
-    img["referenceWindow"].second.setPosition(0, 0);
-
     std::vector<std::string> records = readRecords();
     if (records.size() > 5) records.erase(records.begin() + 5, records.end());
 
     std::vector<Text> recordsTexts(records.size());
     for(int i = 0; i < records.size(); i++)
     {
-        recordsTexts[i] = Text(std::to_string(i + 1) + ") " + records[i], arialFont, 50);
-        recordsTexts[i].setFillColor(Color::Red);
+        recordsTexts[i] = Text(std::to_string(i + 1) + ") " + records[i], optimaFont, 50);
+        recordsTexts[i].setFillColor(Color(85, 4, 29));
         recordsTexts[i].setPosition(0.1823 * windowWidth, screenHeight / 6 + i * 1.2 * recordsTexts[i].getGlobalBounds().height);
     }
 
     RenderWindow recordsWindow(VideoMode(windowWidth, windowHeight), L"Рекорды", Style::Close);
     recordsWindow.setPosition(Vector2i(windowXPos, windowYPos));
+
+    Text titleText(L"Рекорды", optimaFont, 54);
+    titleText.setFillColor(Color(85, 4, 29));
+    titleText.setPosition((windowWidth - titleText.getGlobalBounds().width) / 2, windowHeight * 0.05);
 
     Event event;
 
@@ -566,7 +575,9 @@ void Interface::showRecords() const
 
         recordsWindow.clear(Color::White);
 
-        recordsWindow.draw(img["referenceWindow"].second);
+        recordsWindow.draw(img["recordsWindow"].second);
+
+        recordsWindow.draw(titleText);
 
         for(const auto& recordText : recordsTexts)
         {
