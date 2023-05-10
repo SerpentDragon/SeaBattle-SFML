@@ -91,18 +91,20 @@ inline void Interface::drawCoordinates(int x, int y, int size) const
 
 void Interface::showMessage(const std::wstring& msg) const
 {
-    int windowWidth = fieldSize * 7, windowHeight = fieldSize * 3;
+    int windowWidth = fieldSize * 7, windowHeight = fieldSize * 4;
 
-    RectangleShape messageWindow(Vector2f(windowWidth, windowHeight));
-    messageWindow.setPosition((screenWidth - windowWidth) / 2, (screenHeight - windowHeight) / 2);
-    messageWindow.setOutlineThickness(0.0047 * screenHeight);
-    messageWindow.setOutlineColor(Color::Black);
+    // RectangleShape messageWindow(Vector2f(windowWidth, windowHeight));
+    // messageWindow.setPosition((screenWidth - windowWidth) / 2, (screenHeight - windowHeight) / 2);
+    // messageWindow.setOutlineThickness(0.0047 * screenHeight);
+    // messageWindow.setOutlineColor(Color::Black);
 
     Text messageText(msg, arialFont, 0.03704 * screenHeight);
     messageText.setFillColor(Color::Black);
     messageText.setPosition((screenWidth - messageText.getGlobalBounds().width) / 2, (screenHeight - messageText.getGlobalBounds().height) / 2);
 
-    window->draw(messageWindow);
+    
+    // window->draw(messageWindow);
+    window->draw(img["dialogBackground"].second);
     window->draw(messageText);
     window->display();
 
@@ -200,20 +202,23 @@ Interface::Interface(const RenderWindow* window)
     img["gameWindow"].first.loadFromFile("images/interface/windows/GameWindowBackground.jpg");
     img["gameWindow"].second.setTexture(&img["gameWindow"].first);
 
-    img["referenceWindow"] = std::pair(Texture(), RectangleShape(Vector2f(0.6 * Width, 0.73 * Height)));
+    img["referenceWindow"] = std::pair(Texture(), RectangleShape(Vector2f(0.5 * Width, 0.6 * Height)));
     img["referenceWindow"].first.loadFromFile("images/interface/windows/ReferenceWindowBackground.png");
     img["referenceWindow"].second.setTexture(&img["referenceWindow"].first);
-    img["referenceWindow"].second.setPosition(-50, -43);
 
     img["fieldBackground"] = std::pair(Texture(), RectangleShape(Vector2f(24 * fieldSize, 12 * fieldSize)));
     img["fieldBackground"].first.loadFromFile("images/interface/windows/FieldBackground.png");
     img["fieldBackground"].second.setTexture(&img["fieldBackground"].first);
-    img["fieldBackground"].second.setPosition(350, 130);
+    img["fieldBackground"].second.setPosition(0.1823 * screenWidth, 0.12038 * screenHeight);
 
-    img["recordsWindow"] = std::pair(Texture(), RectangleShape(Vector2f(screenWidth / 4.5, screenHeight / 1.5)));
+    img["recordsWindow"] = std::pair(Texture(), RectangleShape(Vector2f(screenWidth / 5, screenHeight / 2)));
     img["recordsWindow"].first.loadFromFile("images/interface/windows/RecordsWindowBackground.png");
     img["recordsWindow"].second.setTexture(&img["recordsWindow"].first);
-    img["recordsWindow"].second.setPosition(-23, -13);
+
+    img["dialogBackground"] = std::pair(Texture(), RectangleShape(Vector2f(fieldSize * 7, fieldSize * 4)));
+    img["dialogBackground"].first.loadFromFile("images/interface/windows/DialogWindowsBackground.png");
+    img["dialogBackground"].second.setTexture(&img["dialogBackground"].first);
+    img["dialogBackground"].second.setPosition((screenWidth - fieldSize * 7) / 2, (screenHeight - fieldSize * 4) / 2);
 
     img["mainWindowsButton"] = std::pair(Texture(), RectangleShape(Vector2f(0.5 * Width, 0.07831 * Height)));
     img["mainWindowsButton"].first.loadFromFile("images/interface/buttons/MainWindowsButton.png");
