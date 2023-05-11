@@ -81,6 +81,23 @@ Button::Button(RenderWindow *window, int x, int y, int b_width, int b_height, co
     button.setTexture(this->texture); 
 }
 
+Button::Button(RenderWindow *window, const Text& text, int x, int y, int b_width, int b_height, const Texture* texture)
+{
+    this->window = window;
+    xPos = x;
+    yPos = y;
+    width = b_width;
+    height = b_height;
+    pressedCounter = 0;
+    color = colorOn = Color(0, 0, 0, 255);
+    this->text = text;
+    this->texture = texture ? new Texture(*texture) : new Texture();
+
+    button = RectangleShape(Vector2f(width, height));
+    button.setPosition(x, y);
+    button.setTexture(this->texture); 
+}
+
 Button::Button (const Button& obj)
 {
     Swap(obj);

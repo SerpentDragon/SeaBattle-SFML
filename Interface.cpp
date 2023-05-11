@@ -1,5 +1,7 @@
 #include "Interface.h"
 
+#include <iostream>
+
 Text globalTime;
 int hour = 0, minute = 0, second = 0;
 
@@ -93,17 +95,11 @@ void Interface::showMessage(const std::wstring& msg) const
 {
     int windowWidth = fieldSize * 7, windowHeight = fieldSize * 4;
 
-    // RectangleShape messageWindow(Vector2f(windowWidth, windowHeight));
-    // messageWindow.setPosition((screenWidth - windowWidth) / 2, (screenHeight - windowHeight) / 2);
-    // messageWindow.setOutlineThickness(0.0047 * screenHeight);
-    // messageWindow.setOutlineColor(Color::Black);
-
-    Text messageText(msg, arialFont, 0.03704 * screenHeight);
-    messageText.setFillColor(Color::Black);
+    Text messageText(msg, optimaFont, 0.03704 * screenHeight);
+    messageText.setFillColor(Color(85, 4, 29));
     messageText.setPosition((screenWidth - messageText.getGlobalBounds().width) / 2, (screenHeight - messageText.getGlobalBounds().height) / 2);
+    img["dialogBackground"].second.setPosition((screenWidth - windowWidth) / 2, (screenHeight - windowWidth) / 2);
 
-    
-    // window->draw(messageWindow);
     window->draw(img["dialogBackground"].second);
     window->draw(messageText);
     window->display();
@@ -114,34 +110,56 @@ void Interface::showMessage(const std::wstring& msg) const
 bool Interface::showWarning(const std::wstring& msg) const
 {
     int windowWidth = fieldSize * 7, windowHeight = fieldSize * 4;
-    int windowXPos = (window->getSize().x - windowWidth) / 2;
-    int windowYPos = (window->getSize().y - windowHeight) / 2;
+    int windowXPos = window->getPosition().x + (window->getSize().x - windowWidth) / 2;
+    int windowYPos = window->getPosition().y + (window->getSize().y - windowHeight) / 2;
 
-    RectangleShape messageWindow(Vector2f(windowWidth, windowHeight));
-    messageWindow.setPosition(windowXPos, windowYPos);
-    messageWindow.setOutlineThickness(0.0047 * screenHeight);
-    messageWindow.setOutlineColor(Color::Black);
+    RenderWindow warningWindow(VideoMode(windowWidth, windowHeight), L"Предупреждение!", Style::None);
+    warningWindow.setPosition(Vector2i(windowXPos, windowYPos));
 
-    Text messageText(msg, arialFont, 0.03704 * screenHeight);
-    messageText.setFillColor(Color::Black);
-    messageText.setPosition(windowXPos + (windowWidth - messageText.getGlobalBounds().width) / 2, windowYPos + fieldSize / 2);
+    Text messageText(msg, optimaFont, 0.03704 * screenHeight);
+    messageText.setFillColor(Color(85, 4, 29));
+    messageText.setPosition((windowWidth - messageText.getGlobalBounds().width) / 2, fieldSize / 2);
 
-    Button yesButton(window, Text(L"Да", arialFont, 0.0157 * screenWidth), windowXPos + fieldSize, windowYPos + fieldSize * 2.5, fieldSize * 2, fieldSize, Color::Blue, Color::Green);
-    Button noButton(window, Text(L"Нет", arialFont, 0.0157 * screenWidth), windowXPos + fieldSize * 4, windowYPos + fieldSize * 2.5, fieldSize * 2, fieldSize, Color::Blue, Color::Green);
+    Button yesButton(&warningWindow, Text(L"Да", optimaFont, 0.0157 * screenWidth), fieldSize, fieldSize * 2.5, fieldSize * 2, fieldSize, \
+            img["dialogWindowButton"].second.getTexture(), img["dialogWindowSelectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91));
+    Button noButton(&warningWindow, Text(L"Нет", optimaFont, 0.0157 * screenWidth), fieldSize * 4, fieldSize * 2.5, fieldSize * 2, fieldSize, \
+            img["dialogWindowButton"].second.getTexture(), img["dialogWindowSelectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91));
 
-    
-    window->draw(messageWindow);
-    window->draw(messageText);
+    img["dialogBackground"].second.setPosition(0, 0);
 
-    yesButton.drawButton();
-    noButton.drawButton();
-
-    window->display();
+    Event event;
 
     while(true)
     {
-        if (yesButton.isPressed()) return true;
-        else if (noButton.isPressed()) return false;   
+        while(warningWindow.pollEvent(event))
+        {
+            switch(event.type)
+            {
+                
+            }
+        }
+
+        warningWindow.clear();
+
+        warningWindow.draw(img["dialogBackground"].second);
+
+        warningWindow.draw(messageText);
+
+        yesButton.drawButton();
+        noButton.drawButton();
+
+        if (yesButton.isPressed()) 
+        {
+            warningWindow.close();
+            return true;
+        }
+        else if (noButton.isPressed())
+        {
+            warningWindow.close();
+            return false;
+        } 
+
+        warningWindow.display();
     }
 }
 
@@ -218,7 +236,6 @@ Interface::Interface(const RenderWindow* window)
     img["dialogBackground"] = std::pair(Texture(), RectangleShape(Vector2f(fieldSize * 7, fieldSize * 4)));
     img["dialogBackground"].first.loadFromFile("images/interface/windows/DialogWindowsBackground.png");
     img["dialogBackground"].second.setTexture(&img["dialogBackground"].first);
-    img["dialogBackground"].second.setPosition((screenWidth - fieldSize * 7) / 2, (screenHeight - fieldSize * 4) / 2);
 
     img["mainWindowsButton"] = std::pair(Texture(), RectangleShape(Vector2f(0.5 * Width, 0.07831 * Height)));
     img["mainWindowsButton"].first.loadFromFile("images/interface/buttons/MainWindowsButton.png");
@@ -227,6 +244,19 @@ Interface::Interface(const RenderWindow* window)
     img["mainWindowsSelectedButton"] = std::pair(Texture(), RectangleShape(Vector2f(0.255 * Width, 0.07831 * Height)));
     img["mainWindowsSelectedButton"].first.loadFromFile("images/interface/buttons/MainWindowsSelectedButton.png");
     img["mainWindowsSelectedButton"].second.setTexture(&img["mainWindowsSelectedButton"].first);
+
+    img["dialogWindowButton"] = std::pair(Texture(), RectangleShape(Vector2f(fieldSize * 2, fieldSize)));
+    img["dialogWindowButton"].first.loadFromFile("images/interface/buttons/DialogWindowButton.png");
+    img["dialogWindowButton"].second.setTexture(&img["dialogWindowButton"].first);
+
+    img["dialogWindowSelectedButton"] = std::pair(Texture(), RectangleShape(Vector2f(fieldSize * 2, fieldSize)));
+    img["dialogWindowSelectedButton"].first.loadFromFile("images/interface/buttons/DialogWindowSelectedButton.png");
+    img["dialogWindowSelectedButton"].second.setTexture(&img["dialogWindowSelectedButton"].first);
+
+    img["timerBackground"] = std::pair(Texture(), RectangleShape(Vector2f(fieldSize * 5, fieldSize * 1.3)));
+    img["timerBackground"].first.loadFromFile("images/interface/windows/TimerBackground.png");
+    img["timerBackground"].second.setTexture(&img["timerBackground"].first);
+    img["timerBackground"].second.setPosition(0.33 * screenWidth, 0.88 * screenHeight);
 }
 
 Interface::~Interface()
@@ -248,7 +278,7 @@ void Interface::mainMenu() const
     {
         button_text.setString(writing[i]);
         buttons.emplace_back(Button(window, button_text, button_xPos, (0.3358 + i * 0.1092) * Height, button_width, button_height, \
-        img["mainWindowsButton"].second.getTexture(), img["mainWindowsSelectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91)));
+            img["mainWindowsButton"].second.getTexture(), img["mainWindowsSelectedButton"].second.getTexture(), Color(85, 4, 29), Color(0, 36, 91)));
         buttons[i].setTextColor(Color::Black);
     }
 
@@ -305,9 +335,9 @@ void Interface::gameWindow() const
         }
     }
 
-    globalTime = Text("00:00:00", optimaFont, 0.0365 * screenWidth); // text for timer
+    globalTime = Text("00:00:00", optimaFont, 0.0265 * screenWidth); // text for timer
     globalTime.setFillColor(Color(85, 4, 29));
-    globalTime.setPosition(0.35 * screenWidth, 0.88 * screenHeight);
+    globalTime.setPosition(0.375 * screenWidth, 0.893 * screenHeight);
 
     Thread th(&timer);
 
@@ -396,6 +426,7 @@ void Interface::gameWindow() const
 
         window->draw(img["gameWindow"].second);
         window->draw(img["fieldBackground"].second);
+        window->draw(img["timerBackground"].second);
 
         exitButton.drawButton();
         startButton.drawButton();

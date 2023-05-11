@@ -33,6 +33,8 @@ public:
 
     Button(RenderWindow*, const Text&, int, int, int, int, const Texture*, const Texture*, const Color&, const Color&);
 
+    Button(RenderWindow *, const Text&, int, int, int, int, const Texture*);
+
     Button(RenderWindow*, int, int, int, int, const Texture*);
 
     Button (const Button&);
