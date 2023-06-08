@@ -1,8 +1,5 @@
 #include "Mechanics.h"
 
-#include <iostream>
-#include <fstream>
-
 enum directions{up = 0, right, down, left};
 
 void Mechanics::markTheDeck(int i, int j, std::vector<Field>* fieldArea)

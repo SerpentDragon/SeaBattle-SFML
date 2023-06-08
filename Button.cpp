@@ -1,7 +1,5 @@
 #include "Button.h"
 
-#include <iostream>
-
 template <typename T>
 void Button::Swap(T&& obj) noexcept
 {

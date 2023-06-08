@@ -1,7 +1,5 @@
 #include "Interface.h"
 
-#include <iostream>
-
 Text globalTime;
 int hour = 0, minute = 0, second = 0;
 
@@ -97,8 +95,8 @@ void Interface::showMessage(const std::wstring& msg) const
 
     Text messageText(msg, optimaFont, 0.03704 * screenHeight);
     messageText.setFillColor(Color(85, 4, 29));
-    messageText.setPosition((screenWidth - messageText.getGlobalBounds().width) / 2, (screenHeight - messageText.getGlobalBounds().height) / 2);
-    img["dialogBackground"].second.setPosition((screenWidth - windowWidth) / 2, (screenHeight - windowWidth) / 2);
+    messageText.setPosition((screenWidth - messageText.getGlobalBounds().width) / 2, (screenHeight - messageText.getGlobalBounds().height) / 2.04);
+    img["dialogBackground"].second.setPosition((screenWidth - windowWidth) / 2, (screenHeight - windowHeight) / 2);
 
     window->draw(img["dialogBackground"].second);
     window->draw(messageText);
