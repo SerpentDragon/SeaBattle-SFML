@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <unordered_map>
 #include <filesystem>
 #include <functional>
 #include <chrono>
@@ -9,7 +10,7 @@
 #include <sstream>
 #include <vector>
 #include <regex>
-#include <map>
+#include "Managers/TextureManager.hpp"
 #include "Mechanics.h"
 #include "Button.h"
 #include "Field.h"
@@ -20,28 +21,11 @@ using namespace sf;
 
 extern int screenWidth;
 
-void timer();
-
-bool comparator(const std::string&, const std::string);
-
 class Interface
 {
-    RenderWindow* window;
-
-    mutable std::map<std::string, std::pair<Texture, RectangleShape>> img;
-
-    inline void drawCoordinates(int, int, int) const;
-
-    void showMessage(const std::wstring&) const;
-
-    bool showWarning(const std::wstring&) const;
-
-    std::vector<std::string> readRecords() const;
-
-    void writeRecords() const;
-
 public:
-    Interface(const RenderWindow*);
+
+    Interface(RenderWindow*);
 
     Interface(const Interface&) = delete;
 
@@ -60,4 +44,23 @@ public:
     void showReference() const;
 
     void showRecords() const;
+
+private:
+
+    void drawCoordinates(int, int, int) const;
+
+    void showMessage(const std::wstring&) const;
+
+    bool showWarning(const std::wstring&) const;
+
+    std::vector<std::string> readRecords() const;
+
+    void writeRecords() const;
+
+private:
+
+    RenderWindow* window_;
+
+    mutable std::unordered_map<std::string, RectangleShape> img_;
+
 };

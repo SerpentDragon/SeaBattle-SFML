@@ -1,135 +1,125 @@
 #include "Field.h"
 
-/*
-data:
-0 - the field is free
-1 - the field is taken for the ship
-2 - the field is free but there is a ship next to it
-3 - hit ship
-4 - hit field
-*/
-
+// check if the cursor is above the field
 bool Field::onField(int xPos, int yPos) const
 {
-    return x <= xPos && xPos <= x + size && y <= yPos && yPos <= y + size; // check if the cursor is above the field
+    return x_ <= xPos && xPos <= x_ + size_ 
+        && y_ <= yPos && yPos <= y_ + size_;
 }
 
-template<typename T>
-void Field::Swap(T&& obj)
+void Field::swap(const Field& other)
 {
-    window = obj.window;
-    field = obj.field;
-    x = obj.x;
-    y = obj.y;
-    size = obj.size;
-    data = obj.data;
-    dataCounter = obj.dataCounter;
-    hit = obj.hit;
-    miss = obj.miss;
+    window_ = other.window_;
+    field_ = other.field_;
+    x_ = other.x_;
+    y_ = other.y_;
+    size_ = other.size_;
+    data_ = other.data_;
+    dataCounter_ = other.dataCounter_;
+    hitTexture_ = other.hitTexture_;
+    missTexture_ = other.missTexture_;
 }
 
-Field::Field(const RenderWindow* window, int xPos, int yPos)
+Field::Field(RenderWindow* window, int x, int y)
+    : window_(window), x_(x), y_(y), size_(fieldSize),
+    dataCounter_(0), data_(field_data::free)
 {
-    this->window = const_cast<RenderWindow*>(window);
-
-    x = xPos;
-    y = yPos;
-    this->size = fieldSize;
-    dataCounter = 0;
-    data = 0;
-
     // loading textures depending on what area the field is located
-    hit = xPos < xCoord + 12 * fieldSize ? Texture() : playerHitTexture; 
-    miss = xPos < xCoord + 12 * fieldSize ? computerMissedTexture : playerMissedTexture;
+    hitTexture_ = x < xCoord + 12 * fieldSize ? Texture() : playerHitTexture; 
+    missTexture_ = x < xCoord + 12 * fieldSize ? computerMissedTexture : playerMissedTexture;
 
-    field = RectangleShape(Vector2f(size, size));
+    field_ = RectangleShape(Vector2f(size_, size_));
 
-    field.setOutlineThickness(0.0019 * screenHeight);
-    field.setOutlineColor(Color::Black);
-    field.setFillColor(Color::White);
-    field.setPosition(x, y);
+    field_.setOutlineThickness(0.0019 * screenHeight);
+    field_.setOutlineColor(Color::Black);
+    field_.setFillColor(Color::White);
+    field_.setPosition(x_, y_);
 }
 
-Field::Field(const Field& obj)
+Field::Field(const Field& other)
 {
-    Swap(obj);
+    swap(other);
 }
 
-Field::Field(Field&& obj)
+Field::Field(Field&& other)
 {
-    Swap(obj);
+    swap(other);
 
-    obj.window = nullptr;
-    obj.x = obj.y = obj.size = obj.data = obj.dataCounter = 0;
+    other.window_ = nullptr;
+    other.x_ = other.y_ = other.size_ = 
+        other.dataCounter_ = 0;
+    other.data_ = field_data::free;
 }
 
-Field& Field::operator=(const Field& obj)
+Field& Field::operator=(const Field& other)
 {
-    if (this != &obj)
+    if (this != &other)
     {
-        Swap(obj);
+        swap(other);
     }
     return *this;
 }
 
-Field& Field::operator=(Field&& obj)
+Field& Field::operator=(Field&& other)
 {
-    if (this != &obj)
+    if (this != &other)
     {
-        Swap(obj);
+        swap(other);
 
-        obj.window = nullptr;
-        obj.x = obj.y = obj.size = obj.data = obj.dataCounter = 0;
+        other.window_ = nullptr;
+        other.x_ = other.y_ = other.size_ = 
+            other.dataCounter_ = 0;
+        other.data_ = field_data::free;
     }
     return *this;
 }
 
 Field::~Field()
 {
-    window = nullptr;
+    window_ = nullptr;
 }
 
 void Field::drawField() const
 {
-    window->draw(field);
+    window_->draw(field_);
 }
 
 void Field::resetData()
 {
-    dataCounter = 0;
-    data = 0;
+    dataCounter_ = 0;
+    data_ = field_data::free;
 }
 
-const Vector2f Field::getPosition() const { return Vector2f(x, y); }
+const Vector2f Field::getPosition() const { return Vector2f(x_, y_); }
 
-const int Field::getData() const { return data; }
+const int Field::getData() const { return data_; }
 
 void Field::setData(int data)
 {
     if (data == 0) 
     {
-        if (--dataCounter == 0) this->data = 0;
+        if (--dataCounter_ == 0) data_ = field_data::free;
     }
     else
     {
-        dataCounter++;
-        this->data = data;
+        dataCounter_++;
+        data_ = data;
     }
 }
 
 void Field::setCorrectColor() 
 { 
-    field.setFillColor(Color::Green); 
+    field_.setFillColor(Color::Green); 
 }
 
 void Field::setWrongColor() 
 { 
-    field.setFillColor(Color::Red); 
+    field_.setFillColor(Color::Red); 
 }
 
 void Field::setNeutralColor() 
 { 
-    field.setFillColor(Color::White); 
+    field_.setFillColor(Color::White); 
 }
 
 void Field::setCurrentColor(int valid)
@@ -141,28 +131,30 @@ void Field::setCurrentColor(int valid)
 
 void Field::displayHitTexture() 
 {
-    field.setTexture(&hit);
+    field_.setTexture(&hitTexture_);
 }
 
 void Field::displayMissTexture() 
 { 
-    field.setTexture(&miss); 
+    field_.setTexture(&missTexture_); 
 }
 
 bool Field::isChosen() const
 {
-    int x = Mouse::getPosition(*window).x;
-    int y = Mouse::getPosition(*window).y;
+    int x = Mouse::getPosition(*window_).x;
+    int y = Mouse::getPosition(*window_).y;
     
-    if (onField(x, y)) // if the cursor is above the field
+    if (onField(x, y))
     {
-        if (Mouse::isButtonPressed(Mouse::Left))  // if left mouse button was pressed
+        if (Mouse::isButtonPressed(Mouse::Left))
         {
             while(true) // while left mouse button is held
             {
-                if (!Mouse::isButtonPressed(Mouse::Left)) break; // if left mouse button was released 
+                if (!Mouse::isButtonPressed(Mouse::Left)) 
+                    break;
             }
-            if (onField(Mouse::getPosition(*window).x, Mouse::getPosition(*window).y)) return true; // the field was chosen
+            if (onField(Mouse::getPosition(*window_).x, Mouse::getPosition(*window_).y)) 
+                return true; // the field was chosen
         }
     }
 

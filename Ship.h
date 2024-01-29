@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "Managers/TextureManager.hpp"
 #include "settings.h"
 #include "Field.h"
 
@@ -8,34 +9,9 @@ using namespace sf;
 
 class Ship
 {
-    RenderWindow* window;
-
-    int deckNumber;
-    int x;              // starting coordinates
-    int y;
-    int width;
-    int height;
-
-    int IsPlaced;       // is the ship is placed on the field
-
-    int rotateCounter;  // number of rotations of the ship
-
-    Texture shipTexture;
-    Sprite shipRect;
-    int XPos;           // current coordinates
-    int YPos;
-
-    template <typename T>
-    void Swap(T&&) noexcept;
-
-    bool checkCells(const std::vector<Field>&, int) const;
-
-    void locateShip(std::vector<Field>&, int);
-
-    int calculatePosition() const;
-
 public:
-    Ship(const RenderWindow* window, int deck, int xPos, int yPos);
+
+    Ship(RenderWindow* window, int deck, int xPos, int yPos);
 
     Ship(const Ship& obj);
 
@@ -74,4 +50,38 @@ public:
     void setPosition(const Vector2f&);
 
     void setPosition(int, int);
+
+private:
+
+    void swap(const Ship&) noexcept;
+
+    bool checkCells(const std::vector<Field>&, int) const;
+
+    void locateShip(std::vector<Field>&, int);
+
+    int calculatePosition() const;
+
+private:
+
+    RenderWindow* window_;
+
+    // ship's parameters
+    int deckNumber_;
+    int x_;
+    int y_;
+    int width_;
+    int height_;
+
+    // is the ship is placed on the field
+    int IsPlaced_;
+
+    // number of rotations of the ship
+    int rotateCounter_;
+
+    Texture shipTexture_;
+    Sprite shipRect_;
+
+    // current coordinates
+    int curr_x_;           
+    int curr_y_;
 };

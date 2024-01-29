@@ -32,14 +32,20 @@ void initFonts()
 
 void initTextures()
 {
-    playerHitTexture.loadFromFile("images/marks/playerHit.png");
-    playerMissedTexture.loadFromFile("images/marks/playerMissed.png");
-    computerHitTexture.loadFromFile("images/marks/computerHit.png");
-    computerMissedTexture.loadFromFile("images/marks/computerMissed.png");
+    playerHitTexture = *TextureManager::getManager()->
+        getTexture("textures/marks/playerHit");
+    playerMissedTexture = *TextureManager::getManager()->
+        getTexture("textures/marks/playerMissed");
+    computerHitTexture = *TextureManager::getManager()->
+        getTexture("textures/marks/computerHit");
+    computerMissedTexture = *TextureManager::getManager()->
+        getTexture("textures/marks/computerMissed");
 }
 
 int main()
 {
+    TextureManager::getManager();
+
     initFonts();
     initTextures();
 

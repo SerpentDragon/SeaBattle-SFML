@@ -6,29 +6,8 @@ using namespace sf;
 
 class Button
 {
-    RenderWindow* window;
-    RectangleShape button;
-
-    // coordinates and dimensions of the button
-    int width;
-    int height;  
-    int xPos;
-    int yPos;
-
-    int pressedCounter;
-    
-    Color color; // button color
-    Color colorOn; // button color when the cursore is over it
-    Text text; // button text
-    Texture* texture; // button texture
-    Texture *textureOn;
-
-    template <typename T>
-    void Swap(T&&) noexcept;
-
-    bool OnButton(int, int) const;
-
 public:
+
     Button(RenderWindow*, const Text&, int, int, int, int, const Color&, const Color&);
 
     Button(RenderWindow*, const Text&, int, int, int, int, const Texture*, const Texture*, const Color&, const Color&);
@@ -58,4 +37,31 @@ public:
     void setText(const wchar_t*);
 
     int getPressedCounter() const;
+
+private:
+
+    Button(RenderWindow*, int, int, int, int);
+
+    void swap(const Button&) noexcept;
+
+    bool onButton(int, int) const;
+
+private:
+
+    RenderWindow* window_;
+    RectangleShape button_;
+
+    // coordinates and dimensions of the button
+    int width_;
+    int height_;  
+    int xPos_;
+    int yPos_;
+
+    int pressedCounter_;
+    
+    Color color_; // button color
+    Color colorOn_; // button color when the cursore is over it
+    Text text_; // button text
+    Texture* texture_; // button texture
+    Texture* textureOn_;
 };

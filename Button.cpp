@@ -1,182 +1,180 @@
 #include "Button.h"
 
-template <typename T>
-void Button::Swap(T&& obj) noexcept
+void Button::swap(const Button& other) noexcept
 {
-    window = obj.window;
-    button = obj.button;
-    width = obj.width;
-    height = obj.height;
-    xPos = obj.xPos;
-    yPos = obj.yPos;
-    pressedCounter = obj.pressedCounter;
-    color = obj.color;
-    colorOn = obj.colorOn;
-    text = obj.text;
-    texture = obj.texture ? new Texture(*obj.texture) : nullptr;
-    textureOn = obj.textureOn ? new Texture(*obj.textureOn) : nullptr;
+    window_ = other.window_;
+    button_ = other.button_;
+    width_ = other.width_;
+    height_ = other.height_;
+    xPos_ = other.xPos_;
+    yPos_ = other.yPos_;
+    pressedCounter_ = other.pressedCounter_;
+    color_ = other.color_;
+    colorOn_ = other.colorOn_;
+    text_ = other.text_;
+    texture_ = other.texture_ ? new Texture(*other.texture_) : nullptr;
+    textureOn_ = other.textureOn_ ? new Texture(*other.textureOn_) : nullptr;
 }
 
-bool Button::OnButton(int x, int y) const
+// check if the cursor is above the button
+bool Button::onButton(int x, int y) const
 {
-    return xPos <= x && x <= xPos + width && yPos <= y && y <= yPos + height; // check if the cursor is above the button
+    return xPos_ <= x && x <= xPos_ + width_ 
+        && yPos_ <= y && y <= yPos_ + height_;
 }
 
-Button::Button(RenderWindow *window, const Text& text, int x, int y, int b_width, int b_height, const Color& color, const Color& colorOn)
+Button::Button(RenderWindow* window, int x, int y, int width, int height)
+    : window_(window), xPos_(x), yPos_(y), width_(width), height_(height),
+    pressedCounter_(0), button_((Vector2f(width, height)))
 {
-    this->window = window;
-    xPos = x;
-    yPos = y;
-    width = b_width;
-    height = b_height;
-    pressedCounter = 0;
-    this->color = color;
-    this->colorOn = colorOn;
-    this->text = text;
-    texture = textureOn = nullptr;
-
-    button = RectangleShape(Vector2f(width, height));
-    button.setPosition(x, y);
-    button.setFillColor(color);
-
-    this->text.setPosition(x + (width - this->text.getLocalBounds().width) / 2 , y + (height - this->text.getLocalBounds().height) / 2 - 7);   
+    button_.setPosition(x, y);
 }
 
-Button::Button(RenderWindow* window, const Text& text, int x, int y, int b_width, int b_height, const Texture* texture, const Texture* textureOn, const Color& textColor, const Color& textColorOn)
+Button::Button(RenderWindow *window, const Text& text, 
+    int x, int y, int width, int height, 
+    const Color& color, const Color& colorOn)
+    : Button(window, x, y, width, height)
 {
-    this->window = window;
-    xPos = x;
-    yPos = y;
-    width = b_width;
-    height = b_height;
-    pressedCounter = 0;
-    color = textColor;
-    colorOn = textColorOn;
-    this->text = text;
-    this->texture = texture ? new Texture(*texture) : new Texture();
-    this->textureOn = textureOn ? new Texture(*textureOn) : new Texture();
+    color_ = color;
+    colorOn_ = colorOn;
+    text_ = text;
+    texture_ = textureOn_ = nullptr;
 
-    button = RectangleShape(Vector2f(width, height));
-    button.setPosition(x, y);
+    button_.setFillColor(color);
 
-    this->text.setPosition(x + (width - this->text.getLocalBounds().width) / 2 , y + (height - this->text.getLocalBounds().height) / 2 - 7);   
+    auto textBounds = text_.getGlobalBounds();
+    text_.setPosition(x + (width_ - textBounds.width) / 2 , 
+        y + (height_ - textBounds.height) / 2 - 7);
 }
 
-Button::Button(RenderWindow *window, int x, int y, int b_width, int b_height, const Texture* texture)
+Button::Button(RenderWindow* window, const Text& text, 
+    int x, int y, int width, int height, 
+    const Texture* texture, const Texture* textureOn, 
+    const Color& textColor, const Color& textColorOn)
+    : Button(window, x, y, width, height)
 {
-    this->window = window;
-    xPos = x;
-    yPos = y;
-    width = b_width;
-    height = b_height;
-    pressedCounter = 0;
-    color = colorOn = Color(0, 0, 0, 255);
-    text = Text();
-    this->texture = texture ? new Texture(*texture) : new Texture();
+    color_ = textColor;
+    colorOn_ = textColorOn;
 
-    button = RectangleShape(Vector2f(width, height));
-    button.setPosition(x, y);
-    button.setTexture(this->texture); 
+    texture_ = texture ? new Texture(*texture) : new Texture();
+    textureOn_ = textureOn ? new Texture(*textureOn) : new Texture();
+
+    text_ = text;
+    auto textBounds = text_.getLocalBounds();
+    text_.setPosition(x + (width_ - textBounds.width) / 2 , 
+        y + (height_ - textBounds.height) / 2 - 7);   
 }
 
-Button::Button(RenderWindow *window, const Text& text, int x, int y, int b_width, int b_height, const Texture* texture)
+Button::Button(RenderWindow *window, int x, int y, 
+    int width, int height, const Texture* texture)
+    : Button(window, x, y, width, height)
 {
-    this->window = window;
-    xPos = x;
-    yPos = y;
-    width = b_width;
-    height = b_height;
-    pressedCounter = 0;
-    color = colorOn = Color(0, 0, 0, 255);
-    this->text = text;
-    this->texture = texture ? new Texture(*texture) : new Texture();
+    color_ = colorOn_ = Color(0, 0, 0, 255);
+    text_ = Text();
 
-    button = RectangleShape(Vector2f(width, height));
-    button.setPosition(x, y);
-    button.setTexture(this->texture); 
+    texture_ = texture ? new Texture(*texture) : new Texture();
+
+    button_.setTexture(texture_); 
 }
 
-Button::Button (const Button& obj)
+Button::Button(RenderWindow *window, const Text& text, 
+    int x, int y, int width, int height, 
+    const Texture* texture)
+    : Button(window, x, y, width, height)
 {
-    Swap(obj);
+    color_ = colorOn_ = Color(0, 0, 0, 255);
+    text_ = text;
+    
+    texture_ = texture ? new Texture(*texture) : new Texture();
+
+    button_.setTexture(texture_); 
 }
 
-Button::Button(Button&& obj) noexcept
+Button::Button(const Button& other)
 {
-    Swap(obj);
-
-    obj.window = nullptr;
-    obj.width = obj.height = obj.xPos = obj.yPos = obj.pressedCounter = 0;
-    obj.texture = obj.textureOn = nullptr;
+    swap(other);
 }
 
-Button& Button::operator=(const Button& obj)
+Button::Button(Button&& other) noexcept
 {
-    if (this != &obj)
+    swap(other);
+
+    other.window_ = nullptr;
+    other.width_ = other.height_ = other.xPos_ = 
+        other.yPos_ = other.pressedCounter_ = 0;
+    other.texture_ = other.textureOn_ = nullptr;
+}
+
+Button& Button::operator=(const Button& other)
+{
+    if (this != &other)
     {
-        Swap(obj);
+        swap(other);
     }
     return *this;
 }
 
-Button& Button::operator=(Button&& obj) noexcept
+Button& Button::operator=(Button&& other) noexcept
 {
-    if (this != &obj)
+    if (this != &other)
     {
-        Swap(obj);
+        swap(other);
 
-        obj.window = nullptr;
-        obj.width = obj.height = obj.xPos = obj.yPos = obj.pressedCounter = 0;
-        obj.texture = obj.textureOn = nullptr;
+        other.window_ = nullptr;
+        other.width_ = other.height_ = other.xPos_ = 
+            other.yPos_ = other.pressedCounter_ = 0;
+        other.texture_ = other.textureOn_ = nullptr;
     }
     return *this;
 }
 
 Button::~Button()
 {
-    window = nullptr;
-    if (texture) delete texture;
-    if (textureOn) delete textureOn;
+    window_ = nullptr;
+    if (texture_) delete texture_;
+    if (textureOn_) delete textureOn_;
 }
 
 void Button::drawButton() const
 {
-    window->draw(button);
-    window->draw(text);
+    window_->draw(button_);
+    window_->draw(text_);
 }
 
 int Button::isPressed()
 {
-    int x = Mouse::getPosition(*window).x;
-    int y = Mouse::getPosition(*window).y;
+    int x = Mouse::getPosition(*window_).x;
+    int y = Mouse::getPosition(*window_).y;
 
-    window->draw(button);
-    window->draw(text);
+    window_->draw(button_);
+    window_->draw(text_);
     
-    if (OnButton(x, y)) // if the cursor is above the button
+    if (onButton(x, y))
     {
-        if (!texture) button.setFillColor(colorOn); // if button has no texture paint it "colorOn" color
+        if (!texture_) button_.setFillColor(colorOn_);
         else 
         {
-            text.setFillColor(colorOn);
-            button.setTexture(textureOn);
+            text_.setFillColor(colorOn_);
+            button_.setTexture(textureOn_);
         }
-        if (Mouse::isButtonPressed(Mouse::Left))  // if left mouse button was pressed
+        if (Mouse::isButtonPressed(Mouse::Left))
         {
             while(true) // while left mouse button is held
             {
-                if (!Mouse::isButtonPressed(Mouse::Left)) break; // if left mouse button was released 
+                if (!Mouse::isButtonPressed(Mouse::Left)) 
+                    break;
             }
-            if (OnButton(Mouse::getPosition(*window).x, Mouse::getPosition(*window).y)) return ++pressedCounter; // the button was pressed
+            if (onButton(Mouse::getPosition(*window_).x, Mouse::getPosition(*window_).y)) 
+                return ++pressedCounter_; // the button was pressed
         }
     }
     else 
     {
-        if (!texture) button.setFillColor(color); // else if the cursor is not above the button and it has no texture paint it "color" color
-        else if (texture)
+        if (!texture_) button_.setFillColor(color_); // else if the cursor is not above the button and it has no texture paint it "color" color
+        else if (texture_)
         {
-            text.setFillColor(color);
-            button.setTexture(texture);
+            text_.setFillColor(color_);
+            button_.setTexture(texture_);
         }
     }
 
@@ -185,19 +183,22 @@ int Button::isPressed()
 
 void Button::setTextColor(const Color& color)
 {
-    text.setFillColor(color);
+    text_.setFillColor(color);
 }
 
 void Button::setButtonColor(const Color& color)
 {
-    this->color = color;
-    button.setFillColor(color);
+    color_ = color;
+    button_.setFillColor(color);
 }
 
 void Button::setText(const wchar_t* string)
 {
-    text.setString(string);
-    text.setPosition(xPos + (width - text.getLocalBounds().width) / 2 , yPos + (height - text.getLocalBounds().height) / 2 - 7); 
+    text_.setString(string);
+
+    auto textBounds = text_.getLocalBounds();
+    text_.setPosition(xPos_ + (width_ - textBounds.width) / 2 , 
+        yPos_ + (height_ - textBounds.height) / 2 - 7); 
 }
 
-int Button::getPressedCounter() const { return pressedCounter; }
+int Button::getPressedCounter() const { return pressedCounter_; }
