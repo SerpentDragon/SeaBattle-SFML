@@ -1,4 +1,4 @@
-#include "Ship.h"
+#include "Ship.hpp"
 
 void Ship::swap(const Ship& other) noexcept
 {
@@ -45,8 +45,8 @@ void Ship::locateShip(std::vector<Field>& leftField, int data)
     else 
     {
         shipPlace = 1; aroundShip = 2; // otherwise we should mark them as taken
-        xIndex = (curr_x_ - xCoord) / fieldSize;
-        yIndex = (curr_y_ - yCoord) / fieldSize;
+        xIndex = (curr_x_ - gl::xCoord) / gl::fieldSize;
+        yIndex = (curr_y_ - gl::yCoord) / gl::fieldSize;
         IsPlaced_ = xIndex * 10 + yIndex;
     }
 
@@ -80,26 +80,26 @@ void Ship::locateShip(std::vector<Field>& leftField, int data)
 int Ship::calculatePosition() const
 {
     // number of the row where the ship is located
-    int xIndex = (curr_x_ - xCoord) / fieldSize;
+    int xIndex = (curr_x_ - gl::xCoord) / gl::fieldSize;
     // number of the column where the ship is located
-    int yIndex = (curr_y_ - yCoord) / fieldSize; 
+    int yIndex = (curr_y_ - gl::yCoord) / gl::fieldSize; 
 
     // x- and y-offset relative to the upper left 
     // corner of the cell where the upper left corner 
     // of the ship is located
-    int xOffset = (curr_x_ - xCoord) % fieldSize; 
-    int yOffset = (curr_y_ - yCoord) % fieldSize; 
+    int xOffset = (curr_x_ - gl::xCoord) % gl::fieldSize; 
+    int yOffset = (curr_y_ - gl::yCoord) % gl::fieldSize; 
 
-    if (xOffset > fieldSize - xOffset) xIndex++;
-    if (yOffset > fieldSize - yOffset) yIndex++;
+    if (xOffset > gl::fieldSize - xOffset) xIndex++;
+    if (yOffset > gl::fieldSize - yOffset) yIndex++;
 
     return xIndex * 10 + yIndex;
 }
 
 Ship::Ship(RenderWindow* window, int deck, int xPos, int yPos)
     : window_(window), deckNumber_(deck), x_(xPos), curr_x_(xPos),
-    y_(yPos), curr_y_(yPos), width_(deck * 0.034 * screenWidth),
-    height_(0.034 * screenWidth), IsPlaced_(-1), rotateCounter_(0)
+    y_(yPos), curr_y_(yPos), width_(deck * gl::fieldSize),
+    height_(gl::fieldSize), IsPlaced_(-1), rotateCounter_(0)
 {
     shipTexture_ = *TextureManager::getManager()->getTexture(
         "textures/ships/" + std::to_string(deck) + "deck");
@@ -189,9 +189,9 @@ void Ship::setFieldColor(std::vector<Field>& leftField)
     if (IsPlaced_ != -1) locateShip(leftField, 0);
 
     // check if the ship is inside the user field
-    if (xCoord <= curr_x_ && yCoord <= curr_y_ && 
-        xCoord + 10 * fieldSize >= curr_x_ + width_ && 
-        yCoord + 10 * fieldSize >= curr_y_ + height_)
+    if (gl::xCoord <= curr_x_ && gl::yCoord <= curr_y_ && 
+        gl::xCoord + 10 * gl::fieldSize >= curr_x_ + width_ && 
+        gl::yCoord + 10 * gl::fieldSize >= curr_y_ + height_)
     {
         // calculate orientation of the ship
         step = prevWidth > prevHeight ? 10 : 1;
@@ -222,9 +222,9 @@ void Ship::placeShip(std::vector<Field>& leftField)
     int step = width_ > height_ ? 10 : 1;
     int currIndex = calculatePosition();
 
-    if (xCoord <= curr_x_ && yCoord <= curr_y_ && 
-        xCoord + 10 * fieldSize >= curr_x_ + width_ && 
-        yCoord + 10 * fieldSize >= curr_y_ + height_)
+    if (gl::xCoord <= curr_x_ && gl::yCoord <= curr_y_ && 
+        gl::xCoord + 10 * gl::fieldSize >= curr_x_ + width_ && 
+        gl::yCoord + 10 * gl::fieldSize >= curr_y_ + height_)
     {
         for(size_t i = 0; i < deckNumber_; i++, currIndex += step) 
             leftField[currIndex].setNeutralColor();

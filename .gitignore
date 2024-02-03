@@ -1,3 +1,4 @@
 *.o
 sfml-app
 .vscode/
+app_data/data/

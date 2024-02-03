@@ -1,4 +1,4 @@
-#include "Field.h"
+#include "Field.hpp"
 
 // check if the cursor is above the field
 bool Field::onField(int xPos, int yPos) const
@@ -7,7 +7,7 @@ bool Field::onField(int xPos, int yPos) const
         && y_ <= yPos && yPos <= y_ + size_;
 }
 
-void Field::swap(const Field& other)
+void Field::swap(const Field& other) noexcept
 {
     window_ = other.window_;
     field_ = other.field_;
@@ -21,16 +21,20 @@ void Field::swap(const Field& other)
 }
 
 Field::Field(RenderWindow* window, int x, int y)
-    : window_(window), x_(x), y_(y), size_(fieldSize),
+    : window_(window), x_(x), y_(y), size_(gl::fieldSize),
     dataCounter_(0), data_(field_data::free)
 {
     // loading textures depending on what area the field is located
-    hitTexture_ = x < xCoord + 12 * fieldSize ? Texture() : playerHitTexture; 
-    missTexture_ = x < xCoord + 12 * fieldSize ? computerMissedTexture : playerMissedTexture;
+    hitTexture_ = x < gl::xCoord + 12 * gl::fieldSize ? 
+        Texture() 
+        : *TextureManager::getManager()->getTexture("textures/marks/playerHit"); 
+    missTexture_ = x < gl::xCoord + 12 * gl::fieldSize ? 
+        *TextureManager::getManager()->getTexture("textures/marks/computerMissed") 
+        : *TextureManager::getManager()->getTexture("textures/marks/playerMissed");
 
     field_ = RectangleShape(Vector2f(size_, size_));
 
-    field_.setOutlineThickness(0.0019 * screenHeight);
+    field_.setOutlineThickness(FI::fieldOutlineThickness);
     field_.setOutlineColor(Color::Black);
     field_.setFillColor(Color::White);
     field_.setPosition(x_, y_);
@@ -41,7 +45,7 @@ Field::Field(const Field& other)
     swap(other);
 }
 
-Field::Field(Field&& other)
+Field::Field(Field&& other) noexcept
 {
     swap(other);
 
@@ -60,7 +64,7 @@ Field& Field::operator=(const Field& other)
     return *this;
 }
 
-Field& Field::operator=(Field&& other)
+Field& Field::operator=(Field&& other) noexcept
 {
     if (this != &other)
     {
@@ -98,7 +102,8 @@ void Field::setData(int data)
 {
     if (data == 0) 
     {
-        if (--dataCounter_ == 0) data_ = field_data::free;
+        if (--dataCounter_ == 0) 
+            data_ = field_data::free;
     }
     else
     {

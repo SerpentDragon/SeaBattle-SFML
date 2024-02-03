@@ -8,6 +8,8 @@ class Button
 {
 public:
 
+    Button() = default;
+
     Button(RenderWindow*, const Text&, int, int, int, int, const Color&, const Color&);
 
     Button(RenderWindow*, const Text&, int, int, int, int, const Texture*, const Texture*, const Color&, const Color&);

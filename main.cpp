@@ -1,34 +1,12 @@
 #include <SFML/Graphics.hpp>
 #include <ctime>
-#include "Interface.h"
-#include "settings.h"
-#include "Field.h"
+#include "Interface.hpp"
+#include "settings.hpp"
+#include "Field.hpp"
 
 using namespace sf;
 
-int screenWidth = VideoMode::getDesktopMode().width;
-int screenHeight = VideoMode::getDesktopMode().height;
-int Width = 0.624 * screenWidth;
-int Height = 0.745 * screenHeight;
-int fieldSize = 0.034 * screenWidth;
-int xCoord = 0.23 * screenWidth;
-int yCoord = 0.206 * screenHeight;
-
-Font arialFont;
-Font trebuchetFont;
-Font optimaFont;
-
-Color buttonColor(180, 180, 180);
-Color buttonColorOn(0, 191, 255);
-
 Texture playerHitTexture, playerMissedTexture, computerHitTexture, computerMissedTexture;
-
-void initFonts()
-{
-    arialFont.loadFromFile("fonts/arial.ttf");
-    trebuchetFont.loadFromFile("fonts/trebuchetms.ttf");
-    optimaFont.loadFromFile("fonts/optima.ttf");
-}
 
 void initTextures()
 {
@@ -46,13 +24,13 @@ int main()
 {
     TextureManager::getManager();
 
-    initFonts();
+    gl::initFonts();
     initTextures();
 
-    srand(time(0));
+    srand(time(nullptr));
 
-    RenderWindow window(VideoMode(Width, Height), L"Морской бой", Style::Close);
-    window.setPosition(Vector2i((screenWidth - Width) / 2, (screenHeight - Height) / 2));
+    RenderWindow window(VideoMode(gl::Width, gl::Height), L"Морской бой", Style::Close);
+    window.setPosition(Vector2i(gl::startWindowXPos, gl::startWindowYPos));
 
     Interface interface(&window);
 

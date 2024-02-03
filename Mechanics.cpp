@@ -1,4 +1,4 @@
-#include "Mechanics.h"
+#include "Mechanics.hpp"
 
 namespace directions
 {
@@ -155,7 +155,7 @@ Mechanics::Mechanics(RenderWindow* window,
     playerMove_(true), playerShips_(10), computerShips_(10)
 {
     moves_.resize(100);
-    for(int i = 0; i < 100; i++) moves_[i] = i;
+    for(int i = 0; i < moves_.size(); i++) moves_[i] = i;
 }
 
 Mechanics::~Mechanics()
@@ -168,14 +168,14 @@ Mechanics::~Mechanics()
 void Mechanics::placeShips(std::vector<Field>* fieldArea, std::vector<Ship>* ships) const
 {
     bool tmp = false;
-
     int i, j, k;
 
     int decks[] = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
+    int decksSize = sizeof(decks) / sizeof(int);
 
     std::vector<int> direct;
 
-    for(int count = 0; count < 10; count++)
+    for(int count = 0; count < decksSize; count++)
     {
         while(true)
         {           
@@ -190,7 +190,7 @@ void Mechanics::placeShips(std::vector<Field>* fieldArea, std::vector<Ship>* shi
                 if ((*fieldArea)[i * 10 + j].getData()) continue;
 
                 (*fieldArea)[i * 10 + j].setData(field_data::taken);
-                direct.emplace_back(0);
+                direct.emplace_back(directions::up);
                 break;
             }
 
@@ -294,7 +294,7 @@ bool Mechanics::startTheGame()
 
     if (playerMove_)
     {
-        for(int k = 0; k < 100; k++)
+        for(int k = 0; k < rightField_->size(); k++)
         {
             if ((*rightField_)[k].isChosen())
             {
@@ -382,9 +382,10 @@ bool Mechanics::startTheGame()
                         currentDirection = -1;
                     }
 
-                    RectangleShape hitPos(Vector2f(fieldSize, fieldSize));
+                    RectangleShape hitPos(Vector2f(gl::fieldSize, gl::fieldSize));
                     hitPos.setPosition((*leftField_)[i * 10 + j].getPosition());
-                    hitPos.setTexture(&computerHitTexture);
+                    hitPos.setTexture(TextureManager::getManager()->getTexture(
+                        "textures/marks/computerHit"));
 
                     hitPositions_.emplace_back(hitPos);
                 }
@@ -426,9 +427,10 @@ bool Mechanics::startTheGame()
 
                 markTheDeck(i, j, leftField_);
 
-                RectangleShape hitPos(Vector2f(fieldSize, fieldSize));
+                RectangleShape hitPos(Vector2f(gl::fieldSize, gl::fieldSize));
                 hitPos.setPosition((*leftField_)[k].getPosition());
-                hitPos.setTexture(&computerHitTexture);
+                hitPos.setTexture(TextureManager::getManager()->getTexture(
+                    "textures/marks/computerHit"));
 
                 hitPositions_.emplace_back(hitPos);
 

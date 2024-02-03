@@ -1,6 +1,7 @@
 #pragma once
 
-#include "settings.h"
+#include "Managers/TextureManager.hpp"
+#include "settings.hpp"
 
 using namespace sf;
 
@@ -17,21 +18,21 @@ namespace field_data
     enum : unsigned short { free = 0, taken, ship_near, hit_ship, hit_field };
 }
 
-extern Texture playerHitTexture, playerMissedTexture, computerHitTexture, computerMissedTexture;
-
 class Field
 {
 public:
+
+    Field() = default;
 
     Field(RenderWindow*, int, int);
 
     Field(const Field&);
 
-    Field(Field&&);
+    Field(Field&&) noexcept;
 
     Field& operator=(const Field&);
 
-    Field& operator=(Field&&);
+    Field& operator=(Field&&) noexcept;
 
     ~Field();
 
@@ -63,7 +64,7 @@ private:
 
     bool onField(int, int) const;
 
-    void swap(const Field&);
+    void swap(const Field&) noexcept;
 
 private:
 

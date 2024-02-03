@@ -2,8 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 #include "Managers/TextureManager.hpp"
-#include "settings.h"
-#include "Field.h"
+#include "settings.hpp"
+#include "Field.hpp"
 
 using namespace sf;
 

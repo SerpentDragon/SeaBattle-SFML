@@ -1,104 +1,160 @@
-#include "Interface.h"
+#include "Interface.hpp"
 
-Text globalTime;
-int hour = 0, minute = 0, second = 0;
-
-void timer()
+void Interface::initCoordinatesText()
 {
-    std::stringstream time;
-    while(true)
+    for(int i = 0, symbol = 1072; i < 10; i++, symbol++)
     {
-        if (hour < 10) time << 0;
-        time << hour << ":";
-        if (minute < 10) time << 0;
-        time << minute << ":";
-        if (second < 10) time << 0;
-        time << second;
+        coordinates_[i].setString(std::to_string(i + 1));
 
-        globalTime.setString(time.str());
-        time.str(""); 
+        if (symbol == 1081) symbol++;
+        coordinates_[i + 10].setString(static_cast<wchar_t>(symbol));
+    }
 
-        second++;
-        if (second % 60 == 0 && second)
-        {
-            minute++;
-            second = 0;
-        }
-        if (minute % 60 == 0 && minute)
-        {
-            hour++;
-            second = minute = 0;
-        }
-        sleep(milliseconds(1000));
+    for(auto& text : coordinates_)
+    {
+        text.setFont(gl::optimaFont);
+        text.setCharacterSize(static_cast<double>(gl::fieldSize) / 1.5);
+        text.setFillColor(IN::textColor);
     }
 }
 
-bool comparator(const std::string& str1, const std::string str2)
+void Interface::initTextures()
 {
-    int str1FirstIndex = str1.find(":"), str1SecondIndex = str1.rfind(":");
-    int str2FirstIndex = str2.find(":"), str2SecondIndex = str2.rfind(":");
+    img_.emplace("startWindow", Vector2f(gl::Width, gl::Height)).first->second.setTexture(
+        TextureManager::getManager()->getTexture("textures/interface/windows/StartWindowBackground"));
 
-    int str1Hours = stoi(str1.substr(0, str1FirstIndex));
-    int str1Minutes = stoi(str1.substr(str1FirstIndex + 1, 2));
-    int str1Seconds = stoi(str1.substr(str1SecondIndex + 1));
+    img_.emplace("gameWindow", Vector2f(gl::screenWidth, gl::screenHeight)).first->second.setTexture(
+        TextureManager::getManager()->getTexture("textures/interface/windows/GameWindowBackground"));
 
-    int str2Hours = stoi(str2.substr(0, str2FirstIndex));
-    int str2Minutes = stoi(str2.substr(str2FirstIndex + 1, 2));
-    int str2Seconds = stoi(str2.substr(str2SecondIndex + 1));
+    img_.emplace("referenceWindow", Vector2f(IN::refWidnowWidth, IN::refWindowHeight)).first->second.setTexture(
+        TextureManager::getManager()->getTexture("textures/interface/windows/ReferenceWindowBackground"));
 
-    if (str1Hours == str2Hours)
+    img_.emplace("recordsWindow", Vector2f(IN::recWindowWidth, IN::recWindowHeight)).first->second.setTexture(
+        TextureManager::getManager()->getTexture("textures/interface/windows/RecordsWindowBackground"));
+
+    img_.emplace("dialogBackground", Vector2f(IN::infoWindowWidth, IN::infoWindowHeight)).first->second.setTexture(
+        TextureManager::getManager()->getTexture("textures/interface/windows/DialogWindowsBackground"));
+
+    img_.emplace("fieldBackground", Vector2f(IN::fieldsBackWidth, IN::fieldsBackHeight)).first->second.setTexture(
+        TextureManager::getManager()->getTexture("textures/interface/windows/FieldBackground"));
+    img_["fieldBackground"].setPosition(IN::fieldsBackXPos, IN::fieldsBackYPos);
+
+    img_.emplace("timerBackground", Vector2f(IN::timeBackWidth, IN::timeBackHeight)).first->second.setTexture(
+        TextureManager::getManager()->getTexture("textures/interface/windows/TimerBackground"));
+    img_["timerBackground"].setPosition(IN::timeBackXPos, IN::timeBackYPos);
+}
+
+void Interface::createMainWindowButtons()
+{
+    const Texture* texture = TextureManager::getManager()->
+        getTexture("textures/interface/buttons/main");
+    const Texture* textureOn = TextureManager::getManager()->
+        getTexture("textures/interface/buttons/mainSelected");
+
+    playButton_ = Button(window_, Text(L"Играть", gl::optimaFont, IN::mainButtonsFontSize), 
+        IN::mainButtonsXPos, IN::playButtonYPos, IN::mainButtonsWidth, IN::mainButtonsHeight, 
+        texture, textureOn, IN::textColor, IN::textColorOn);
+
+    referenceButton_ = Button(window_, Text(L"Справка", gl::optimaFont, IN::mainButtonsFontSize), 
+        IN::mainButtonsXPos, IN::referenceButtonYPos, IN::mainButtonsWidth, IN::mainButtonsHeight, 
+        texture, textureOn, IN::textColor, IN::textColorOn);
+
+    recordsButton_ = Button(window_, Text(L"Рекорды", gl::optimaFont, IN::mainButtonsFontSize), 
+        IN::mainButtonsXPos, IN::recordsButtonYPos, IN::mainButtonsWidth, IN::mainButtonsHeight, 
+        texture, textureOn, IN::textColor, IN::textColorOn);
+
+    exitButton_ = Button(window_, Text(L"Выход", gl::optimaFont, IN::mainButtonsFontSize), 
+        IN::mainButtonsXPos, IN::exitButtonYPos, IN::mainButtonsWidth, IN::mainButtonsHeight, 
+        texture, textureOn, IN::textColor, IN::textColorOn);
+}
+
+void Interface::createGameWindowButtons()
+{
+    const Texture* texture = TextureManager::getManager()->
+        getTexture("textures/interface/buttons/main");
+    const Texture* textureOn = TextureManager::getManager()->
+        getTexture("textures/interface/buttons/mainSelected");
+
+    startButton_ = Button(window_, Text(L"Старт", gl::optimaFont, IN::gameWindowButtonsTextFontSize), 
+        IN::startButtonXPos, IN::gameWindowButtonsYPos, IN::gameWindowButtonsWidth, IN::gameWindowButtonsHeight, 
+        texture, textureOn, IN::textColor, IN::textColorOn);
+
+    autoButton_ = Button(window_, Text(L"Авто", gl::optimaFont, IN::gameWindowButtonsTextFontSize), 
+        IN::autoButtonXPos, IN::gameWindowButtonsYPos, IN::gameWindowButtonsWidth, IN::gameWindowButtonsHeight, 
+        texture, textureOn, IN::textColor, IN::textColorOn);
+
+    quitButton_ = Button(window_, Text(L"Выход", gl::optimaFont, IN::gameWindowButtonsTextFontSize), 
+        IN::quitButtonXPos, IN::gameWindowButtonsYPos, IN::gameWindowButtonsWidth, IN::gameWindowButtonsHeight, 
+        texture, textureOn, IN::textColor, IN::textColorOn);
+}
+
+void Interface::createGameFields()
+{
+    for(size_t i = 0; i < 10; i++) 
     {
-        if (str1Minutes == str2Minutes)
+        for(size_t j = 0; j < 10; j++)
         {
-            return str1Seconds < str2Seconds;
+            leftField_[i * 10 + j] = Field(window_, gl::xCoord + i * gl::fieldSize, 
+                gl::yCoord + j * gl::fieldSize);
+            rightField_[i * 10 + j] = Field(window_, gl::xCoord + (i + 12) * gl::fieldSize, 
+                gl::yCoord + j * gl::fieldSize);
         }
-        else return str1Minutes < str2Minutes;
     }
-    else return str1Hours < str2Hours;
+}
+
+void Interface::createShips()
+{
+    for(int i = 3; i >= 0; i--)
+    {
+        for(size_t j = 0; j < i + 1; j++) 
+        {
+            ships_.emplace_back(Ship(window_, 4 - i, 0.0261 * gl::screenWidth, 
+                0.3255 * gl::screenHeight + i * gl::fieldSize * 1.1));
+        }
+    }
+}
+
+void Interface::initGlobalTimeText()
+{
+    timeText_ = Text("00:00:00", gl::optimaFont, IN::timeTextFontSize);
+    timeText_.setFillColor(IN::textColor);
+    timeText_.setPosition(IN::timeTextXPos, IN::timeTextYPos);
 }
 
 void Interface::drawCoordinates(int x, int y, int size) const
 {
-    Text coordText("", optimaFont, static_cast<double>(size) / 1.5);
-    coordText.setFillColor(Color(85, 4, 29));
-    int symbol, offset = (size - coordText.getGlobalBounds().width) / 4;
+    int length = coordinates_.size();
+    int offset = (size - coordinates_[0].getGlobalBounds().width) / 4;
 
-    for(int i = 0, symbol = 1072; i < 10; i++, symbol++)
+    for(int i = 0; i < length; i++)
     {
-        coordText.setString(std::to_string(i + 1));
+        i < length / 2 ? 
+            coordinates_[i].setPosition(x + i * size + offset, y - size) : 
+            coordinates_[i].setPosition(x - size + offset / 2, 
+                y + (i - length / 2) * size);
+        window_->draw(coordinates_[i]);
+    }
 
-        if (i == 9) offset /= 2;
-
-        coordText.setPosition(x + i * size + offset, y - size);
-        window_->draw(coordText);
-
-        coordText.setPosition(x + (i + 12) * size + offset, y - size);
-        window_->draw(coordText);
-
-        if (symbol == 1081) symbol++;
-
-        coordText.setString(static_cast<wchar_t>(symbol));
-
-        coordText.setPosition(x - size + offset / 2, y + i * size);
-        window_->draw(coordText);
-
-        coordText.setPosition(x + 11 * size + offset / 2, y + i * size);
-        window_->draw(coordText);
+    for(int i = 0; i < length; i++)
+    {
+        i < length / 2 ? 
+            coordinates_[i].setPosition(x + (i + 12) * size + offset, y - size) : 
+            coordinates_[i].setPosition(x + 11 * size + offset / 2, 
+                y + (i - length / 2) * size);
+        window_->draw(coordinates_[i]);
     }
 }
 
 void Interface::showMessage(const std::wstring& msg) const
 {
-    int windowWidth = fieldSize * 7, windowHeight = fieldSize * 4;
-
-    Text messageText(msg, optimaFont, 0.03704 * screenHeight);
-    messageText.setFillColor(Color(85, 4, 29));
+    Text messageText(msg, gl::optimaFont, IN::infoWindowTextFontSize);
+    messageText.setFillColor(IN::textColor);
 
     auto messageBounds = messageText.getGlobalBounds();
-    messageText.setPosition((screenWidth - messageBounds.width) / 2, 
-        (screenHeight - messageBounds.height) / 2.04);
-    img_["dialogBackground"].setPosition((screenWidth - windowWidth) / 2, 
-        (screenHeight - windowHeight) / 2);
+    messageText.setPosition((gl::screenWidth - messageBounds.width) / 2, 
+        (gl::screenHeight - messageBounds.height) / 2.04);
+    img_["dialogBackground"].setPosition((gl::screenWidth - IN::infoWindowWidth) / 2, 
+        (gl::screenHeight - IN::infoWindowHeight) / 2);
 
     window_->draw(img_["dialogBackground"]);
     window_->draw(messageText);
@@ -109,27 +165,31 @@ void Interface::showMessage(const std::wstring& msg) const
 
 bool Interface::showWarning(const std::wstring& msg) const
 {
-    int windowWidth = fieldSize * 7, windowHeight = fieldSize * 4;
-    int windowXPos = window_->getPosition().x + (window_->getSize().x - windowWidth) / 2;
-    int windowYPos = window_->getPosition().y + (window_->getSize().y - windowHeight) / 2;
+    int windowXPos = window_->getPosition().x + 
+        (window_->getSize().x - IN::infoWindowWidth) / 2;
+    int windowYPos = window_->getPosition().y + 
+        (window_->getSize().y - IN::infoWindowHeight) / 2;
 
-    RenderWindow warningWindow(VideoMode(windowWidth, windowHeight), L"Предупреждение!", Style::None);
+    RenderWindow warningWindow(VideoMode(IN::infoWindowWidth, 
+        IN::infoWindowHeight), L"Предупреждение!", Style::None);
     warningWindow.setPosition(Vector2i(windowXPos, windowYPos));
 
-    Text messageText(msg, optimaFont, 0.03704 * screenHeight);
-    messageText.setFillColor(Color(85, 4, 29));
-    messageText.setPosition((windowWidth - messageText.getGlobalBounds().width) / 2, fieldSize / 2);
+    Text messageText(msg, gl::optimaFont, IN::infoWindowTextFontSize);
+    messageText.setFillColor(IN::textColor);
+    messageText.setPosition((IN::infoWindowWidth - 
+        messageText.getGlobalBounds().width) / 2, gl::fieldSize / 2);
 
-    Button yesButton(&warningWindow, Text(L"Да", optimaFont, 0.0157 * screenWidth), 
-        fieldSize, fieldSize * 2.5, fieldSize * 2, fieldSize, 
-        img_["dialogWindowButton"].getTexture(), 
-        img_["dialogWindowSelectedButton"].getTexture(), 
-        Color(85, 4, 29), Color(0, 36, 91));
-    Button noButton(&warningWindow, Text(L"Нет", optimaFont, 0.0157 * screenWidth), 
-        fieldSize * 4, fieldSize * 2.5, fieldSize * 2, fieldSize,
-        img_["dialogWindowButton"].getTexture(), 
-        img_["dialogWindowSelectedButton"].getTexture(), 
-        Color(85, 4, 29), Color(0, 36, 91));
+    const Texture* texture = TextureManager::getManager()->
+        getTexture("textures/interface/buttons/dialog");
+    const Texture* textureOn = TextureManager::getManager()->
+        getTexture("textures/interface/buttons/dialogSelected");
+
+    Button yesButton(&warningWindow, Text(L"Да", gl::optimaFont, IN::infoWindowButtonFontSize), 
+        IN::infoWindowYesButtonXPos, IN::infoWindowButtonYPos, IN::infoWindowButtonWidth, 
+        IN::infoWindowButtonHeight, texture, textureOn, IN::textColor, IN::textColorOn);
+    Button noButton(&warningWindow, Text(L"Нет", gl::optimaFont, IN::infoWindowButtonFontSize), 
+        IN::infoWindowNoButtonXPos, IN::infoWindowButtonYPos, IN::infoWindowButtonWidth, 
+        IN::infoWindowButtonHeight, texture, textureOn, IN::textColor, IN::textColorOn);
 
     img_["dialogBackground"].setPosition(0, 0);
 
@@ -139,13 +199,12 @@ bool Interface::showWarning(const std::wstring& msg) const
     {
         while(warningWindow.pollEvent(event))
         {
-            switch(event.type){}
+            switch(event.type) {}
         }
 
         warningWindow.clear();
 
         warningWindow.draw(img_["dialogBackground"]);
-
         warningWindow.draw(messageText);
 
         yesButton.drawButton();
@@ -166,87 +225,19 @@ bool Interface::showWarning(const std::wstring& msg) const
     }
 }
 
-std::vector<std::string> Interface::readRecords() const
+Interface::Interface(RenderWindow* window) :
+    window_(window),
+    leftField_(100), rightField_(100),
+    mechanics_(window_, &leftField_, &rightField_),
+    file_(IN::maxRecordsNum)
 {
-    std::vector<std::string> records;
-
-    std::fstream file("data/records.ltx", std::ios_base::in | std::ios_base::binary);
-    if (!file)
-    {
-        std::filesystem::create_directories("data");
-        std::ifstream tmpFile("data/records.ltx");
-        tmpFile.close();
-    }
-    else
-    {
-        std::string record;
-        std::regex regexTemplate("[0-9]{2,}:[0-9]{2}:[0-9]{2}");
-
-        while(std::getline(file, record))
-        {
-            if (std::regex_match(record, regexTemplate))
-            {
-                int min = stoi(record.substr(record.find(":") + 1, 2));
-                int sec = stoi(record.substr(record.rfind(":") + 1));
-
-                if (min < 59 && sec < 59) records.emplace_back(record);
-            }
-        }
-        file.close();
-
-        std::sort(records.begin(), records.end(), comparator);
-    }
-
-    return records;
-}
-
-void Interface::writeRecords() const
-{
-    std::vector<std::string> records = readRecords();
-    records.emplace_back(globalTime.getString());
-    std::sort(records.begin(), records.end(), comparator);
-
-    std::fstream file("data/records.ltx", std::ios_base::out | std::ios_base::binary);
-    for(int i = 0; i < 5 && i < records.size(); i++) file << records[i] << std::endl;
-    file.close();
-}
-
-Interface::Interface(RenderWindow* window) : window_(window)
-{
-    img_.emplace("startWindow", Vector2f(Width, Height)).first->second.setTexture(
-        TextureManager::getManager()->getTexture("textures/interface/windows/StartWindowBackground"));
-
-    img_.emplace("gameWindow", Vector2f(screenWidth, screenHeight)).first->second.setTexture(
-        TextureManager::getManager()->getTexture("textures/interface/windows/GameWindowBackground"));
-
-    img_.emplace("referenceWindow", Vector2f(0.5 * Width, 0.6 * Height)).first->second.setTexture(
-        TextureManager::getManager()->getTexture("textures/interface/windows/ReferenceWindowBackground"));
-
-    img_.emplace("fieldBackground", Vector2f(24 * fieldSize, 12 * fieldSize)).first->second.setTexture(
-        TextureManager::getManager()->getTexture("textures/interface/windows/FieldBackground"));
-    img_["fieldBackground"].setPosition(0.1823 * screenWidth, 0.12038 * screenHeight);
-
-    img_.emplace("recordsWindow", Vector2f(screenWidth / 5, screenHeight / 2)).first->second.setTexture(
-        TextureManager::getManager()->getTexture("textures/interface/windows/RecordsWindowBackground"));
-
-    img_.emplace("dialogBackground", Vector2f(fieldSize * 7, fieldSize * 4)).first->second.setTexture(
-        TextureManager::getManager()->getTexture("textures/interface/windows/DialogWindowsBackground"));
-
-    img_.emplace("mainWindowsButton", Vector2f(0.5 * Width, 0.07831 * Height)).first->second.setTexture(
-        TextureManager::getManager()->getTexture("textures/interface/buttons/MainWindowsButton"));
-
-    img_.emplace("mainWindowsSelectedButton", Vector2f(0.255 * Width, 0.07831 * Height)).first->second.setTexture(
-        TextureManager::getManager()->getTexture("textures/interface/buttons/MainWindowsSelectedButton"));
-
-    img_.emplace("dialogWindowButton", Vector2f(fieldSize * 2, fieldSize)).first->second.setTexture(
-        TextureManager::getManager()->getTexture("textures/interface/buttons/DialogWindowButton"));
-
-    img_.emplace("dialogWindowSelectedButton", Vector2f(fieldSize * 2, fieldSize)).first->second.setTexture(
-        TextureManager::getManager()->getTexture("textures/interface/buttons/DialogWindowSelectedButton"));
-
-    img_.emplace("timerBackground", Vector2f(fieldSize * 5, fieldSize * 1.3)).first->second.setTexture(
-        TextureManager::getManager()->getTexture("textures/interface/windows/TimerBackground"));
-    img_["timerBackground"].setPosition(0.33 * screenWidth, 0.88 * screenHeight);
+    initCoordinatesText();
+    initTextures();
+    createMainWindowButtons();
+    createGameWindowButtons();
+    createGameFields();
+    createShips();
+    initGlobalTimeText();
 }
 
 Interface::~Interface()
@@ -254,28 +245,8 @@ Interface::~Interface()
     window_ = nullptr;
 }
 
-void Interface::mainMenu() const
+void Interface::mainMenu()
 {
-    int button_width = 0.23 * Width;
-    int button_height = 0.08 * Height;
-    int font_size = 0.053 * Height;
-    int button_xPos = 0.73 * Width;
-
-    Text button_text(L"", optimaFont, font_size);
-    const std::wstring writing[] = {L"Играть", L"Справка", L"Рекорды", L"Выход"}; // main buttons of the window
-    std::vector<Button> buttons;
-
-    for(size_t i = 0; i < 4; i++) 
-    {
-        button_text.setString(writing[i]);
-        buttons.emplace_back(Button(window_, button_text, button_xPos, 
-            (0.3358 + i * 0.1092) * Height, button_width, button_height,
-            img_["mainWindowsButton"].getTexture(), 
-            img_["mainWindowsSelectedButton"].getTexture(), 
-            Color(85, 4, 29), Color(0, 36, 91)));
-        buttons[i].setTextColor(Color::Black);
-    }
-
     Event event;   
 
     while(window_->isOpen())
@@ -285,83 +256,52 @@ void Interface::mainMenu() const
             switch(event.type) {}
         }
 
-        window_->clear(Color(240, 240, 240));
+        window_->clear();
 
         window_->draw(img_["startWindow"]);
 
-        if (buttons[0].isPressed()) gameWindow();           // Play button
-        else if (buttons[1].isPressed()) showReference();   // Reference button
-        else if (buttons[2].isPressed())                    // Records button
+        if (playButton_.isPressed()) gameWindow();
+        else if (referenceButton_.isPressed()) showReference();
+        else if (recordsButton_.isPressed()) showRecords();                
+        else if (exitButton_.isPressed())
         {
-            showRecords();
-        }                   
-        else if (buttons[3].isPressed())                    // Exit button
-        {
-            if (showWarning(L"Вы уверены, что\n  хотите выйти?")) window_->close(); 
+            if (showWarning(L"Вы уверены, что\n  хотите выйти?")) 
+                window_->close(); 
         }
 
         window_->display();
     }
 }
 
-void Interface::gameWindow() const
+void Interface::gameWindow()
 {
-    int button_width = 0.1178 * screenWidth, button_height = 0.078 * screenHeight;
-    int font_size = 0.025 * screenWidth;
-
-    Button startButton(window_, Text(L"Старт", optimaFont, font_size), 
-        0.0418 * screenWidth, 0.88 * screenHeight, button_width, button_height, 
-        img_["mainWindowsButton"].getTexture(), 
-        img_["mainWindowsSelectedButton"].getTexture(), 
-        Color(85, 4, 29), Color(0, 36, 91));
-    startButton.setTextColor(Color::Black);
-    Button exitButton(window_, Text(L"Выход", optimaFont, font_size), 
-        0.84 * screenWidth, 0.88 * screenHeight, button_width, button_height, 
-        img_["mainWindowsButton"].getTexture(), 
-        img_["mainWindowsSelectedButton"].getTexture(), 
-        Color(85, 4, 29), Color(0, 36, 91));
-    exitButton.setTextColor(Color::Black);
-    Button autoButton(window_, Text(L"Авто", optimaFont, font_size), 
-        0.185 * screenWidth, 0.88 * screenHeight, button_width, button_height, 
-        img_["mainWindowsButton"].getTexture(), 
-        img_["mainWindowsSelectedButton"].getTexture(), 
-        Color(85, 4, 29), Color(0, 36, 91));
-    autoButton.setTextColor(Color::Black);
-
-
-    std::vector<Field> leftField, rightField; // create game fields
-    for(size_t i = 0; i < 10; i++) 
+    timeText_.setString("00:00:00");
+    Thread th([this]()
     {
-        for(size_t j = 0; j < 10; j++)
+        std::stringstream time;
+        while(true)
         {
-            leftField.emplace_back(Field(window_, xCoord + i * fieldSize, yCoord + j * fieldSize));
-            rightField.emplace_back(Field(window_, xCoord + (i + 12) * fieldSize, yCoord + j * fieldSize));
+            auto [seconds, minutes, hours] = this->timer_.ticktock();
+
+            if (hours < 10) time << 0;
+            time << hours << ":";
+            if (minutes < 10) time << 0;
+            time << minutes << ":";
+            if (seconds < 10) time << 0;
+            time << seconds;
+
+            this->timeText_.setString(time.str());
+            time.str(""); 
+
+            sleep(milliseconds(1000));
         }
-    }
-
-    globalTime = Text("00:00:00", optimaFont, 0.0265 * screenWidth); // text for timer
-    globalTime.setFillColor(Color(85, 4, 29));
-    globalTime.setPosition(0.375 * screenWidth, 0.893 * screenHeight);
-
-    Thread th(&timer);
-
-    std::vector<Ship> ships; // create ships
-    for(int i = 3; i >= 0; i--)
-    {
-        for(size_t j = 0; j < i + 1; j++) 
-        {
-            ships.emplace_back(Ship(window_, 4 - i, 0.0261 * screenWidth, 0.3255 * screenHeight + i * fieldSize * 1.1));
-        }
-    }
+    });
 
     int movement = -1;
     int dx, dy;
     bool checkGameStarted = false, checkPause = false;
-    hour = minute = second = 0;
 
-    Mechanics mech(window_, &leftField, &rightField);
-
-    window_->create(VideoMode(screenWidth, screenHeight), "Морской бой", Style::Fullscreen);
+    window_->create(VideoMode(gl::screenWidth, gl::screenHeight), "Морской бой", Style::Fullscreen);
 
     Event event;
 
@@ -378,10 +318,10 @@ void Interface::gameWindow() const
                         int y = Mouse::getPosition(*window_).y;
                         for(size_t i = 0; i < 10; i++)
                         {
-                            if (ships[i].onShip(x, y)) // check if the cursor is above teh ship
+                            if (ships_[i].onShip(x, y)) // check if the cursor is above teh ship
                             {
                                 movement = i;
-                                Vector2f coord = ships[i].getPosition();
+                                Vector2f coord = ships_[i].getPosition();
                                 dx = x - coord.x; // if "yes" remember current position
                                 dy = y - coord.y;
                                 break;
@@ -394,15 +334,15 @@ void Interface::gameWindow() const
                     {
                         int x = Mouse::getPosition(*window_).x;
                         int y = Mouse::getPosition(*window_).y;
-                        ships[movement].setPosition(x - dx, y - dy); // if the cursore is above the ship, move it
-                        ships[movement].setFieldColor(leftField);
+                        ships_[movement].setPosition(x - dx, y - dy); // if the cursore is above the ship, move it
+                        ships_[movement].setFieldColor(leftField_);
                     }
                     break;
                 case Event::MouseButtonReleased:
                     if (event.mouseButton.button == Mouse::Left 
                         && movement != -1 && !checkGameStarted) 
                     {
-                        ships[movement].placeShip(leftField); // free ship
+                        ships_[movement].placeShip(leftField_); // free ship
                         movement = -1;
                         dx = dy = 0;
                     }
@@ -413,11 +353,11 @@ void Interface::gameWindow() const
                         int y = Mouse::getPosition(*window_).y;
                         for(size_t i = 0; i < 10; i++)
                         {
-                            if (ships[i].onShip(x, y) && ships[i].isPlaced()) // rotate ship relatively to cursor
+                            if (ships_[i].onShip(x, y) && ships_[i].isPlaced()) // rotate ship relatively to cursor
                             {
-                                ships[i].rotateShip(x, y);
-                                ships[i].setFieldColor(leftField);
-                                Vector2f coord = ships[i].getPosition();
+                                ships_[i].rotateShip(x, y);
+                                ships_[i].setFieldColor(leftField_);
+                                Vector2f coord = ships_[i].getPosition();
                                 dx = x - coord.x;
                                 dy = y - coord.y;
                                 break;
@@ -434,47 +374,50 @@ void Interface::gameWindow() const
         window_->draw(img_["fieldBackground"]);
         window_->draw(img_["timerBackground"]);
 
-        exitButton.drawButton();
-        startButton.drawButton();
-        autoButton.drawButton();
+        startButton_.drawButton();
+        autoButton_.drawButton();
+        quitButton_.drawButton();
 
         if (checkGameStarted && !checkPause)
         {
-            if (mech.startTheGame()) sleep(milliseconds(500));
+            if (mechanics_.startTheGame()) sleep(milliseconds(500));
         }
 
         for(int i = 0; i < 100; i++) 
         {
-            leftField[i].drawField();
-            rightField[i].drawField();
+            leftField_[i].drawField();
+            rightField_[i].drawField();
         }
 
-        drawCoordinates(xCoord, yCoord, fieldSize);
+        drawCoordinates(gl::xCoord, gl::yCoord, gl::fieldSize);
 
-        for(size_t i = 0; i < 10; i++) ships[i].drawShip();
+        for(size_t i = 0; i < 10; i++) ships_[i].drawShip();
 
-        window_->draw(globalTime);
+        window_->draw(timeText_);
 
-        if (checkGameStarted) mech.drawPositions();
+        if (checkGameStarted) mechanics_.drawPositions();
 
         if (checkGameStarted && !checkPause)
         {
-            if (mech.checkEndGame())
+            if (mechanics_.checkEndGame())
             {
-                std::wstring result = mech.getResult();
-                if (result == L"Победа!") writeRecords();
+                std::wstring result = mechanics_.getResult();
+                if (result == L"Победа!") 
+                {
+                    file_.writeRecordsToFile({ timeText_.getString() });
+                }
                 showMessage(result);
                 break;
             }
         }
 
-        if (startButton.isPressed())
+        if (startButton_.isPressed())
         {
             bool flag = true;
 
             if (!checkGameStarted)
             {
-                for(const auto& ship : ships) // check if all the sips were placed 
+                for(const auto& ship : ships_) // check if all the sips were placed 
                 {
                     if (ship.isPlaced())
                     {
@@ -491,69 +434,83 @@ void Interface::gameWindow() const
                 {
                     th.launch();
                     checkGameStarted = true;
-                    mech.placeShips(&rightField, &ships);
-                    startButton.setText(L"Пауза");
+                    mechanics_.placeShips(&rightField_, &ships_);
+                    startButton_.setText(L"Пауза");
                 }
                 else
                 {
-                    if (startButton.getPressedCounter() % 2 == 0) 
+                    if (startButton_.getPressedCounter() % 2 == 0) 
                     {
                         th.terminate();
                         checkPause = true;
-                        startButton.setText(L"Продолжить");
+                        startButton_.setText(L"Продолжить");
                     }
                     else 
                     {
                         th.launch();
                         checkPause = false;
-                        startButton.setText (L"Пауза");
+                        startButton_.setText (L"Пауза");
                     }
                 }         
             }
-            else // else reset ships positions
+            else // else reset ships_ positions
             {
-                for(auto& ship : ships) ship.resetPosition(leftField);
+                for(auto& ship : ships_) ship.resetPosition(leftField_);
             }
         }
-        else if (autoButton.isPressed() && !checkGameStarted)
+        else if (autoButton_.isPressed() && !checkGameStarted)
         {
-            for(auto& ship : ships) ship.resetPosition(leftField);
-            for(auto& field : leftField) field.resetData();
+            for(auto& ship : ships_) ship.resetPosition(leftField_);
+            for(auto& field : leftField_) field.resetData();
 
-            mech.placeShips(&leftField, &ships);           
+            mechanics_.placeShips(&leftField_, &ships_);           
         }
-        else if (exitButton.isPressed())
+        else if (quitButton_.isPressed())
         {
-            hour = minute = second = 0;
             if (showWarning(L"Вы уверены, что\n  хотите выйти?")) break;
         }
         
-        window_->display(); 
-
-        
+        window_->display();    
     }
 
     th.terminate();
-    window_->create(VideoMode(Width, Height), "Морской бой", Style::Close);
-    window_->setPosition(Vector2i((screenWidth - Width) / 2, (screenHeight - Height) / 2)); 
+    window_->create(VideoMode(gl::Width, gl::Height), "Морской бой", Style::Close);
+    window_->setPosition(Vector2i((gl::screenWidth - gl::Width) / 2, (gl::screenHeight - gl::Height) / 2)); 
 }
 
 void Interface::showReference() const
 {
-    RenderWindow refWindow(VideoMode(0.5 * Width, 0.6 * Height), L"Справка", Style::Close);
+    RenderWindow refWindow(VideoMode(IN::refWidnowWidth, IN::refWindowHeight), 
+        L"Справка", Style::Close);
 
-    int windowXPos = window_->getPosition().x + (window_->getSize().x - 0.5 * Width) / 2;
-    int windowYPos = window_->getPosition().y + (window_->getSize().y - 0.6 * Height) / 2;
+    int windowXPos = window_->getPosition().x + 
+        (window_->getSize().x - IN::refWidnowWidth) / 2;
+    int windowYPos = window_->getPosition().y + 
+        (window_->getSize().y - IN::refWindowHeight) / 2;
 
     refWindow.setPosition(Vector2i(windowXPos, windowYPos));
-    Event event;
 
-    Text text(L"В начале игры вам необходимо расставить свои \nкорабли на левом поле:\n1 - четырехпалубный\n2 - трехпалубных\n3 - двухпалубных\n4 - однопалубных\n\
-Расстановка кораблей производится путем пере-\nтаскивания их на игровое поле. Корабли не мо-\nгут касаться сторонами или углами. Пермым хо-\nдит игрок.\nВ случае \
-попадания игроком по кораблю против-\nника, этот игрок продолжает свой ход. В ином \nслучае, ход переходит другому игроку. Игра за-\nканчивается, когда убиты все корабли одного \
-из \nигроков (корабль считается убитым тогда, когда \nу него подбиты все палубы).", optimaFont, 0.0201 * Width);
-    text.setFillColor(Color(85, 4, 29));
-    text.setPosition(0.025 * Width, 0.03 * Height);
+    Text rulesText(
+        L"В начале игры вам необходимо расставить свои \n"
+        L"корабли на левом поле:\n"
+        L"1 - четырехпалубный\n"
+        L"2 - трехпалубных\n"
+        L"3 - двухпалубных\n"
+        L"4 - однопалубных\n"
+        L"Расстановка кораблей производится путем пере-\nтаскивания их на игровое поле. Корабли не мо-\n"
+        L"гут касаться сторонами или углами. Пермым хо-\n"
+        L"дит игрок.\n"
+        L"В случае попадания игроком по кораблю против-\n"
+        L"ника, этот игрок продолжает свой ход. В ином \n"
+        L"случае, ход переходит другому игроку. Игра за-\n"
+        L"канчивается, когда убиты все корабли одного из \n"
+        L"игроков (корабль считается убитым тогда, когда \nу него подбиты все палубы).", 
+    gl::optimaFont, IN::rulesTextFontSize);
+    
+    rulesText.setFillColor(IN::textColor);
+    rulesText.setPosition(IN::rulesTextXPos, IN::rulesTextYPos);
+
+    Event event;
 
     while(refWindow.isOpen())
     {
@@ -567,11 +524,11 @@ void Interface::showReference() const
             }
         }
 
-        refWindow.clear(Color(240, 240, 240));
+        refWindow.clear();
 
         refWindow.draw(img_["referenceWindow"]);
 
-        refWindow.draw(text);
+        refWindow.draw(rulesText);
 
         refWindow.display();
     }
@@ -579,29 +536,31 @@ void Interface::showReference() const
 
 void Interface::showRecords() const
 {
-    int windowWidth = screenWidth / 5, windowHeight = screenHeight / 2;
-    int windowXPos = window_->getPosition().x + (window_->getSize().x - windowWidth) / 2;
-    int windowYPos = window_->getPosition().y + (window_->getSize().y - windowHeight) / 2;
+    int windowXPos = window_->getPosition().x + 
+        (window_->getSize().x - IN::recWindowWidth) / 2;
+    int windowYPos = window_->getPosition().y + 
+        (window_->getSize().y - IN::recWindowHeight) / 2;
 
-    std::vector<std::string> records = readRecords();
-    if (records.size() > 5) records.erase(records.begin() + 5, records.end());
+    auto records = file_.readRecordsFromFile();
 
     std::vector<Text> recordsTexts(records.size());
     for(int i = 0; i < records.size(); i++)
     {
-        recordsTexts[i] = Text(std::to_string(i + 1) + ") " + records[i], optimaFont, 50);
-        recordsTexts[i].setFillColor(Color(85, 4, 29));
-        recordsTexts[i].setPosition(0.1823 * windowWidth, 
-            screenHeight / 6 + i * 1.2 * recordsTexts[i].getGlobalBounds().height);
+        recordsTexts[i] = Text(std::to_string(i + 1) + ") " + records[i], 
+            gl::optimaFont, IN::recordsTextFontSize);
+        recordsTexts[i].setFillColor(IN::textColor);
+        recordsTexts[i].setPosition(IN::recordsXPos, 
+            gl::screenHeight / 6 + i * 1.2 * recordsTexts[i].getGlobalBounds().height);
     }
 
-    RenderWindow recordsWindow(VideoMode(windowWidth, windowHeight), L"Рекорды", Style::Close);
+    RenderWindow recordsWindow(VideoMode(IN::recWindowWidth, IN::recWindowHeight), 
+        L"Рекорды", Style::Close);
     recordsWindow.setPosition(Vector2i(windowXPos, windowYPos));
 
-    Text titleText(L"Рекорды", optimaFont, 54);
-    titleText.setFillColor(Color(85, 4, 29));
-    titleText.setPosition((windowWidth - 
-        titleText.getGlobalBounds().width) / 2, windowHeight * 0.05);
+    Text titleText(L"Рекорды", gl::optimaFont, IN::recWindowTitleTextFontSize);
+    titleText.setFillColor(IN::textColor);
+    titleText.setPosition((IN::recWindowWidth - 
+        titleText.getGlobalBounds().width) / 2, IN::recWindowTitleTextYPos);
 
     Event event;
 

@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <vector>
 #include <array>
-#include "Ship.h"
-#include "Field.h"
-#include "settings.h"
+#include "Ship.hpp"
+#include "Field.hpp"
+#include "settings.hpp"
 
 class Mechanics
 {
@@ -15,11 +15,11 @@ public:
 
     Mechanics(const Mechanics&) = delete;
     
-    Mechanics(Mechanics&&) = delete;
+    Mechanics(Mechanics&&) noexcept = delete;
 
     Mechanics& operator=(const Mechanics&) = delete;
 
-    Mechanics& operator=(Mechanics&&) = delete;
+    Mechanics& operator=(Mechanics&&) noexcept = delete;
 
     ~Mechanics();
 
@@ -54,7 +54,7 @@ private:
 
     std::vector<int> possibleDirections_; // possible directions to check ariund the ship to destroy it
 
-    std::vector<int> moves_; // list of comupter's move. Keep it to not hit a field which already hit
+    mutable std::vector<int> moves_; // list of comupter's move. Keep it to not hit a field which already hit
 
     std::vector<RectangleShape> hitPositions_; // textures to mark player's hit ships
 
