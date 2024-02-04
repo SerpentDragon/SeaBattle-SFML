@@ -40,6 +40,8 @@ public:
 
     int getPressedCounter() const;
 
+    void resetPressedCounter();
+
 private:
 
     Button(RenderWindow*, int, int, int, int);

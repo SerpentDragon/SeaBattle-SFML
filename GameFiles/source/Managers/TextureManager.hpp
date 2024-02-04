@@ -1,9 +1,9 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
-#include <unordered_map>
-#include <filesystem>
 #include <string>
+#include <filesystem>
+#include <unordered_map>
+#include <SFML/Graphics.hpp>
 
 namespace fs = std::filesystem;
 

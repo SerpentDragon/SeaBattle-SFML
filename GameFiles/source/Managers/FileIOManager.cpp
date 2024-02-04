@@ -46,7 +46,7 @@ void FileIOManager::writeRecordsToFile(const std::vector<std::string>& records) 
     std::fstream recordsFile(file_, ib::out | ib::binary);
     if(recordsFile.is_open())
     {
-        for(int i = 0; i < maxRecords_; i++)
+        for(int i = 0; i < maxRecords_ && i < fileData.size(); i++)
             recordsFile << fileData[i] << std::endl;
 
         recordsFile.close();

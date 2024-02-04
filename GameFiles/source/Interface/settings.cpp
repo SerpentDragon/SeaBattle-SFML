@@ -19,9 +19,9 @@ namespace gl
 
     void initFonts()
     {
-        arialFont.loadFromFile("fonts/arial.ttf");
-        trebuchetFont.loadFromFile("fonts/trebuchetms.ttf");
-        optimaFont.loadFromFile("fonts/optima.ttf");
+        arialFont.loadFromFile("app_data/fonts/arial.ttf");
+        trebuchetFont.loadFromFile("app_data/fonts/trebuchetms.ttf");
+        optimaFont.loadFromFile("app_data/fonts/optima.ttf");
     }
 
     const sf::Color buttonColor(180, 180, 180);

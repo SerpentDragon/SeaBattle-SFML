@@ -1,11 +1,11 @@
 #pragma once
 
-#include <filesystem>
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-#include <vector>
 #include <string>
+#include <vector>
+#include <fstream>
+#include <iostream>
+#include <algorithm>
+#include <filesystem>
 
 using ib = std::ios_base;
 namespace fs = std::filesystem;

@@ -121,6 +121,23 @@ void Interface::initGlobalTimeText()
     timeText_.setPosition(IN::timeTextXPos, IN::timeTextYPos);
 }
 
+void Interface::reinitGameParams()
+{
+    timer_ = Timer();
+    gameplay_ = Gameplay(window_, &leftField_, &rightField_);
+
+    for(size_t i = 0; i < leftField_.size(); i++)
+    {
+        leftField_[i].reinitField();
+        rightField_[i].reinitField();
+    }
+
+    for(auto& ship : ships_) ship.resetPosition(leftField_);
+
+    startButton_.setText(L"Старт");
+    startButton_.resetPressedCounter();
+}
+
 void Interface::drawCoordinates(int x, int y, int size) const
 {
     int length = coordinates_.size();
@@ -228,7 +245,7 @@ bool Interface::showWarning(const std::wstring& msg) const
 Interface::Interface(RenderWindow* window) :
     window_(window),
     leftField_(100), rightField_(100),
-    mechanics_(window_, &leftField_, &rightField_),
+    gameplay_(window_, &leftField_, &rightField_),
     file_(IN::maxRecordsNum)
 {
     initCoordinatesText();
@@ -316,7 +333,7 @@ void Interface::gameWindow()
                     {
                         int x = Mouse::getPosition(*window_).x;
                         int y = Mouse::getPosition(*window_).y;
-                        for(size_t i = 0; i < 10; i++)
+                        for(size_t i = 0; i < ships_.size(); i++)
                         {
                             if (ships_[i].onShip(x, y)) // check if the cursor is above teh ship
                             {
@@ -351,7 +368,7 @@ void Interface::gameWindow()
                     {
                         int x = Mouse::getPosition(*window_).x;
                         int y = Mouse::getPosition(*window_).y;
-                        for(size_t i = 0; i < 10; i++)
+                        for(size_t i = 0; i < ships_.size(); i++)
                         {
                             if (ships_[i].onShip(x, y) && ships_[i].isPlaced()) // rotate ship relatively to cursor
                             {
@@ -380,10 +397,10 @@ void Interface::gameWindow()
 
         if (checkGameStarted && !checkPause)
         {
-            if (mechanics_.startTheGame()) sleep(milliseconds(500));
+            if (gameplay_.startTheGame()) sleep(milliseconds(500));
         }
 
-        for(int i = 0; i < 100; i++) 
+        for(int i = 0; i < leftField_.size(); i++) 
         {
             leftField_[i].drawField();
             rightField_[i].drawField();
@@ -391,17 +408,17 @@ void Interface::gameWindow()
 
         drawCoordinates(gl::xCoord, gl::yCoord, gl::fieldSize);
 
-        for(size_t i = 0; i < 10; i++) ships_[i].drawShip();
+        for(size_t i = 0; i < ships_.size(); i++) ships_[i].drawShip();
 
         window_->draw(timeText_);
 
-        if (checkGameStarted) mechanics_.drawPositions();
+        if (checkGameStarted) gameplay_.drawPositions();
 
         if (checkGameStarted && !checkPause)
         {
-            if (mechanics_.checkEndGame())
+            if (gameplay_.checkEndGame())
             {
-                std::wstring result = mechanics_.getResult();
+                std::wstring result = gameplay_.getResult();
                 if (result == L"Победа!") 
                 {
                     file_.writeRecordsToFile({ timeText_.getString() });
@@ -417,7 +434,8 @@ void Interface::gameWindow()
 
             if (!checkGameStarted)
             {
-                for(const auto& ship : ships_) // check if all the sips were placed 
+                // check if all the sips were placed 
+                for(const auto& ship : ships_) 
                 {
                     if (ship.isPlaced())
                     {
@@ -428,13 +446,14 @@ void Interface::gameWindow()
                 }
             }
 
-            if (flag) // if they were, start the game
+            // if all the ships were placed, start the game
+            if (flag) 
             {
                 if (!checkGameStarted) 
                 {
                     th.launch();
                     checkGameStarted = true;
-                    mechanics_.placeShips(&rightField_, &ships_);
+                    gameplay_.placeShips(&rightField_, &ships_);
                     startButton_.setText(L"Пауза");
                 }
                 else
@@ -463,7 +482,7 @@ void Interface::gameWindow()
             for(auto& ship : ships_) ship.resetPosition(leftField_);
             for(auto& field : leftField_) field.resetData();
 
-            mechanics_.placeShips(&leftField_, &ships_);           
+            gameplay_.placeShips(&leftField_, &ships_);           
         }
         else if (quitButton_.isPressed())
         {
@@ -476,6 +495,8 @@ void Interface::gameWindow()
     th.terminate();
     window_->create(VideoMode(gl::Width, gl::Height), "Морской бой", Style::Close);
     window_->setPosition(Vector2i((gl::screenWidth - gl::Width) / 2, (gl::screenHeight - gl::Height) / 2)); 
+
+    reinitGameParams();
 }
 
 void Interface::showReference() const

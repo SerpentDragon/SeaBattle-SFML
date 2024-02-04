@@ -1,27 +1,27 @@
 #pragma once
 
-#include <algorithm>
-#include <vector>
 #include <array>
-#include "Ship.hpp"
-#include "Field.hpp"
+#include <vector>
+#include <algorithm>
 #include "settings.hpp"
+#include "../Elements/Ship.hpp"
+#include "../Elements/Field.hpp"
 
-class Mechanics
+class Gameplay
 {
 public:
 
-    Mechanics(RenderWindow*, std::vector<Field>*, std::vector<Field>*);
+    Gameplay(RenderWindow*, std::vector<Field>*, std::vector<Field>*);
 
-    Mechanics(const Mechanics&) = delete;
+    Gameplay(const Gameplay&) = delete;
     
-    Mechanics(Mechanics&&) noexcept = delete;
+    Gameplay(Gameplay&&) noexcept = default;
 
-    Mechanics& operator=(const Mechanics&) = delete;
+    Gameplay& operator=(const Gameplay&) = delete;
 
-    Mechanics& operator=(Mechanics&&) noexcept = delete;
+    Gameplay& operator=(Gameplay&&) noexcept = default;
 
-    ~Mechanics();
+    ~Gameplay();
 
     void placeShips(std::vector<Field>*, std::vector<Ship>*) const;
 

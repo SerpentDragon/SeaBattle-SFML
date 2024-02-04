@@ -202,3 +202,5 @@ void Button::setText(const wchar_t* string)
 }
 
 int Button::getPressedCounter() const { return pressedCounter_; }
+
+void Button::resetPressedCounter() { pressedCounter_ = 0; }

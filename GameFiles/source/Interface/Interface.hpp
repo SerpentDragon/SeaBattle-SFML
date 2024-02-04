@@ -1,23 +1,23 @@
 #pragma once
 
-#include "Managers/TextureManager.hpp"
-#include "Managers/FileIOManager.hpp"
-#include "Managers/Timer.hpp"
-#include <SFML/Graphics.hpp>
-#include <unordered_map>
-#include "Mechanics.hpp"
-#include "settings.hpp"
-#include <filesystem>
-#include "Button.hpp"
-#include "Field.hpp"
-#include "Field.hpp"
-#include "Ship.hpp"
-#include <fstream>
-#include <sstream>
-#include <chrono>
-#include <thread>
-#include <vector>
 #include <array>
+#include <vector>
+#include <thread>
+#include <chrono>
+#include <sstream>
+#include <fstream>
+#include <fstream>
+#include <filesystem>
+#include "Gameplay.hpp"
+#include <unordered_map>
+#include <SFML/Graphics.hpp>
+#include "../Elements/Ship.hpp"
+#include "../Managers/Timer.hpp"
+#include "../Elements/Field.hpp"
+#include "../Widgets/Button.hpp"
+#include "../Interface/settings.hpp"
+#include "../Managers/FileIOManager.hpp"
+#include "../Managers/TextureManager.hpp"
 
 using namespace sf;
 
@@ -61,7 +61,9 @@ private:
 
     void initGlobalTimeText();
 
-private: 
+private:
+
+    void reinitGameParams();
 
     void drawCoordinates(int, int, int) const;
 
@@ -100,6 +102,6 @@ private:
     // ships
     std::vector<Ship> ships_;
 
-    Mechanics mechanics_;
+    Gameplay gameplay_;
     FileIOManager file_;
 };

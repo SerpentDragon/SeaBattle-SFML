@@ -1,4 +1,3 @@
-*.o
-sfml-app
 .vscode/
-app_data/data/
+GameFiles/app_data/data/
+build/

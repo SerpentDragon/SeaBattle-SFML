@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Managers/TextureManager.hpp"
-#include "settings.hpp"
+#include "../Interface/settings.hpp"
+#include "../Managers/TextureManager.hpp"
+
 
 using namespace sf;
 
@@ -35,6 +36,8 @@ public:
     Field& operator=(Field&&) noexcept;
 
     ~Field();
+
+    void reinitField();
 
     void drawField() const;
 

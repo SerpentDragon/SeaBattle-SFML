@@ -1,9 +1,9 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "Managers/TextureManager.hpp"
-#include "settings.hpp"
-#include "Field.hpp"
+#include "../Elements/Field.hpp"
+#include "../Interface/settings.hpp"
+#include "../Managers/TextureManager.hpp"
 
 using namespace sf;
 

@@ -83,6 +83,19 @@ Field::~Field()
     window_ = nullptr;
 }
 
+void Field::reinitField()
+{
+    field_ = RectangleShape(Vector2f(size_, size_));
+
+    field_.setOutlineThickness(FI::fieldOutlineThickness);
+    field_.setOutlineColor(Color::Black);
+    field_.setFillColor(Color::White);
+    field_.setPosition(x_, y_);
+
+    dataCounter_ = 0;
+    data_ = field_data::free;    
+}
+
 void Field::drawField() const
 {
     window_->draw(field_);
