@@ -1,6 +1,8 @@
 #pragma once
 
-#include "settings.h"
+#include <memory>
+#include "../Interface/settings.hpp"
+#include "../Managers/TextureManager.hpp"
 
 using namespace sf;
 
@@ -23,17 +25,21 @@ class Field
 {
 public:
 
-    Field(RenderWindow*, int, int);
+    Field() = default;
 
-    Field(const Field&);
+    Field(std::shared_ptr<RenderWindow>, int, int);
 
-    Field(Field&&);
+    Field(const Field&) = default;
 
-    Field& operator=(const Field&);
+    Field(Field&&) noexcept = default;
 
-    Field& operator=(Field&&);
+    Field& operator=(const Field&) = default;
 
-    ~Field();
+    Field& operator=(Field&&) noexcept = default;
+
+    ~Field() = default;
+
+public:
 
     void drawField() const;
 
@@ -59,15 +65,15 @@ public:
 
     bool isChosen() const;
 
+    void reinitField();
+
 private:
 
     bool onField(int, int) const;
 
-    void swap(const Field&);
-
 private:
 
-    RenderWindow* window_;
+    std::shared_ptr<RenderWindow> window_;
     RectangleShape field_;
 
     int x_;    // position and size of the fied
@@ -77,6 +83,6 @@ private:
     unsigned int dataCounter_;
     unsigned short data_; // information about field status (free, taken or already used)
 
-    Texture hitTexture_;
-    Texture missTexture_;
+    std::shared_ptr<Texture> hitTexture_;
+    std::shared_ptr<Texture> missTexture_;
 };

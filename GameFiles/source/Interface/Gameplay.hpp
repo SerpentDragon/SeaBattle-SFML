@@ -1,27 +1,29 @@
 #pragma once
 
-#include <algorithm>
-#include <vector>
 #include <array>
-#include "Ship.h"
-#include "Field.h"
-#include "settings.h"
+#include <vector>
+#include <algorithm>
+#include "settings.hpp"
+#include "../Elements/Ship.hpp"
+#include "../Elements/Field.hpp"
 
-class Mechanics
+class Gameplay
 {
 public:
 
-    Mechanics(RenderWindow*, std::vector<Field>*, std::vector<Field>*);
+    Gameplay(std::shared_ptr<RenderWindow>, std::vector<Field>*, std::vector<Field>*);
 
-    Mechanics(const Mechanics&) = delete;
+    Gameplay(const Gameplay&) = delete;
     
-    Mechanics(Mechanics&&) = delete;
+    Gameplay(Gameplay&&) = default;
 
-    Mechanics& operator=(const Mechanics&) = delete;
+    Gameplay& operator=(const Gameplay&) = delete;
 
-    Mechanics& operator=(Mechanics&&) = delete;
+    Gameplay& operator=(Gameplay&&) = default;
 
-    ~Mechanics();
+    ~Gameplay();
+
+public:
 
     void placeShips(std::vector<Field>*, std::vector<Ship>*) const;
 
@@ -45,7 +47,7 @@ private:
 
 private:
 
-    RenderWindow* window_;
+    std::shared_ptr<RenderWindow> window_;
 
     bool playerMove_; // flag to check whether a user or a computer is making a move now
 

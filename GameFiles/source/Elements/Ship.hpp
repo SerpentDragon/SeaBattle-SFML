@@ -1,9 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <SFML/Graphics.hpp>
-#include "Managers/TextureManager.hpp"
-#include "settings.h"
-#include "Field.h"
+#include "../Elements/Field.hpp"
+#include "../Interface/settings.hpp"
+#include "../Managers/TextureManager.hpp"
 
 using namespace sf;
 
@@ -11,17 +12,19 @@ class Ship
 {
 public:
 
-    Ship(RenderWindow* window, int deck, int xPos, int yPos);
+    Ship(std::shared_ptr<RenderWindow>, int, int, int);
 
-    Ship(const Ship& obj);
+    Ship(const Ship&) = default;
 
-    Ship(Ship&& obj) noexcept;
+    Ship(Ship&&) noexcept = default;
 
-    Ship& operator=(const Ship& obj);
+    Ship& operator=(const Ship&) = default;
 
-    Ship& operator=(Ship&& obj) noexcept;
+    Ship& operator=(Ship&&) noexcept = default;
 
-    ~Ship();
+    ~Ship() = default;
+
+public:
 
     void drawShip() const;
 
@@ -53,8 +56,6 @@ public:
 
 private:
 
-    void swap(const Ship&) noexcept;
-
     bool checkCells(const std::vector<Field>&, int) const;
 
     void locateShip(std::vector<Field>&, int);
@@ -63,7 +64,7 @@ private:
 
 private:
 
-    RenderWindow* window_;
+    std::shared_ptr<RenderWindow> window_;
 
     // ship's parameters
     int deckNumber_;
@@ -78,7 +79,7 @@ private:
     // number of rotations of the ship
     int rotateCounter_;
 
-    Texture shipTexture_;
+    std::shared_ptr<Texture> shipTexture_;
     Sprite shipRect_;
 
     // current coordinates

@@ -1,4 +1,4 @@
-#include "Field.h"
+#include "Field.hpp"
 
 // check if the cursor is above the field
 bool Field::onField(int xPos, int yPos) const
@@ -7,76 +7,28 @@ bool Field::onField(int xPos, int yPos) const
         && y_ <= yPos && yPos <= y_ + size_;
 }
 
-void Field::swap(const Field& other)
-{
-    window_ = other.window_;
-    field_ = other.field_;
-    x_ = other.x_;
-    y_ = other.y_;
-    size_ = other.size_;
-    data_ = other.data_;
-    dataCounter_ = other.dataCounter_;
-    hitTexture_ = other.hitTexture_;
-    missTexture_ = other.missTexture_;
-}
-
-Field::Field(RenderWindow* window, int x, int y)
-    : window_(window), x_(x), y_(y), size_(fieldSize),
+Field::Field(std::shared_ptr<RenderWindow> window, int x, int y)
+    : window_(window), x_(x), y_(y), size_(gl::fieldSize),
     dataCounter_(0), data_(field_data::free)
 {
     // loading textures depending on what area the field is located
-    hitTexture_ = x < xCoord + 12 * fieldSize ? Texture() : playerHitTexture; 
-    missTexture_ = x < xCoord + 12 * fieldSize ? computerMissedTexture : playerMissedTexture;
+    hitTexture_ = x < gl::xCoord + 12 * gl::fieldSize ? 
+        std::shared_ptr<Texture>(new Texture())
+        : std::make_shared<Texture>(*TextureManager::getManager()->getTexture(
+            "textures/marks/playerHit"));
+        
+    missTexture_ = x < gl::xCoord + 12 * gl::fieldSize ? 
+        std::make_shared<Texture>(*TextureManager::getManager()->getTexture(
+            "textures/marks/computerMissed")) 
+        :  std::make_shared<Texture>(*TextureManager::getManager()->getTexture(
+            "textures/marks/playerMissed"));
 
     field_ = RectangleShape(Vector2f(size_, size_));
 
-    field_.setOutlineThickness(0.0019 * screenHeight);
+    field_.setOutlineThickness(0.0019 * gl::screenHeight);
     field_.setOutlineColor(Color::Black);
     field_.setFillColor(Color::White);
     field_.setPosition(x_, y_);
-}
-
-Field::Field(const Field& other)
-{
-    swap(other);
-}
-
-Field::Field(Field&& other)
-{
-    swap(other);
-
-    other.window_ = nullptr;
-    other.x_ = other.y_ = other.size_ = 
-        other.dataCounter_ = 0;
-    other.data_ = field_data::free;
-}
-
-Field& Field::operator=(const Field& other)
-{
-    if (this != &other)
-    {
-        swap(other);
-    }
-    return *this;
-}
-
-Field& Field::operator=(Field&& other)
-{
-    if (this != &other)
-    {
-        swap(other);
-
-        other.window_ = nullptr;
-        other.x_ = other.y_ = other.size_ = 
-            other.dataCounter_ = 0;
-        other.data_ = field_data::free;
-    }
-    return *this;
-}
-
-Field::~Field()
-{
-    window_ = nullptr;
 }
 
 void Field::drawField() const
@@ -131,12 +83,12 @@ void Field::setCurrentColor(int valid)
 
 void Field::displayHitTexture() 
 {
-    field_.setTexture(&hitTexture_);
+    field_.setTexture(&(*hitTexture_));
 }
 
 void Field::displayMissTexture() 
 { 
-    field_.setTexture(&missTexture_); 
+    field_.setTexture(&(*missTexture_)); 
 }
 
 bool Field::isChosen() const
@@ -159,4 +111,19 @@ bool Field::isChosen() const
     }
 
     return false;
+}
+
+void Field::reinitField()
+{
+    // field_ = RectangleShape(Vector2f(size_, size_));
+
+    // field_.setOutlineThickness(FI::fieldOutlineThickness);
+    // field_.setOutlineColor(Color::Black);
+    // field_.setFillColor(Color::White);
+    // field_.setPosition(x_, y_);
+
+    field_.setTexture(nullptr);
+
+    dataCounter_ = 0;
+    data_ = field_data::free;  
 }

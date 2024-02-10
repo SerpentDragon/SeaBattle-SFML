@@ -1,11 +1,11 @@
-#include "Mechanics.h"
+#include "Gameplay.hpp"
 
 namespace directions
 {
     enum : unsigned short { up = 0, right, down, left };
 }
 
-void Mechanics::markTheDeck(int i, int j, std::vector<Field>* fieldArea)
+void Gameplay::markTheDeck(int i, int j, std::vector<Field>* fieldArea)
 {
     for(int row = -1; row <= 1; row += 2)
     {
@@ -32,7 +32,7 @@ void Mechanics::markTheDeck(int i, int j, std::vector<Field>* fieldArea)
     }
 }
 
-void Mechanics::markKilledShip(const std::vector<int>& positions, std::vector<Field>* fieldArea)
+void Gameplay::markKilledShip(const std::vector<int>& positions, std::vector<Field>* fieldArea)
 {
     // check all chosen positions around the ship
     for(const auto& position : positions) 
@@ -52,7 +52,7 @@ void Mechanics::markKilledShip(const std::vector<int>& positions, std::vector<Fi
     }
 }
 
-bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
+bool Gameplay::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
 {
     // variables to check ship's orientation
     bool vertical = false, horizontal = false; 
@@ -131,9 +131,12 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
     {
         computerShips_--;
 
+        int xPos = (*fieldArea)[0].getPosition().x + i * gl::fieldSize;
+        int yPos = (*fieldArea)[0].getPosition().y + j * gl::fieldSize;
+
         for(auto it = shipList_.begin(); it != shipList_.end(); it++)
         {
-            if (it->getDeckNumber() == deckCounter)
+            if (it->onShip(xPos, yPos))
             {
                 shipList_.erase(it);
                 break;
@@ -144,12 +147,12 @@ bool Mechanics::checkShipIsKilled(int i, int j, std::vector<Field>* fieldArea)
     return true;
 }
 
-void Mechanics::drawSurvivedShips() const
+void Gameplay::drawSurvivedShips() const
 {
     for(const auto& ship : shipList_) ship.drawShip();
 }
 
-Mechanics::Mechanics(RenderWindow* window, 
+Gameplay::Gameplay(std::shared_ptr<RenderWindow> window, 
     std::vector<Field>* leftField, std::vector<Field>* rightField)
     : window_(window), leftField_(leftField), rightField_(rightField),
     playerMove_(true), playerShips_(10), computerShips_(10)
@@ -158,24 +161,23 @@ Mechanics::Mechanics(RenderWindow* window,
     for(int i = 0; i < 100; i++) moves_[i] = i;
 }
 
-Mechanics::~Mechanics()
+Gameplay::~Gameplay()
 {
-    window_ = nullptr;
     leftField_ = nullptr;
     rightField_ = nullptr;
 }
 
-void Mechanics::placeShips(std::vector<Field>* fieldArea, std::vector<Ship>* ships) const
+void Gameplay::placeShips(std::vector<Field>* fieldArea, std::vector<Ship>* ships) const
 {
     bool tmp = false;
-
     int i, j, k;
 
-    int decks[] = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
+    unsigned short decks[] = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
+    int decksSize = sizeof(decks) / sizeof(unsigned short);
 
     std::vector<int> direct;
 
-    for(int count = 0; count < 10; count++)
+    for(int count = 0; count < decksSize; count++)
     {
         while(true)
         {           
@@ -287,7 +289,7 @@ void Mechanics::placeShips(std::vector<Field>* fieldArea, std::vector<Ship>* shi
     }
 }
 
-bool Mechanics::startTheGame()
+bool Gameplay::startTheGame()
 {
     // check if the current move is for player or computer
     bool flag = false;
@@ -382,9 +384,10 @@ bool Mechanics::startTheGame()
                         currentDirection = -1;
                     }
 
-                    RectangleShape hitPos(Vector2f(fieldSize, fieldSize));
+                    RectangleShape hitPos(Vector2f(gl::fieldSize, gl::fieldSize));
                     hitPos.setPosition((*leftField_)[i * 10 + j].getPosition());
-                    hitPos.setTexture(&computerHitTexture);
+                    hitPos.setTexture(TextureManager::getManager()->getTexture(
+                        "textures/marks/computerHit"));
 
                     hitPositions_.emplace_back(hitPos);
                 }
@@ -426,9 +429,10 @@ bool Mechanics::startTheGame()
 
                 markTheDeck(i, j, leftField_);
 
-                RectangleShape hitPos(Vector2f(fieldSize, fieldSize));
+                RectangleShape hitPos(Vector2f(gl::fieldSize, gl::fieldSize));
                 hitPos.setPosition((*leftField_)[k].getPosition());
-                hitPos.setTexture(&computerHitTexture);
+                hitPos.setTexture(TextureManager::getManager()->getTexture(
+                    "textures/marks/computerHit"));
 
                 hitPositions_.emplace_back(hitPos);
 
@@ -479,19 +483,19 @@ bool Mechanics::startTheGame()
     return flag;
 }
 
-void Mechanics::drawPositions() const
+void Gameplay::drawPositions() const
 {
     for(const auto& position : hitPositions_) 
         window_->draw(position);
 }
 
-bool Mechanics::checkEndGame() const
+bool Gameplay::checkEndGame() const
 {
     return playerShips_ == 0 
         || computerShips_ == 0;
 }
 
-std::wstring Mechanics::getResult() const
+std::wstring Gameplay::getResult() const
 {
     if (!playerShips_) 
     {
