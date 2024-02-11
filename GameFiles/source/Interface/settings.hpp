@@ -1,5 +1,6 @@
 #pragma once
 
+#include "absolute_path.h"
 #include <SFML/Graphics.hpp>
 
 // global namespace

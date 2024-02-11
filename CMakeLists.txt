@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 
 project (SEA_BATTLE VERSION 1.0.0)
 
+set(INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME})
+configure_file(GameFiles/path/absolute_path.h.in absolute_path.h)
+
 find_package(Boost COMPONENTS locale REQUIRED)
 find_package(SFML 2.5 COMPONENTS graphics audio window system REQUIRED)
 
@@ -31,3 +34,19 @@ set_target_properties(sea_battle PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )
+
+install(TARGETS sea_battle RUNTIME DESTINATION bin)
+
+set(CPACK_GENERATOR DEB)
+
+install(DIRECTORY GameFiles/app_data/fonts DESTINATION ${INSTALL_DIR}/app_data)
+install(DIRECTORY GameFiles/app_data/textures DESTINATION ${INSTALL_DIR}/app_data)
+install(CODE "file(MAKE_DIRECTORY ${INSTALL_DIR}/app_data/data)")
+
+set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+
+set(CPACK_PACKAGE_CONTACT shelyganovdmitry@gmail.com)
+
+include (CPack)

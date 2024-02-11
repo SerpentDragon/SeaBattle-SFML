@@ -12,7 +12,7 @@ std::shared_ptr<TextureManager> TextureManager::getManager()
 
 const sf::Texture* TextureManager::getTexture(const std::string& name) const
 {
-    auto it = textures_.find(prefix_ + name);
+    auto it = textures_.find(INSTALL_DIR + prefix_ + name);
     if (it != textures_.end()) return &(it->second);
     else return nullptr;
 }
@@ -20,12 +20,12 @@ const sf::Texture* TextureManager::getTexture(const std::string& name) const
 sf::Texture* TextureManager::loadTextureFromFile(const std::string& filename)
 {
     sf::Texture texture;
-    std::string file = prefix_ + filename;
+    std::string file = INSTALL_DIR + prefix_ + filename;
 
     if (texture.loadFromFile(file))
     {
-        textures_[file] = texture;
-        return &textures_[file];
+        textures_[INSTALL_DIR + file] = texture;
+        return &textures_[INSTALL_DIR + file];
     }
     else return nullptr;
 }
@@ -33,10 +33,10 @@ sf::Texture* TextureManager::loadTextureFromFile(const std::string& filename)
 TextureManager::TextureManager()
     : prefix_("app_data/")
 {
-    loadAllTexturesFromDirectory(prefix_ + "textures/interface/buttons/");
-    loadAllTexturesFromDirectory(prefix_ + "textures/interface/windows/");
-    loadAllTexturesFromDirectory(prefix_ + "textures/marks/");
-    loadAllTexturesFromDirectory(prefix_ + "textures/ships/");
+    loadAllTexturesFromDirectory(std::string(INSTALL_DIR) + prefix_ + "textures/interface/buttons/");
+    loadAllTexturesFromDirectory(std::string(INSTALL_DIR) + prefix_ + "textures/interface/windows/");
+    loadAllTexturesFromDirectory(std::string(INSTALL_DIR) + prefix_ + "textures/marks/");
+    loadAllTexturesFromDirectory(std::string(INSTALL_DIR) + prefix_ + "textures/ships/");
 }
 
 void TextureManager::loadAllTexturesFromDirectory(const std::string& dir)

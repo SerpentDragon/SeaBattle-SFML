@@ -4,6 +4,7 @@
 #include <memory>
 #include <filesystem>
 #include <unordered_map>
+#include "absolute_path.h"
 #include <SFML/Graphics.hpp>
 
 namespace fs = std::filesystem;

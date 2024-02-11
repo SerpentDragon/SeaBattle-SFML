@@ -3,7 +3,8 @@
 bool comparator(const std::string&, const std::string&);
 
 FileIOManager::FileIOManager(int maxRecords) : 
-    dir_("app_data/data/"), maxRecords_(maxRecords)
+    dir_(std::string(INSTALL_DIR) + "app_data/data/"), 
+    maxRecords_(maxRecords)
 {
     file_ = dir_ + "records.ltx";
 
