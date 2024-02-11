@@ -13,13 +13,16 @@ set(SOURCE_FILE
     GameFiles/source/Interface/settings.cpp
     GameFiles/source/Managers/FileIOManager.cpp
     GameFiles/source/Managers/TextureManager.cpp
+    GameFiles/source/Managers/Localizer.cpp
     GameFiles/source/Managers/Timer.cpp
     GameFiles/source/Widgets/Button.cpp
+    GameFiles/source/Widgets/DropDownList.cpp
     GameFiles/main.cpp
 )
 
 file(COPY GameFiles/app_data/fonts DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/app_data)
 file(COPY GameFiles/app_data/textures DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/app_data)
+file(COPY GameFiles/app_data/locale DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/app_data)
 
 add_executable(sea_battle ${SOURCE_FILE})
 

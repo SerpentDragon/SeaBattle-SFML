@@ -6,6 +6,7 @@
 #include "settings.hpp"
 #include "../Elements/Ship.hpp"
 #include "../Elements/Field.hpp"
+#include "../Managers/Localizer.hpp"
 
 class Gameplay
 {

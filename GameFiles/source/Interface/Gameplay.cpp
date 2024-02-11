@@ -500,7 +500,7 @@ std::wstring Gameplay::getResult() const
     if (!playerShips_) 
     {
         drawSurvivedShips();
-        return L"Поражение!";
+        return Localizer::translate(L"Поражение!");
     }
-    return L"Победа!";
+    return Localizer::translate(L"Победа!");
 }

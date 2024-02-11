@@ -16,6 +16,8 @@
 #include "../Managers/Timer.hpp"
 #include "../Elements/Field.hpp"
 #include "../Widgets/Button.hpp"
+#include "../Managers/Localizer.hpp"
+#include "../Widgets/DropDownList.hpp"
 #include "../Managers/FileIOManager.hpp"
 #include "../Managers/TextureManager.hpp"
 
@@ -71,9 +73,14 @@ private:
 
     void reinitGameParams();
 
-    void showMessage(const std::wstring&) const;
+    std::vector<Text> createMessageBoxText(
+        const std::vector<std::wstring>& msg) const;
 
-    bool showWarning(const std::wstring&) const;
+    void showMessage(const std::vector<std::wstring>&) const;
+
+    bool showWarning(const std::vector<std::wstring>&) const;
+
+    void recreateTexts();
 
 private:
 
@@ -106,6 +113,8 @@ private:
 
     // ships
     std::vector<Ship> ships_;
+
+    DropDownList dropDownList_;
 
     Gameplay gameplay_;
     FileIOManager file_;

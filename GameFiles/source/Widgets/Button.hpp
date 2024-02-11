@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <SFML/Graphics.hpp>
 
 using namespace sf;
@@ -42,7 +43,9 @@ public:
 
     void setButtonColor(const Color&);
 
-    void setText(const wchar_t*);
+    void setText(const std::wstring&);
+
+    void setTextFontSize(int);
 
 private:
 
