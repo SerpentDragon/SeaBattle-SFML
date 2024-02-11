@@ -1,5 +1,5 @@
 # SEA BATTLE
-This application is a classic game "Sea Battle" created using SFML crossplatform graphic library.
+This application is a classic game "Sea Battle" created using SFML 2.5.1 crossplatform graphic library.
 
 # Rules
 The playing field has a size of 10x10 cells. Each player places their ships on their side of the game board. Ships can be of different lengths, but should not overlap or touch each other.
