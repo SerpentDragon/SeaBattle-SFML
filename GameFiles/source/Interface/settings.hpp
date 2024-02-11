@@ -51,6 +51,7 @@ namespace IN
     extern const int quitButtonXPos;
     extern const int gameWindowButtonsYPos;
     extern const int gameWindowButtonsTextFontSize;
+    extern const int startButtonContinueTextFontSize;
 
     extern const int dialogButtonsWidth;
     extern const int dialogButtonsHeight;
@@ -87,6 +88,8 @@ namespace IN
     extern const int rulesTextFontSize;
     extern const int rulesTextXPos;
     extern const int rulesTextYPos;
+    extern const int rulesTextInterval;
+
 
     // Substrates params
     extern const int fieldsBackWidth;
@@ -108,4 +111,17 @@ namespace IN
 namespace FI
 {
     extern const int fieldOutlineThickness;
+}
+
+// DropDown List namespace
+namespace DR_LS
+{
+    // DropDown List params
+    extern const int dropDownListSize;
+    extern const int droDownListXPos;
+    extern const int dropDownListYPos;
+
+    // DropDown List colors
+    extern const sf::Color DARK_BROWN;
+    extern const sf::Color BROWN;
 }

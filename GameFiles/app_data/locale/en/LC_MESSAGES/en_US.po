@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Старт"
+msgstr "Start"
+
+msgid "Предупреждение!"
+msgstr "Warning!"
+
+msgid "Да"
+msgstr "Yes"
+
+msgid "Нет"
+msgstr "No"
+
+msgid "Играть"
+msgstr "Play"
+
+msgid "Справка"
+msgstr "Rules"
+
+msgid "Рекорды"
+msgstr "Records"
+
+msgid "Выход"
+msgstr "Exit"
+
+msgid "Авто"
+msgstr "Auto"
+
+msgid "Вы уверены, что"
+msgstr "Are you sure you"
+
+msgid "хотите выйти?"
+msgstr "want to exit?"
+
+msgid "Морской бой"
+msgstr "Sea Battle"
+
+msgid "Корабли неверно"
+msgstr "Your ships are"
+
+msgid "расставлены!"
+msgstr "misplaced!"
+
+msgid "Пауза"
+msgstr "Pause"
+
+msgid "Продолжить"
+msgstr "Continue"
+
+msgid "Поражение!"
+msgstr "Lose!"
+
+msgid "Победа!"
+msgstr "Win!"
+
+msgid "В начале игры вам необходимо расставить свои"
+msgstr "At the beginning of th game you have to place"
+
+msgid "корабли на левом поле:"
+msgstr "your ships in the left field:"
+
+msgid "1 - четырехпалубный"
+msgstr "1 four-deck ship"
+
+msgid "2 - трехпалубных"
+msgstr "2 triple-deck ships"
+
+msgid "3 - двухпалубных"
+msgstr "3 double-deck ships"
+
+msgid "4 - однопалубных"
+msgstr "4 single-deck ships"
+
+msgid "Расстановка кораблей производится путем пере-"
+msgstr "The deployment of ships is carried out by"
+
+msgid "таскивания их на игровое поле. Корабли не мо-"
+msgstr "dragging and dropping ships onto the playing"
+
+msgid "гут касаться сторонами или углами. Первым хо-"
+msgstr "field. Ships can't touch sides or angles. The"
+
+msgid "дит игрок."
+msgstr "first move is for player."
+
+msgid "В случае попадания игроком по кораблю против-"
+msgstr "If a player hits an opponent's ship the player"
+
+msgid "ника, этот игрок продолжает свой ход. В ином"
+msgstr "continues his turn. Otherwise the next move"
+
+msgid "случае, ход переходит другому игроку. Игра за-"
+msgstr "is for another player. The game is over when"
+
+msgid "канчивается, когда убиты все корабли одного из"
+msgstr "all of one player's ships are destroyed. The"
+
+msgid "игроков (корабль считается убитым тогда, когда"
+msgstr "ship is considered to be destroyed when all of"
+
+msgid "у него подбиты все палубы)."
+msgstr "it's decks are destroyed"
+
+msgid "а"
+msgstr "a"
+
+msgid "б"
+msgstr "b"
+
+msgid "в"
+msgstr "c"
+
+msgid "г"
+msgstr "d"
+
+msgid "д"
+msgstr "e"
+
+msgid "е"
+msgstr "f"
+
+msgid "ж"
+msgstr "g"
+
+msgid "з"
+msgstr "h"
+
+msgid "и"
+msgstr "i"
+
+msgid "к"
+msgstr "j"

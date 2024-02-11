@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Старт"
+msgstr "Start"
+
+msgid "Предупреждение!"
+msgstr "Warnung!"
+
+msgid "Да"
+msgstr "Ja"
+
+msgid "Нет"
+msgstr "Nein"
+
+msgid "Играть"
+msgstr "Spielen"
+
+msgid "Справка"
+msgstr "Synopse"
+
+msgid "Рекорды"
+msgstr "Rekorde"
+
+msgid "Выход"
+msgstr "Ausgang"
+
+msgid "Авто"
+msgstr "Auto"
+
+msgid "Вы уверены, что"
+msgstr "Wollen Sie"
+
+msgid "хотите выйти?"
+msgstr "aussteigen?"
+
+msgid "Морской бой"
+msgstr "Seegefecht"
+
+msgid "Корабли неверно"
+msgstr "Schiffe sind"
+
+msgid "расставлены!"
+msgstr "falsch aufgestellt!"
+
+msgid "Пауза"
+msgstr "Pause"
+
+msgid "Продолжить"
+msgstr "Fortfahren"
+
+msgid "Поражение!"
+msgstr "Niederlage!"
+
+msgid "Победа!"
+msgstr "Gewinn!"
+
+msgid "В начале игры вам необходимо расставить свои"
+msgstr "Zu Beginn des Spiels mussen Sie Ihre Schiffe"
+
+msgid "корабли на левом поле:"
+msgstr "auf dem linken Feld platzieren:"
+
+msgid "1 - четырехпалубный"
+msgstr "1 vierdeck-Schiff"
+
+msgid "2 - трехпалубных"
+msgstr "2 3-Deck-Schiffe"
+
+msgid "3 - двухпалубных"
+msgstr "3 Doppeldeckschiffe"
+
+msgid "4 - однопалубных"
+msgstr "4 Eindeckschiffe"
+
+msgid "Расстановка кораблей производится путем пере-"
+msgstr "Die Anordnung der Schiffe erfolgt, indem"
+
+msgid "таскивания их на игровое поле. Корабли не мо-"
+msgstr "Sie sie auf das Spielfeld ziehen. Schiffe"
+
+msgid "гут касаться сторонами или углами. Первым хо-"
+msgstr "können die Seiten oder Ecken nicht berühren."
+
+msgid "дит игрок."
+msgstr "Der Spieler geht zuerst."
+
+msgid "В случае попадания игроком по кораблю против-"
+msgstr "Wenn ein Spieler auf ein feindliches Schiff"
+
+msgid "ника, этот игрок продолжает свой ход. В ином"
+msgstr "trifft, setzt dieser Spieler seinen Zug fort."
+
+msgid "случае, ход переходит другому игроку. Игра за-"
+msgstr "Andernfalls geht der Zug an einen anderen"
+
+msgid "канчивается, когда убиты все корабли одного из"
+msgstr "Spieler uber. Das Spiel endet, wenn alle Schiffe"
+
+msgid "игроков (корабль считается убитым тогда, когда"
+msgstr "eines Spielers getötet wurden (das Schiff gilt"
+
+msgid "у него подбиты все палубы)."
+msgstr "als getotet, wenn es alle Decks hat)."
+
+msgid "а"
+msgstr "a"
+
+msgid "б"
+msgstr "b"
+
+msgid "в"
+msgstr "c"
+
+msgid "г"
+msgstr "d"
+
+msgid "д"
+msgstr "e"
+
+msgid "е"
+msgstr "f"
+
+msgid "ж"
+msgstr "g"
+
+msgid "з"
+msgstr "h"
+
+msgid "и"
+msgstr "i"
+
+msgid "к"
+msgstr "j"

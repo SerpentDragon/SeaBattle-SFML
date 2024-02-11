@@ -15,12 +15,12 @@ int main()
     srand(time(nullptr));
 
     auto window = std::make_shared<RenderWindow>(VideoMode(gl::Width, gl::Height), 
-        L"Морской бой", Style::Close);
+        Localizer::translate(L"Морской бой"), Style::Close);
     window->setPosition(Vector2i((gl::screenWidth - gl::Width) / 2, (gl::screenHeight - gl::Height) / 2));
 
     Interface interface(window);
 
     interface.mainMenu();
 
-    return 0;
+    return EXIT_SUCCESS;
 }

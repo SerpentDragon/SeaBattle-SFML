@@ -53,6 +53,7 @@ namespace IN
     const int quitButtonXPos = 5 * gl::screenWidth / 6;
     const int gameWindowButtonsYPos = 0.88 * gl::screenHeight;
     const int gameWindowButtonsTextFontSize = 0.025 * gl::screenWidth;
+    const int startButtonContinueTextFontSize = 0.016 * gl::screenWidth;
 
     const int dialogButtonsWidth = gl::fieldSize * 2;
     const int dialogButtonsHeight = gl::fieldSize;
@@ -89,6 +90,7 @@ namespace IN
     const int rulesTextFontSize = 0.0201 * gl::Width;
     const int rulesTextXPos = gl::Width / 40;
     const int rulesTextYPos = 3 * gl::Height / 100;
+    const int rulesTextInterval = 0.0675 * gl::Width / 3;
 
     // Substrates params
     const int fieldsBackWidth = 24 * gl::fieldSize;
@@ -112,3 +114,15 @@ namespace FI
     const int fieldOutlineThickness = gl::screenHeight / 500;
 }
 
+// DropDown List namespace
+namespace DR_LS
+{
+    // DropDown List params
+    const int dropDownListSize = 50 * gl::fieldSize / 65;
+    const int droDownListXPos = gl::Width - DR_LS::dropDownListSize * 1.5;
+    const int dropDownListYPos = DR_LS::dropDownListSize / 2;
+
+    // DropDown List colors
+    const sf::Color DARK_BROWN(86, 3, 29);
+    const sf::Color BROWN(191,110,63);
+}

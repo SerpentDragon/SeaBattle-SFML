@@ -16,5 +16,16 @@ The player who first destroys all the enemy ships wins the game.
 The user is playing against the computer.
 Before starting the game, the user places his ships on the field by dragging. In order to change the orientation of the ship, you need to press the PCM on it, while holding its LMB. In addition, the user is given the opportunity to automatically arrange their ships. To do this, click the appropriate button. When all the ships are placed, you need to press the "Start" button - the game will begin
 
+## Build & run
+To build amd run this applications you can use CMakeLists.txt from this repositiry.
+To download app on your PC, you can download release from 'release_branch' and install it:
+```
+sudo dpkg -i SEA_BATTLE-1.0.0-Linux.deb
+```
+To ensure correct operation of the app use this command:
+```
+sudo sea_battle
+```
+
 ## Demo
 ![Alt text](https://github.com/SerpentDragon/SeaBattle-SFML/blob/master/Demo/demo.png)

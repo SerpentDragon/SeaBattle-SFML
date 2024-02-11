@@ -37,6 +37,7 @@ TextureManager::TextureManager()
     loadAllTexturesFromDirectory(std::string(INSTALL_DIR) + prefix_ + "textures/interface/windows/");
     loadAllTexturesFromDirectory(std::string(INSTALL_DIR) + prefix_ + "textures/marks/");
     loadAllTexturesFromDirectory(std::string(INSTALL_DIR) + prefix_ + "textures/ships/");
+    loadAllTexturesFromDirectory(std::string(INSTALL_DIR) + prefix_ + "textures/languages/");
 }
 
 void TextureManager::loadAllTexturesFromDirectory(const std::string& dir)

@@ -134,11 +134,20 @@ void Button::setButtonColor(const Color& color)
     button_.setFillColor(color);
 }
 
-void Button::setText(const wchar_t* string)
+void Button::setText(const std::wstring& string)
 {
     text_.setString(string);
 
     auto textBounds = text_.getLocalBounds();
     text_.setPosition(xPos_ + (width_ - textBounds.width) / 2 , 
         yPos_ + (height_ - textBounds.height) / 2 - 7); 
+}
+
+void Button::setTextFontSize(int fontSize)
+{
+    text_.setCharacterSize(fontSize);
+
+    auto textBounds = text_.getLocalBounds();
+    text_.setPosition(xPos_ + (width_ - textBounds.width) / 2 , 
+        yPos_ + (height_ - textBounds.height) / 2); 
 }
