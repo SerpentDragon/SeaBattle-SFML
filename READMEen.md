@@ -27,5 +27,12 @@ To ensure correct operation of the app use this command:
 sudo sea_battle
 ```
 
+## Remove
+To remove installed app:
+```
+sudo dpkg -r sea_battle
+sudo rm -rf /usr/local/SEA_BATTLE
+```
+
 ## Demo
 ![Alt text](https://github.com/SerpentDragon/SeaBattle-SFML/blob/master/Demo/demo.png)

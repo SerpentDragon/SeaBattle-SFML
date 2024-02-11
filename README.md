@@ -27,6 +27,13 @@ sudo dpkg -i SEA_BATTLE-1.0.0-Linux.deb
 sudo sea_battle
 ```
 
+## Удаление
+Чтобы удалить установленное приложение, выполните:
+```
+sudo dpkg -r sea_battle
+sudo rm -rf /usr/local/SEA_BATTLE
+```
+
 ## Демо
 ![Alt text](https://github.com/SerpentDragon/SeaBattle-SFML/blob/master/Demo/demo.png)
 
