@@ -1,21 +1,5 @@
 #include "Button.hpp"
 
-// void Button::swap(const Button& other) noexcept
-// {
-//     window_ = other.window_;
-//     button_ = other.button_;
-//     width_ = other.width_;
-//     height_ = other.height_;
-//     xPos_ = other.xPos_;
-//     yPos_ = other.yPos_;
-//     pressedCounter_ = other.pressedCounter_;
-//     color_ = other.color_;
-//     colorOn_ = other.colorOn_;
-//     text_ = other.text_;
-//     texture_ = other.texture_ ? new Texture(*other.texture_) : nullptr;
-//     textureOn_ = other.textureOn_ ? new Texture(*other.textureOn_) : nullptr;
-// }
-
 // check if the cursor is above the button
 bool Button::onButton(int x, int y) const
 {
@@ -23,9 +7,9 @@ bool Button::onButton(int x, int y) const
         && yPos_ <= y && y <= yPos_ + height_;
 }
 
-Button::Button(std::shared_ptr<RenderWindow> window, int x, int y, int width, int height)
-    : window_(window), xPos_(x), yPos_(y), width_(width), height_(height),
-    pressedCounter_(0), button_((Vector2f(width, height)))
+Button::Button(std::shared_ptr<RenderWindow> window, int x, int y, 
+    int width, int height) : window_(window), xPos_(x), yPos_(y), 
+    width_(width), height_(height), button_((Vector2f(width, height)))
 {
     button_.setPosition(x, y);
 }
@@ -93,58 +77,13 @@ Button::Button(std::shared_ptr<RenderWindow>window, const Text& text,
     button_.setTexture(&(*texture_));
 }
 
-// Button::Button(const Button& other)
-// {
-//     swap(other);
-// }
-
-// Button::Button(Button&& other) noexcept
-// {
-//     swap(other);
-
-//     other.window_ = nullptr;
-//     other.width_ = other.height_ = other.xPos_ = 
-//         other.yPos_ = other.pressedCounter_ = 0;
-//     other.texture_ = other.textureOn_ = nullptr;
-// }
-
-// Button& Button::operator=(const Button& other)
-// {
-//     if (this != &other)
-//     {
-//         swap(other);
-//     }
-//     return *this;
-// }
-
-// Button& Button::operator=(Button&& other) noexcept
-// {
-//     if (this != &other)
-//     {
-//         swap(other);
-
-//         other.window_ = nullptr;
-//         other.width_ = other.height_ = other.xPos_ = 
-//             other.yPos_ = other.pressedCounter_ = 0;
-//         other.texture_ = other.textureOn_ = nullptr;
-//     }
-//     return *this;
-// }
-
-// Button::~Button()
-// {
-//     window_ = nullptr;
-//     if (texture_) delete texture_;
-//     if (textureOn_) delete textureOn_;
-// }
-
 void Button::drawButton() const
 {
     window_->draw(button_);
     window_->draw(text_);
 }
 
-int Button::isPressed()
+bool Button::isPressed()
 {
     int x = Mouse::getPosition(*window_).x;
     int y = Mouse::getPosition(*window_).y;
@@ -168,7 +107,7 @@ int Button::isPressed()
                     break;
             }
             if (onButton(Mouse::getPosition(*window_).x, Mouse::getPosition(*window_).y)) 
-                return ++pressedCounter_; // the button was pressed
+                return true; // the button was pressed
         }
     }
     else 
@@ -181,7 +120,7 @@ int Button::isPressed()
         }
     }
 
-    return 0;
+    return false;
 }
 
 void Button::setTextColor(const Color& color)
@@ -203,7 +142,3 @@ void Button::setText(const wchar_t* string)
     text_.setPosition(xPos_ + (width_ - textBounds.width) / 2 , 
         yPos_ + (height_ - textBounds.height) / 2 - 7); 
 }
-
-int Button::getPressedCounter() const { return pressedCounter_; }
-
-void Button::resetPressedCounter() { pressedCounter_ = 0; }

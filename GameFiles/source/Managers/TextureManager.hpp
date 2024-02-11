@@ -1,9 +1,10 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
-#include <unordered_map>
-#include <filesystem>
 #include <string>
+#include <memory>
+#include <filesystem>
+#include <unordered_map>
+#include <SFML/Graphics.hpp>
 
 namespace fs = std::filesystem;
 
@@ -11,7 +12,7 @@ class TextureManager
 {
 public:
 
-    static TextureManager* getManager();
+    static std::shared_ptr<TextureManager> getManager();
 
     const sf::Texture* getTexture(const std::string&) const;
 
@@ -29,7 +30,7 @@ private:
 
 private:
 
-    static TextureManager* manager_;
+    static std::shared_ptr<TextureManager> manager_;
 
     std::string prefix_;
 

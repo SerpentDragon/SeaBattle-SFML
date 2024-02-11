@@ -1,4 +1,5 @@
 #include <ctime>
+#include <memory>
 #include <SFML/Graphics.hpp>
 #include "source/Elements/Field.hpp"
 #include "source/Interface/settings.hpp"
@@ -13,7 +14,7 @@ int main()
 
     srand(time(nullptr));
 
-    auto window = std::make_shared<RenderWindow>(VideoMode(gl::Width, gl::Height), 
+    auto window = std::make_shared<RenderWindow>(VideoMode(500, 500), 
         L"Морской бой", Style::Close);
     window->setPosition(Vector2i((gl::screenWidth - gl::Width) / 2, (gl::screenHeight - gl::Height) / 2));
 

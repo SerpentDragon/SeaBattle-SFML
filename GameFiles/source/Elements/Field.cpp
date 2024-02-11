@@ -125,5 +125,5 @@ void Field::reinitField()
     field_.setTexture(nullptr);
 
     dataCounter_ = 0;
-    data_ = field_data::free;  
+    data_ = field_data::free;
 }

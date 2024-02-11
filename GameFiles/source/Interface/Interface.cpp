@@ -38,7 +38,6 @@ void Interface::reinitGameParams()
     for(auto& ship : ships_) ship.resetPosition(leftField_);
 
     startButton_.setText(L"Старт");
-    startButton_.resetPressedCounter();
 }
 
 void Interface::showMessage(const std::wstring& msg) const
@@ -431,7 +430,8 @@ void Interface::gameWindow()
 
             if (!checkGameStarted)
             {
-                for(const auto& ship : ships_) // check if all the sips were placed 
+                // check if all the sips were placed 
+                for(const auto& ship : ships_) 
                 {
                     if (ship.isPlaced())
                     {
@@ -442,7 +442,8 @@ void Interface::gameWindow()
                 }
             }
 
-            if (flag) // if they were, start the game
+            // if all the ships were placed, start the game
+            if (flag)
             {
                 if (!checkGameStarted) 
                 {
@@ -453,21 +454,21 @@ void Interface::gameWindow()
                 }
                 else
                 {
-                    if (startButton_.getPressedCounter() % 2 == 0) 
+                    if(!checkPause)
                     {
                         timeThread.terminate();
                         checkPause = true;
                         startButton_.setText(L"Продолжить");
                     }
-                    else 
+                    else
                     {
                         timeThread.launch();
                         checkPause = false;
-                        startButton_.setText (L"Пауза");
+                        startButton_.setText(L"Пауза");
                     }
-                }         
+                }      
             }
-            else // else reset ships_ positions
+            else // else reset ships positions
             {
                 for(auto& ship : ships_) ship.resetPosition(leftField_);
             }
@@ -484,9 +485,7 @@ void Interface::gameWindow()
             if (showWarning(L"Вы уверены, что\n  хотите выйти?")) break;
         }
         
-        window_->display(); 
-
-        
+        window_->display();
     }
 
     timeThread.terminate();

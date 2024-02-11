@@ -36,17 +36,13 @@ public:
     
     void drawButton() const;
     
-    int isPressed();
+    bool isPressed();
 
     void setTextColor(const Color&);
 
     void setButtonColor(const Color&);
 
     void setText(const wchar_t*);
-
-    int getPressedCounter() const;
-
-    void resetPressedCounter();
 
 private:
 
@@ -64,8 +60,6 @@ private:
     int height_;  
     int xPos_;
     int yPos_;
-
-    int pressedCounter_;
     
     Color color_; // button color
     Color colorOn_; // button color when the cursore is over it
