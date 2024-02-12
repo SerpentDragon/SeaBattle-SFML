@@ -59,7 +59,7 @@ private:
 
     public:
 
-        constexpr static int itemOutlineThickness = 3;
+        static int itemOutlineThickness;
 
     public:
 

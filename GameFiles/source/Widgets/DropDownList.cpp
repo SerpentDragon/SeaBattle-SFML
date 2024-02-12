@@ -113,6 +113,8 @@ void DropDownList::createItems()
 
 // Items class
 
+int DropDownList::Item::itemOutlineThickness = gl::Width / 400;
+
 DropDownList::Item::Item(int x, int y, const int size, 
     std::shared_ptr<Texture> texture, const std::string& locale)
     : itemRect_(Vector2f(size, size)), locale_(locale)

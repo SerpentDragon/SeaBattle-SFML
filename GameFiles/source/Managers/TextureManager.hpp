@@ -16,7 +16,7 @@ public:
 
     const sf::Texture* getTexture(const std::string&) const;
 
-    sf::Texture* loadTextureFromFile(const std::string&);
+    const sf::Texture* loadTextureFromFile(const std::string&);
 
 private:
 
