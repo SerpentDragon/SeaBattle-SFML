@@ -1,38 +1,48 @@
-# SEA BATTLE
-This application is a classic game "Sea Battle" created using SFML 2.5.1 crossplatform graphic library.
+# Морской бой
+Данное приложение является классической игрой "Морской бой", которая была создана с помощью кроссплатформенной графической библиотеки SFML 2.5.1
 
-# Rules
-The playing field has a size of 10x10 cells. Each player places their ships on their side of the game board. Ships can be of different lengths, but should not overlap or touch each other.
+# Правила игры
+Игровое поле имеет размер 10x10 клеток. Каждый игрок размещает свои корабли на своей стороне игровой доски. Корабли могут быть разной длины, но не должны перекрываться или соприкасаться друг с другом.
 
-When the players have finished placing the ships, the players begin to attack the enemy ships in turn. Each player chooses a cell on the board that he wants to shoot at, and reports the address of this cell to the opponent.
+Когда игроки закончили расставлять корабли, игроки начинают поочередно атаковать корабли противника. Каждый игрок выбирает клетку на доске, на которую он хочет произвести выстрел, и сообщает адрес этой клетки противнику.
 
-If a shot hits one of the opponent's ship cells, the opponent reports it, and the attacking player marks the cell on his side of the board as a "hit". If the enemy ship is destroyed, the player marks all the cells of the ship as "sunk".
+Если выстрел попадает в одну из клеток корабля противника, противник сообщает об этом, и атакующий игрок отмечает клетку на своей стороне доски как "попадание". Если корабль противника уничтожен, то игрок отмечает все клетки корабля как "потопленные".
 
-If the shot misses, the attacking player marks the cell on his side of the board as a "miss". Players continue to attack in turn until one of the players destroys all the enemy ships.
+Если выстрел промахивается, атакующий игрок отмечает клетку на своей стороне доски как "промах". Игроки продолжают атаковать по очереди до тех пор, пока один из игроков не уничтожит все корабли противника.
 
-The player who first destroys all the enemy ships wins the game.
+Игрок, который первым уничтожит все корабли противника, побеждает игру.
 
-## Functional
-The user is playing against the computer.
-Before starting the game, the user places his ships on the field by dragging. In order to change the orientation of the ship, you need to press the PCM on it, while holding its LMB. In addition, the user is given the opportunity to automatically arrange their ships. To do this, click the appropriate button. When all the ships are placed, you need to press the "Start" button - the game will begin
+## Функционал
+Пользователь играет против компьютера.
+Перед началом игры пользователь размещает свои корабли на поле путём перетаскивания. Для того, чтобы изменить ориентацию корабля, необходимо нажать на нём ПКМ, при этом удерживая его ЛКМ. Кроме того, пользователю предоставляется возможность автоматической расстановки своих кораблей. Для этого необходимо нажать соответствующую кнопку. Когда все корабли расставлены, нужно нажать кнопку "Старт" - игра начнётся
 
-## Build & run
-To build amd run this applications you can use CMakeLists.txt from this repositiry.
-To download app on your PC, you can download release from 'release_branch' and install it:
+## Сборка и запуск
+Для сборки и запуска из локальной директории можно использовать приведенный CMakeLists.txt:
+```
+git clone git@github.com:SerpentDragon/SeaBattle-SFML.git
+cd SeaBattle-SFML
+mkdir build
+cd build
+cmake ..
+cmake --build .
+./sea_battle
+```
+Для установки приложения на Ваш ПК, Вы можете скачать релиз из ветки'release_branch' и установить его:
 ```
 sudo dpkg -i SEA_BATTLE-1.0.0-Linux.deb
 ```
-To ensure correct operation of the app use this command:
+Для корректной работы приложения выполнить
 ```
 sudo sea_battle
 ```
 
-## Remove
-To remove installed app:
+## Удаление
+Чтобы удалить установленное приложение, выполните:
 ```
 sudo dpkg -r sea_battle
 sudo rm -rf /usr/local/SEA_BATTLE
 ```
 
-## Demo
+## Демо
 ![Alt text](https://github.com/SerpentDragon/SeaBattle-SFML/blob/master/Demo/demo.png)
+
