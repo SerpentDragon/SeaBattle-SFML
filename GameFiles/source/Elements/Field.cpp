@@ -115,13 +115,6 @@ bool Field::isChosen() const
 
 void Field::reinitField()
 {
-    // field_ = RectangleShape(Vector2f(size_, size_));
-
-    // field_.setOutlineThickness(FI::fieldOutlineThickness);
-    // field_.setOutlineColor(Color::Black);
-    // field_.setFillColor(Color::White);
-    // field_.setPosition(x_, y_);
-
     field_.setTexture(nullptr);
 
     dataCounter_ = 0;
