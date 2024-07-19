@@ -30,8 +30,6 @@ private:
 
     TextureManager& operator=(TextureManager&&) noexcept = delete;
 
-    ~TextureManager() = default;
-
     void loadAllTexturesFromDirectory(const std::string&);
 
 private:
