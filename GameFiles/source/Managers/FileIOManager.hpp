@@ -24,6 +24,8 @@ public:
 
     FileIOManager& operator=(FileIOManager&&) noexcept = delete;
 
+    ~FileIOManager() = default;
+
     std::vector<std::string> readRecordsFromFile() const;
 
     void writeRecordsToFile(const std::vector<std::string>&) const;

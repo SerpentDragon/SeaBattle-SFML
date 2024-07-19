@@ -16,6 +16,8 @@ public:
 
     Timer& operator=(Timer&&) noexcept = default;
 
+    ~Timer() = default;
+
 public:
 
     std::tuple<int, int, int> ticktock();

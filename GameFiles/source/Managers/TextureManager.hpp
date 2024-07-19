@@ -24,7 +24,13 @@ private:
 
     TextureManager(const TextureManager&) = delete;
 
+    TextureManager(TextureManager&&) noexcept = delete;
+
     TextureManager& operator=(const TextureManager&) = delete;
+
+    TextureManager& operator=(TextureManager&&) noexcept = delete;
+
+    ~TextureManager() = default;
 
     void loadAllTexturesFromDirectory(const std::string&);
 
