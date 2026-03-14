@@ -180,7 +180,7 @@ void Gameplay::placeShips(std::vector<Field>* fieldArea, std::vector<Ship>* ship
     for(int count = 0; count < decksSize; count++)
     {
         while(true)
-        {           
+        {
             // choose the place for a ship
             i = rand() % 10;
             j = rand() % 10;

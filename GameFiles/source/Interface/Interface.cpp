@@ -551,6 +551,7 @@ void Interface::gameWindow()
         else if (autoButton_.isPressed() && !checkGameStarted)
         {
             for(auto& ship : ships_) ship.resetPosition(leftField_);
+            for(int i = 0; i < leftField_.size(); i++) leftField_[i].setData(field_data::free);
             for(auto& field : leftField_) field.resetData();
 
             gameplay_.placeShips(&leftField_, &ships_);           

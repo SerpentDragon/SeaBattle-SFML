@@ -188,7 +188,6 @@ void Ship::resetPosition(std::vector<Field>& leftField)
     // if the ship is placed we should free area around it
     if (IsPlaced_ != -1)
     {
-        locateShip(leftField, 0);
         IsPlaced_ = -1;
     }
     
